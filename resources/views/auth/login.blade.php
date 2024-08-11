@@ -4,13 +4,30 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>KARYAMU - Aplikasi Management Karya</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
+
 <body>
-    <div
-        style="width: 100%;height:100vh;display:flex;justify-content:center;align-items:center; background:url('assets/img/background-auth.png');background-size:cover">
+    <style>
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('assets/img/background-auth.svg');
+            background-size: cover;
+
+            background-position: top;
+            opacity: 0.7;
+            z-index: -1;
+        }
+    </style>
+    <div class="main-content"
+        style="width: 100%;height:100vh;display:flex;justify-content:center;align-items:center; ">
         <div class="card shadow" style="border:none;width:40%;border-radius:30px">
             <div class="card-body " style="padding: 50px 100px 50px">
                 <div class="d-flex justify-content-center align-items-center" style="flex-direction: column">
@@ -46,9 +63,9 @@
                             </label>
                         </div>
                         @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" style="text-decoration:none">
-                            <p style="color:#0097FF;">Forgot Password?</p>
-                        </a>
+                            <a href="{{ route('password.request') }}" style="text-decoration:none">
+                                <p style="color:#0097FF;">Forgot Password?</p>
+                            </a>
                         @endif
                     </div>
                     <div class="d-grid gap-2">

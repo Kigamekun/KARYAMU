@@ -22,7 +22,7 @@
 
     <div class="mt-5" style="width: 80%;margin:auto">
         <div class="row">
-            <div class="col-4">
+            <div class="col-12 col-lg-4">
                 <div class="card" style="border-radius:15px;">
                     <div class="card-body">
                         <h5 class="card-title
@@ -78,9 +78,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-8">
-                <h3>Semua Karya</h3>
-                <div class="row mt-5">
+            <div class="col-lg-8 col-12">
+                <h3 class="lg-mt-5 mt-3">Semua Karya</h3>
+                <div class="row ">
                     @foreach ($data as $item)
                         <div class="col-md-6 col-lg-4 mb-4">
                         <x-card :item="$item" :height="'200px'"/>

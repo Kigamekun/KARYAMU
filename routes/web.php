@@ -15,6 +15,10 @@ Route::get('/about', function () {
     return view('about');
 })->name('about');
 
+Route::get('/contact', function () {
+    return view('mail.artwork-publish');
+})->name('contact');
+
 
 Route::prefix('karya-home')->group(function () {
     Route::get('/', [ArtworkController::class, 'karyaHome'])->name('karya-home.index');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\NewKarya;
 use App\Models\Artwork;
 use App\Models\ArtworkStudent;
 use Illuminate\Http\Request;
@@ -9,8 +10,11 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\DataTables;
 use App\Models\Student;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Teacher;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Province;
+use App\Models\School;
 
 
 class ArtworkController extends Controller
@@ -36,6 +40,7 @@ class ArtworkController extends Controller
 
     public function index(Request $request)
     {
+
         if ($request->ajax()) {
             $data = Artwork::all();
             return DataTables::of($data)
@@ -137,12 +142,16 @@ class ArtworkController extends Controller
             'description' => 'required',
             'type' => 'required',
             'students.*' => 'required',
+            'students' => 'required',
         ]);
         $student_id = Student::where('user_id', Auth::user()->id)->first() != null ? Student::where('user_id', Auth::user()->id)->first()->id : null;
-        $school_id = Student::where('user_id', Auth::user()->id)->first() != null ? Student::where('user_id', Auth::user()->id)->first()->school_id : null;
 
-        if ($school_id == null) {
+        if (Auth::user()->role == 'admin') {
+            $school_id = null;
+        } else if (Auth::user()->role == 'teacher') {
             $school_id = Teacher::where('user_id', Auth::user()->id)->first()->school_id;
+        } else if (Auth::user()->role == 'student') {
+            $school_id = Student::where('user_id', Auth::user()->id)->first()->school_id;
         }
 
         if ($request->type == 'image') {
@@ -192,6 +201,9 @@ class ArtworkController extends Controller
                 ]);
             }
         }
+
+        Mail::to('startcodedigital@gmail.com')->send(new NewKarya($artwork));
+
         return redirect()->back()->with(['message' => 'Artwork berhasil ditambahkan', 'status' => 'success']);
     }
 
@@ -211,6 +223,7 @@ class ArtworkController extends Controller
             'description' => 'required',
             'type' => 'required',
             'students.*' => 'required',
+            'students' => 'required',
         ]);
         if ($request->type == 'image') {
             if ($request->hasFile('image')) {
@@ -263,7 +276,20 @@ class ArtworkController extends Controller
 
     public function karyaHome()
     {
-        $data = Artwork::where('is_approved', 1)->paginate(12);
+        if (isset($_GET['provinsi'])) {
+            $provinceId = Province::where('name', $_GET['provinsi'])->first()->id;
+            $school = School::join('master_subdistrict', 'schools.subdistrict_code', '=', 'master_subdistrict.code')
+                ->join('master_district', 'master_subdistrict.district_code', '=', 'master_district.code')
+                ->join('master_regency', 'master_district.regency_code', '=', 'master_regency.code')
+                ->join('master_province', 'master_regency.province_code', '=', 'master_province.code')
+                ->where('master_province.id', $provinceId)
+                ->pluck('schools.id')
+                ->toArray();
+            $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->paginate(12);
+
+        } else {
+            $data = Artwork::where('is_approved', 1)->paginate(12);
+        }
         return view('karya-home', [
             'data' => $data
         ]);
@@ -272,12 +298,65 @@ class ArtworkController extends Controller
     public function detailHome($id)
     {
         $artwork = Artwork::find($id);
-        $terkait = Artwork::where('is_approved', 1)->limit(4)->get();
-
+        $terkait = Artwork::where('is_approved', 1)->limit(3)->get();
 
         return view('karya-detail', [
             'data' => $artwork,
             'terkait' => $terkait
         ]);
+    }
+
+    public function filter(Request $request)
+    {
+        $search = $request->input('search');
+        $selectedSchools = $request->input('schools');
+        $types = $request->input('type');
+
+        $query = Artwork::query();
+        if ($search) {
+            $query->where('title', 'like', '%' . $search . '%');
+        }
+
+        if ($selectedSchools) {
+            $query->whereIn('school_id', $selectedSchools);
+        }
+
+        if ($types) {
+            $query->whereIn('type', $types);
+        }
+
+        $karyas = $query->paginate(12);
+
+        return view('karya-home', [
+            'data' => $karyas
+        ]);
+    }
+
+    public function like(Request $request, $id)
+    {
+        // Find the artwork by ID
+        $artwork = Artwork::find($id);
+
+        // Check if the artwork exists
+        if (!$artwork) {
+            return response()->json(['error' => 'Artwork not found'], 404);
+        }
+
+        // Determine if the item is being liked or unliked
+        $isLiked = $request->input('liked');
+
+        if ($isLiked) {
+            // If the item is being unliked, decrease the like count
+            $artwork->likes = max(0, $artwork->likes - 1);
+        } else {
+            // If the item is being liked, increase the like count
+            $artwork->likes += 1;
+        }
+
+        // Save the updated artwork model
+        $artwork->save();
+
+        // Return the updated like count as a JSON response
+        return response()->json(['likes' => $artwork->likes]);
     }
 }

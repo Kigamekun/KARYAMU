@@ -2,10 +2,26 @@
 
 use App\Http\Controllers\{ProfileController, ArtworkController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
 use Illuminate\Support\Facades\Route;
-use App\Models\{Artwork, Training,Teacher};
+use App\Models\{Artwork, Training, Teacher, School, Province};
 
 Route::get('/', function () {
-    $data = Artwork::all();
+
+
+    if (isset($_GET['provinsi'])) {
+        $provinceId = Province::where('name', $_GET['provinsi'])->first()->id;
+        $school = School::join('master_subdistrict', 'schools.subdistrict_code', '=', 'master_subdistrict.code')
+            ->join('master_district', 'master_subdistrict.district_code', '=', 'master_district.code')
+            ->join('master_regency', 'master_district.regency_code', '=', 'master_regency.code')
+            ->join('master_province', 'master_regency.province_code', '=', 'master_province.code')
+            ->where('master_province.id', $provinceId)
+            ->pluck('schools.id')
+            ->toArray();
+        $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->get();
+
+    } else {
+        $data = Artwork::where('is_approved', 1)->get();
+    }
+
     return view('welcome', [
         'data' => $data
     ]);
@@ -50,6 +66,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
+Route::post('/like-item/{id}', [ArtworkController::class, 'like'])->name('like-item');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -62,6 +80,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/store', [ArtworkController::class, 'store'])->name('karya.store');
         Route::get('/{id}/edit', [ArtworkController::class, 'edit'])->name('karya.edit');
         Route::get('/{id}', [ArtworkController::class, 'detail'])->name('karya.detail');
+        Route::post('/filter', [ArtworkController::class, 'filter'])->name('karya.filter')->withoutMiddleware('auth');
 
         Route::put('/approve/{id}', [ArtworkController::class, 'approve'])->name('karya.approve');
         Route::put('/update/{id}', [ArtworkController::class, 'update'])->name('karya.update');

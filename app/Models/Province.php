@@ -5,12 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class School extends Model
+class Province extends Model
 {
+    protected $table = 'master_province';
 
-    public function subdistrict()
-    {
-        return $this->belongsTo(Subdistrict::class, 'subdistrict_id');
-    }
+
     use HasFactory;
 }

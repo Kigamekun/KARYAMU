@@ -135,8 +135,19 @@
                                     {{ $data->description }}
                                 </p>
                                 <div class="mt-4">
-                                    <i class="fa-regular fa-heart fa-xl"></i>
-                                    670
+                                    @php
+                                        $liked =
+                                            isset($_COOKIE['liked_items']) &&
+                                            in_array($data->id, explode(',', $_COOKIE['liked_items']));
+                                    @endphp
+                                    @if ($liked)
+                                        <i class="fa-solid fa-heart fa-xl" style="color:red; cursor:pointer;"
+                                            onclick="toggleLike({{ $data->id }}, true)"></i>
+                                    @else
+                                        <i class="fa-regular fa-heart fa-xl" style="cursor:pointer;"
+                                            onclick="toggleLike({{ $data->id }}, false)"></i>
+                                    @endif
+                                    <span class="ms-2" id="likes-count-{{ $data->id }}">{{ $data->likes }}</span>
                                 </div>
                                 <div class="mt-4">
                                     @if ($data->students->count() > 1)
@@ -183,4 +194,59 @@
         </div>
     </div>
     </div>
+
+
+    <script>
+        function toggleLike(itemId, isLiked) {
+            fetch(`/like-item/${itemId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        liked: isLiked // Send the current liked status
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Update the like count
+                    document.getElementById(`likes-count-${itemId}`).innerText = data.likes;
+
+                    // Find the heart icon
+                    const heartIcon = document.querySelector(`.fa-heart[onclick="toggleLike(${itemId}, ${isLiked})"]`);
+
+                    // Toggle the heart icon and liked status
+                    if (isLiked) {
+                        heartIcon.classList.remove('fa-solid');
+                        heartIcon.classList.add('fa-regular');
+                        heartIcon.style.color = '';
+                        heartIcon.setAttribute('onclick', `toggleLike(${itemId}, false)`);
+                    } else {
+                        heartIcon.classList.remove('fa-regular');
+                        heartIcon.classList.add('fa-solid');
+                        heartIcon.style.color = 'red';
+                        heartIcon.setAttribute('onclick', `toggleLike(${itemId}, true)`);
+                    }
+
+                    // Update the liked items in cookies
+                    let likedItems = getCookie('liked_items');
+                    likedItems = likedItems ? likedItems.split(',') : [];
+
+                    if (isLiked) {
+                        likedItems = likedItems.filter(id => id != itemId);
+                    } else {
+                        likedItems.push(itemId);
+                    }
+
+                    document.cookie = `liked_items=${likedItems.join(',')};path=/`;
+                });
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+    </script>
 @endsection

@@ -19,7 +19,6 @@
             </div>
         </div>
     </div>
-
     <div class="mt-5" style="width: 80%;margin:auto">
         <div class="row">
             <div class="col-12 col-lg-4">
@@ -28,10 +27,11 @@
                         <h5 class="card-title
                         ">Filter</h5>
                         <br>
-                        <div class="input-group mb-3">
+                        <form action="{{ route('karya.filter') }}" method="POST">
+                            @csrf
                             <div class="input-group mb-3">
-                                <input type="text" class="form-control" placeholder="Search" aria-label="Search"
-                                    aria-describedby="button-addon2">
+                                <input type="text" class="form-control" name="search" placeholder="Search"
+                                    aria-label="Search" aria-describedby="button-addon2">
                             </div>
                             <div class="accordion w-100" id="accordionExample">
                                 <div class="accordion-item">
@@ -44,59 +44,63 @@
                                     <div id="collapseOne" class="accordion-collapse collapse show"
                                         aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                                         <div class="accordion-body">
-                                            <h6>
-                                                Sekolah
-                                            </h6>
-                                            <select id="selectElement" multiple>
-                                                <option>Option 1</option>
-                                                <option>Option 2</option>
-                                                <option>Option 3</option>
+                                            <h6>Sekolah</h6>
+                                            <select id="selectElement" name="schools[]" multiple>
+                                                @foreach (DB::table('schools')->get() as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                @endforeach
                                             </select>
                                             <br>
-                                            <h6>
-                                                Tipe
-                                            </h6>
+                                            <h6>Tipe</h6>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckDefault">
-                                                <label class="form-check-label" for="flexCheckDefault">
-                                                    Gambar
-                                                </label>
+                                                <input class="form-check-input" type="checkbox" name="type[]"
+                                                    value="image" id="flexCheckDefault">
+                                                <label class="form-check-label" for="flexCheckDefault">Gambar</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="flexCheckChecked" checked>
-                                                <label class="form-check-label" for="flexCheckChecked">
-                                                    Video
-                                                </label>
+                                                <input class="form-check-input" type="checkbox" name="type[]"
+                                                    value="video" id="flexCheckChecked" checked>
+                                                <label class="form-check-label" for="flexCheckChecked">Video</label>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            <button type="submit" class="btn btn-primary mt-3 w-100">Filter</button>
+                        </form>
                     </div>
                 </div>
             </div>
             <div class="col-lg-8 col-12">
-                <h3 class="lg-mt-5 mt-3">Semua Karya</h3>
+                @isset($_GET['provinsi'])
+                    <h1 class="mb-4">Semua Karya Provinsi {{ $_GET['provinsi'] }}</h1>
+                @else
+                    <h1 class="mb-4">Semua Karya</h1>
+                @endisset
                 <div class="row ">
-                    @foreach ($data as $item)
-                        <div class="col-md-6 col-lg-4 mb-4">
-                        <x-card :item="$item" :height="'200px'"/>
-
+                    @if ($data->isEmpty())
+                        <div class="col-12 text-center mt-4">
+                            <div class="empty-state">
+                                <img src="{{ asset('assets/img/empty.svg') }}" alt="">
+                                <h3 class="mt-5">Tidak ada data yang tersedia</h3>
+                                <p>Silakan tambahkan beberapa item untuk ditampilkan di sini.</p>
+                            </div>
                         </div>
-                    @endforeach
-                    <div class="mt-5">
-                        {{ $data->links() }}
-                    </div>
-
+                    @else
+                        @foreach ($data as $item)
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <x-card :item="$item" :height="'200px'" />
+                            </div>
+                        @endforeach
+                        <div class="mt-5">
+                            {{ $data->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 @endsection
-
 
 @section('js')
     <script>

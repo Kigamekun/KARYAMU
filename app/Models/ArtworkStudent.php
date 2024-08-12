@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class ArtworkStudent extends Pivot
 {
+    protected $table = 'artwork_students';
     protected $fillable = [
         'artwork_id',
         'student_id',

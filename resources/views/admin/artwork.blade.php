@@ -91,18 +91,19 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="title" class="fw-semibold">Judul</label>
+                            <label for="title" class="fw-semibold">Judul<span class="ml-1 text-danger">*</span></label>
                             <input type="text" class="form-control" id="title" name="title"
                                 placeholder="Masukan Judul" required>
                             <x-input-error :messages="$errors->get('title')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="description" class="fw-semibold">Deskripsi</label>
+                            <label for="description" class="fw-semibold">Deskripsi<span
+                                    class="ml-1 text-danger">*</span></label>
                             <textarea class="form-control" id="description" name="description" placeholder="Masukan Deskripsi" required></textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="type" class="fw-semibold">Tipe</label>
+                            <label for="type" class="fw-semibold">Tipe<span class="ml-1 text-danger">*</span></label>
                             <select class="form-control" onchange="selectType()" id="type" name="type" required>
                                 <option value="image">Foto</option>
                                 <option value="video">Video</option>
@@ -110,20 +111,21 @@
                             <x-input-error :messages="$errors->get('type')" class="mt-2" />
                         </div>
                         <div class="mb-3" id="image-upload">
-                            <label for="image" class="fw-semibold">Image<span class="text-danger">*</span></label>
+                            <label for="image" class="fw-semibold">Image<span class="ml-1 text-danger">*</span></label>
                             <input type="file" class=" dropify" id="image" name="image" placeholder="Isi file"
                                 data-allowed-file-extensions='["png", "jpeg","jpg"]'>
                             <x-input-error :messages="$errors->get('image')" class="mt-2" />
                         </div>
                         <div class="mb-3 d-none" id="video-upload">
-                            <label for="video" class="fw-semibold">Video</label>
+                            <label for="video" class="fw-semibold">Video<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="video" name="video"
                                 placeholder="Masukan URL Video">
                             <x-input-error :messages="$errors->get('video')" class="mt-2" />
                         </div>
                         <div class="mb-3">
                             <label for="students" class="fw-semibold">Pilih Siswa</label>
-                            <select class="form-control select2" id="students" name="students[]" multiple="multiple">
+                            <select class="form-control select2" id="students" name="students[]" multiple="multiple"
+                                required>
                                 @foreach ($students as $student)
                                     <option value="{{ $student->id }}">{{ $student->name }}</option>
                                 @endforeach
@@ -186,7 +188,6 @@
                         data: 'title',
                         name: 'title'
                     },
-
                     {
                         data: 'type',
                         name: 'type'
@@ -232,39 +233,39 @@
                 @method('PUT')
                 <div class="modal-body">
                     <div class="mb-3">
-                            <label for="title" class="fw-semibold">Judul</label>
+                            <label for="title" class="fw-semibold">Judul <span class="ml-1 text-danger">*</span></label>
                             <input type="text" class="form-control" id="title" name="title"
                                 placeholder="Masukan Judul" value="${$(e.relatedTarget).data('title')}" required>
                             <x-input-error :messages="$errors->get('title')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="description" class="fw-semibold">Deskripsi</label>
+                            <label for="description" class="fw-semibold">Deskripsi <span class="ml-1 text-danger">*</span></label>
                             <textarea class="form-control" id="description" name="description" placeholder="Masukan Deskripsi" required>${$(e.relatedTarget).data('description')}</textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="type" class="fw-semibold">Tipe</label>
-                            <select class="form-control" onchange="selectType()" id="type" name="type" required>
+                            <label for="type" class="fw-semibold">Tipe<span class="ml-1 text-danger">*</span></label>
+                            <select class="form-control" onchange="selectTypeEdit()" id="type-edit" name="type" required>
                                 <option value="image" ${$(e.relatedTarget).data('type') == 'image' ? 'selected' : ''}>Foto</option>
                                 <option value="video" ${$(e.relatedTarget).data('type') == 'video' ? 'selected' : ''}>Video</option>
                             </select>
                             <x-input-error :messages="$errors->get('type')" class="mt-2" />
                         </div>
-                        <div class="mb-3" id="image-upload">
+                        <div class="mb-3 ${$(e.relatedTarget).data('type') == 'video' ? 'd-none' : ''}" id="image-upload-edit">
                             <label for="image" class="fw-semibold">Image<span class="text-danger">*</span></label>
                             <input type="file" class=" dropify" id="image" name="image" placeholder="Isi file"
                                 data-allowed-file-extensions='["png", "jpeg","jpg"]' data-default-file="${$(e.relatedTarget).data('file_path')}">
                             <x-input-error :messages="$errors->get('image')" class="mt-2" />
                         </div>
-                        <div class="mb-3 d-none" id="video-upload">
-                            <label for="video" class="fw-semibold">Video</label>
+                        <div class="mb-3 ${$(e.relatedTarget).data('type') == 'image' ? 'd-none' : ''}" id="video-upload-edit">
+                            <label for="video" class="fw-semibold">Video<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="video" name="video"
                                 placeholder="Masukan URL Video" value="${$(e.relatedTarget).data('video_link')}">
                             <x-input-error :messages="$errors->get('video')" class="mt-2" />
                         </div>
                         <div class="mb-3">
                             <label for="students" class="fw-semibold">Pilih Siswa</label>
-                            <select class="form-control select4" id="students" name="students[]" multiple="multiple">
+                            <select class="form-control select4" id="students" name="students[]" multiple="multiple" required>
                                 ${memberOption}
                             </select>
                             <x-input-error :messages="$errors->get('students')" class="mt-2" />
@@ -315,23 +316,23 @@
                 </div>
 
                   ${response.type == 'image' ? `
-                   <div class="mb-3">
-                        <label for="video_link" class="fw-semibold">Video Link</label>
-                        <p>                            <img src="storage/artwork/${response.file_path}" alt="${response.title}" style="width: 100%;border-radius:15px">
-            </p>
-                    </div>
-                    ` : ''}
+                       <div class="mb-3">
+                            <label for="video_link" class="fw-semibold">Video Link</label>
+                            <p>                            <img src="storage/artwork/${response.file_path}" alt="${response.title}" style="width: 100%;border-radius:15px">
+                </p>
+                        </div>
+                        ` : ''}
 
                 ${response.type == 'video' ? `
-                   <div class="mb-3">
-                        <label for="video_link" class="fw-semibold">Video Link</label>
-                        <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
-                                <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
-                                    style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
-                                    class="card-img-top" alt="YouTube Thumbnail">
-                            </a></p>
-                    </div>
-                    ` : ''}
+                       <div class="mb-3">
+                            <label for="video_link" class="fw-semibold">Video Link</label>
+                            <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
+                                    <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
+                                        style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
+                                        class="card-img-top" alt="YouTube Thumbnail">
+                                </a></p>
+                        </div>
+                        ` : ''}
 
                 <div class="mb-3">
                     <label for="status" class="fw-semibold">Status</label>
@@ -363,6 +364,17 @@
             } else {
                 $('#image-upload').addClass('d-none');
                 $('#video-upload').removeClass('d-none');
+            }
+        }
+
+        function selectTypeEdit() {
+            var type = $('#type-edit').val();
+            if (type == 'image') {
+                $('#image-upload-edit').removeClass('d-none');
+                $('#video-upload-edit').addClass('d-none');
+            } else {
+                $('#image-upload-edit').addClass('d-none');
+                $('#video-upload-edit').removeClass('d-none');
             }
         }
     </script>

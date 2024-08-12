@@ -27,7 +27,6 @@
 </head>
 
 <body>
-
     <style>
         .dropify-message p {
             font-size: 14px;
@@ -65,25 +64,6 @@
                         <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i
                                     class="fas fa-search"></i></a></li>
                     </ul>
-                    <div class="search-element">
-                        <input class="form-control" type="search" placeholder="Search" aria-label="Search"
-                            data-width="250">
-                        <button class="btn" type="submit"><i class="fas fa-search"></i></button>
-                        <div class="search-backdrop"></div>
-                        <div class="search-result">
-                            <div class="search-header">
-                                Projects
-                            </div>
-                            <div class="search-item">
-                                <a href="#">
-                                    <div class="search-icon bg-danger text-white mr-3">
-                                        <i class="fas fa-code"></i>
-                                    </div>
-                                    KARYAMU
-                                </a>
-                            </div>
-                        </div>
-                    </div>
                 </form>
                 <ul class="navbar-nav navbar-right">
                     <li class="dropdown dropdown-list-toggle"><a href="#" data-toggle="dropdown"
@@ -149,14 +129,17 @@
                                     <i class="fa-solid fa-book-open fa-xl " style="color: #0097FF"></i>
                                     <div style="text-align:left">
                                         Sekolah Dasar
-                                        <h6 style="font-size: 15px">SDN Batutulis 2</h6>
+                                        <h6 style="font-size: 15px">
+                                            {{ Auth::user()->teacher != null ? Auth::user()->teacher->school->name : '' }}
+                                            {{ Auth::user()->student != null ? Auth::user()->student->school->name : '' }}
+                                        </h6>
                                     </div>
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div class="sidebar-brand sidebar-brand-sm">
-                        <a href="index.html" style="color: #0097FF">                                    <i class="fa-solid fa-graduation-cap"></i>
+                        <a href="index.html" style="color: #0097FF"> <i class="fa-solid fa-graduation-cap"></i>
                         </a>
                     </div>
                     <div class="d-flex align-center justify-between"
@@ -268,7 +251,6 @@
 
     <!-- JS Libraies -->
     <script src="{{ asset('node_modules/jquery-sparkline/jquery.sparkline.min.js') }}"></script>
-    {{-- <script src="{{ asset('node_modules/chart.js/dist/Chart.min.js') }}"></script> --}}
     <script src="{{ asset('node_modules/owl.carousel/dist/owl.carousel.min.js') }}"></script>
     <script src="{{ asset('node_modules/summernote/dist/summernote-bs4.js') }}"></script>
     <script src="{{ asset('node_modules/chocolat/dist/js/jquery.chocolat.min.js') }}"></script>
@@ -310,7 +292,6 @@
         function confirmLogout(event) {
             event.preventDefault();
             const form = event.target.closest('form');
-
             if (form !== null) {
                 Swal.fire({
                     title: 'Konfirmasi Logout',
@@ -322,7 +303,6 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         console.log(form.action);
-                        // If the form action exists, proceed with submitting the form
                         form.submit();
                     }
                 });
@@ -335,7 +315,6 @@
         function confirmApprove(event) {
             event.preventDefault();
             const form = event.target.closest('form');
-
             if (form !== null) {
                 Swal.fire({
                     title: 'Konfirmasi Approve',
@@ -347,7 +326,6 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         console.log(form.action);
-                        // If the form action exists, proceed with submitting the form
                         form.submit();
                     }
                 });
@@ -393,7 +371,7 @@
     <script>
         $(document).ready(function() {
             $('#logoutForm').on('submit', function(e) {
-                e.preventDefault(); // Prevent form submission
+                e.preventDefault();
 
                 Swal.fire({
                     title: 'Konfirmasi Logout',
@@ -404,7 +382,6 @@
                     cancelButtonText: 'Batal',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Proceed with form submission
                         $(this).off('submit').submit();
                     }
                 });

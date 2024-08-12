@@ -7,5 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Teacher extends Model
 {
+
+    protected $fillable = [
+        'nip',
+        'phone',
+        'address',
+        'school_id',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
     use HasFactory;
 }

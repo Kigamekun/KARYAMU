@@ -8,12 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class Student extends Model
 {
 
+    protected $fillable = [
+        'nis',
+        'phone',
+        'address',
+        'school_id',
+    ];
     public function artworks()
     {
         return $this->belongsToMany(Artwork::class, 'artwork_students', 'student_id', 'artwork_id')
             ->using(ArtworkStudent::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     public function school()
     {
         return $this->belongsTo(School::class);

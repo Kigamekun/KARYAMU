@@ -22,6 +22,7 @@ class UserController extends Controller
             }
             $data = $data->get()->map(function ($user) {
                 if ($user->role == 'student') {
+
                     return [
                         'id' => $user->id,
                         'name' => $user->name,
@@ -30,7 +31,7 @@ class UserController extends Controller
                         'role' => $user->role,
                         'nis' => $user->student->nis ?? null,
                         'nip' => $user->teacher->nip ?? null,
-                        'phone_number' => $user->student->phone_number ?? null,
+                        'phone_number' => $user->student->phone ?? null,
                         'address' => $user->student->address ?? null,
                         'school_id' => $user->student->school_id ?? null,
                     ];
@@ -43,7 +44,7 @@ class UserController extends Controller
                         'role' => $user->role,
                         'nip' => $user->teacher->nip ?? null,
                         'nis' => $user->teacher->nis ?? null,
-                        'phone_number' => $user->teacher->phone_number ?? null,
+                        'phone_number' => $user->teacher->phone ?? null,
                         'address' => $user->teacher->address ?? null,
                         'school_id' => $user->teacher->school_id ?? null,
                     ];
@@ -116,38 +117,53 @@ class UserController extends Controller
     {
         Validator::validate($request->all(), [
             'name' => 'required',
+            'username' => 'required',
             'email' => 'required',
             'password' => 'required',
             'role' => 'required',
-            'phone_number' => 'required',
-            'address' => 'required',
         ]);
 
-        if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-            $thumbname = time() . '-' . $file->getClientOriginalName();
-            Storage::disk('public')->put('users/' . $thumbname, file_get_contents($file));
-            User::insert([
-                'photo' => $thumbname,
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => bcrypt($request->password),
-                'role' => $request->role,
-                'phone_number' => $request->phone_number,
-                'address' => $request->address,
-                'unit_id' => $request->unit,
+        $user = User::create([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => $request->role,
+        ]);
+
+        if ($request->role == 'student') {
+
+            Validator::validate($request->all(), [
+                'nis' => 'required',
+                'school_id' => 'required',
+                'phone_number' => 'required',
+                'address' => 'required',
             ]);
-        } else {
-            User::insert([
+
+            $user->student()->create([
                 'name' => $request->name,
-                'email' => $request->email,
-                'password' => bcrypt($request->password),
-                'role' => $request->role,
-                'phone_number' => $request->phone_number,
+                'nis' => $request->nis,
+                'school_id' => $request->school_id,
+                'phone' => $request->phone_number,
                 'address' => $request->address,
-                'unit_id' => $request->unit,
+            ]);
+        } elseif ($request->role == 'teacher') {
+            Validator::validate($request->all(), [
+                'nip' => 'required',
+                'school_id' => 'required',
+                'phone_number' => 'required',
+                'address' => 'required',
+            ]);
+
+            $user->teacher()->create([
+                'name' => $request->name,
+                'nip' => $request->nip,
+                'school_id' => $request->school_id,
+                'phone' => $request->phone_number,
+                'address' => $request->address,
             ]);
         }
+
 
         return redirect()->back()->with(['message' => 'Users berhasil ditambahkan', 'status' => 'success']);
 
@@ -158,33 +174,47 @@ class UserController extends Controller
     {
         Validator::validate($request->all(), [
             'name' => 'required',
+            'username' => 'required',
             'email' => 'required',
             'role' => 'required',
-            'phone_number' => 'required',
-            'address' => 'required',
         ]);
 
-        if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-            $thumbname = time() . '-' . $file->getClientOriginalName();
-            Storage::disk('public')->put('users/' . $thumbname, file_get_contents($file));
-            User::where('id', $id)->update([
-                'photo' => $thumbname,
-                'name' => $request->name,
-                'email' => $request->email,
-                'role' => $request->role,
-                'phone_number' => $request->phone_number,
-                'address' => $request->address,
-                'unit_id' => $request->unit,
+        User::where('id', $id)->update([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'role' => $request->role,
+        ]);
+
+        if ($request->role == 'student') {
+            Validator::validate($request->all(), [
+                'nis' => 'required',
+                'school_id' => 'required',
+                'phone_number' => 'required',
+                'address' => 'required',
             ]);
-        } else {
-            User::where('id', $id)->update([
+
+            User::find($id)->student()->update([
                 'name' => $request->name,
-                'email' => $request->email,
-                'role' => $request->role,
-                'phone_number' => $request->phone_number,
+                'nis' => $request->nis,
+                'school_id' => $request->school_id,
+                'phone' => $request->phone_number,
                 'address' => $request->address,
-                'unit_id' => $request->unit,
+            ]);
+        } elseif ($request->role == 'teacher') {
+            Validator::validate($request->all(), [
+                'nip' => 'required',
+                'school_id' => 'required',
+                'phone_number' => 'required',
+                'address' => 'required',
+            ]);
+
+            User::find($id)->teacher()->update([
+                'name' => $request->name,
+                'nip' => $request->nip,
+                'school_id' => $request->school_id,
+                'phone' => $request->phone_number,
+                'address' => $request->address,
             ]);
         }
 

@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class School extends Model
+class District extends Model
 {
+    protected $table = 'master_district';
 
-    public function subdistrict()
+    public function city()
     {
-        return $this->belongsTo(Subdistrict::class, 'subdistrict_id');
+        return $this->belongsTo(Regency::class, 'regency_id');
     }
+
     use HasFactory;
 }

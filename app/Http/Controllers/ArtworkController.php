@@ -84,27 +84,45 @@ class ArtworkController extends Controller
 
     public function filterHome(Request $request)
     {
-        $search = $_GET['search'];
-        $selectedSchools = $_GET['schools'];
-        $types = $_GET['type'];
 
-        $query = Artwork::query();
-        if ($search) {
-            $query->where('title', 'like', '%' . $search . '%');
+
+        if (isset($_GET['provinsi'])) {
+            $provinceId = Province::where('name', $_GET['provinsi'])->first()->id;
+            $school = School::join('master_subdistrict', 'schools.subdistrict_code', '=', 'master_subdistrict.code')
+                ->join('master_district', 'master_subdistrict.district_code', '=', 'master_district.code')
+                ->join('master_regency', 'master_district.regency_code', '=', 'master_regency.code')
+                ->join('master_province', 'master_regency.province_code', '=', 'master_province.code')
+                ->where('master_province.id', $provinceId)
+                ->pluck('schools.id')
+                ->toArray();
+            $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->paginate(12);
+
+        } else if (isset($_GET['search'])) {
+
+            $search = $_GET['search'];
+            $selectedSchools = $_GET['schools'];
+            $types = $_GET['type'];
+
+            $query = Artwork::query();
+            if ($search) {
+                $query->where('title', 'like', '%' . $search . '%');
+            }
+
+            if ($selectedSchools) {
+                $query->whereIn('school_id', $selectedSchools);
+            }
+
+            if ($types) {
+                $query->whereIn('type', $types);
+            }
+
+            $data = $query->paginate(12);
+
+        } else {
+            $data = Artwork::where('is_approved', 1)->paginate(12);
         }
-
-        if ($selectedSchools) {
-            $query->whereIn('school_id', $selectedSchools);
-        }
-
-        if ($types) {
-            $query->whereIn('type', $types);
-        }
-
-        $karyas = $query->paginate(12);
-
         return view('karya-home', [
-            'data' => $karyas
+            'data' => $data
         ]);
 
     }

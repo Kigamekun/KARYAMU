@@ -99,7 +99,7 @@
                             <label for="activity_photo" class="fw-semibold">Activity Photo<span
                                     class="text-danger">*</span></label>
                             <input type="file" class=" dropify" id="activity_photo" name="activity_photo"
-                                placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]'>
+                                placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M">
                             <x-input-error :messages="$errors->get('activity_photo')" class="mt-2" />
                         </div>
                         <div class="mb-3">
@@ -222,7 +222,7 @@
                                         <label for="activity_photo" class="fw-semibold">Activity Photo<span
                                                 class="text-danger">*</span></label>
                                         <input type="file" class=" dropify" id="activity_photo" name="activity_photo"
-                                            placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]' data-default-file="${$(e.relatedTarget).data('activity_photo')}">
+                                            placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M" data-default-file="${$(e.relatedTarget).data('activity_photo')}">
                                         <x-input-error :messages="$errors->get('activity_photo')" class="mt-2" />
                                     </div>
                                     <div class="mb-3">

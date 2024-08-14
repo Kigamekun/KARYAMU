@@ -29,9 +29,12 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h3>Data Karya</h3>
                     <div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#createData">
-                            Tambah Data
-                        </button>
+                        @if (Auth::user()->role != 'admin')
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#createData">
+                                Tambah Data
+                            </button>
+                        @endif
+
                     </div>
                 </div>
                 <br>
@@ -113,7 +116,7 @@
                         <div class="mb-3" id="image-upload">
                             <label for="image" class="fw-semibold">Image<span class="ml-1 text-danger">*</span></label>
                             <input type="file" class=" dropify" id="image" name="image" placeholder="Isi file"
-                                data-allowed-file-extensions='["png", "jpeg","jpg"]'>
+                                data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M" >
                             <x-input-error :messages="$errors->get('image')" class="mt-2" />
                         </div>
                         <div class="mb-3 d-none" id="video-upload">
@@ -254,7 +257,7 @@
                         <div class="mb-3 ${$(e.relatedTarget).data('type') == 'video' ? 'd-none' : ''}" id="image-upload-edit">
                             <label for="image" class="fw-semibold">Image<span class="text-danger">*</span></label>
                             <input type="file" class=" dropify" id="image" name="image" placeholder="Isi file"
-                                data-allowed-file-extensions='["png", "jpeg","jpg"]' data-default-file="${$(e.relatedTarget).data('file_path')}">
+                                data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M" data-default-file="${$(e.relatedTarget).data('file_path')}">
                             <x-input-error :messages="$errors->get('image')" class="mt-2" />
                         </div>
                         <div class="mb-3 ${$(e.relatedTarget).data('type') == 'image' ? 'd-none' : ''}" id="video-upload-edit">
@@ -316,23 +319,23 @@
                 </div>
 
                   ${response.type == 'image' ? `
-                       <div class="mb-3">
-                            <label for="video_link" class="fw-semibold">Video Link</label>
-                            <p>                            <img src="storage/artwork/${response.file_path}" alt="${response.title}" style="width: 100%;border-radius:15px">
-                </p>
-                        </div>
-                        ` : ''}
+                           <div class="mb-3">
+                                <label for="video_link" class="fw-semibold">Video Link</label>
+                                <p>                            <img src="storage/artwork/${response.file_path}" alt="${response.title}" style="width: 100%;border-radius:15px">
+                    </p>
+                            </div>
+                            ` : ''}
 
                 ${response.type == 'video' ? `
-                       <div class="mb-3">
-                            <label for="video_link" class="fw-semibold">Video Link</label>
-                            <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
-                                    <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
-                                        style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
-                                        class="card-img-top" alt="YouTube Thumbnail">
-                                </a></p>
-                        </div>
-                        ` : ''}
+                           <div class="mb-3">
+                                <label for="video_link" class="fw-semibold">Video Link</label>
+                                <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
+                                        <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
+                                            style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
+                                            class="card-img-top" alt="YouTube Thumbnail">
+                                    </a></p>
+                            </div>
+                            ` : ''}
 
                 <div class="mb-3">
                     <label for="status" class="fw-semibold">Status</label>

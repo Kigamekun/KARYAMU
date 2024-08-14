@@ -24,9 +24,11 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h3>Data Pelatihan</h3>
                     <div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#createData">
-                            Tambah Data
-                        </button>
+                        @if (Auth::user()->role != 'admin')
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#createData">
+                                Tambah Data
+                            </button>
+                        @endif
                     </div>
                 </div>
                 <br>

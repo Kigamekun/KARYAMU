@@ -82,14 +82,11 @@ class TrainingController extends Controller
         Validator::validate($request->all(), [
             'title' => 'required',
             'description' => 'required',
-            'activity_photo' => 'required',
+            'activity_photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1048',
         ]);
 
         $teacher_id = auth()->user()->teacher->id;
 
-        $request->validate([
-            'activity_photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1048',
-        ]);
         $file = $request->file('activity_photo');
         $thumbname = time() . '-' . $file->getClientOriginalName();
         Storage::disk('public')->put('activity_photo/' . $thumbname, file_get_contents($file));

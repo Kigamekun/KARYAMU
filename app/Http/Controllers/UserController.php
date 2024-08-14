@@ -138,7 +138,7 @@ class UserController extends Controller
         if ($request->role == 'student') {
 
             Validator::validate($request->all(), [
-                'nis' => 'required,unique:students',
+                'nis' => 'required|unique:students',
                 'school_id' => 'required',
                 'phone_number' => 'required',
                 'address' => 'required',
@@ -153,7 +153,7 @@ class UserController extends Controller
             ]);
         } elseif ($request->role == 'teacher') {
             Validator::validate($request->all(), [
-                'nip' => 'required,unique:teachers',
+                'nip' => 'required|unique:teachers',
                 'school_id_teacher' => 'required',
                 'phone_number_teacher' => 'required',
                 'address_teacher' => 'required',
@@ -186,7 +186,7 @@ class UserController extends Controller
 
         if ($request->role == 'student') {
             Validator::validate($request->all(), [
-                'nis' => 'required,unique:students',
+                'nis' => 'required|unique:students',
                 'school_id' => 'required',
                 'phone_number' => 'required',
                 'address' => 'required',
@@ -207,7 +207,7 @@ class UserController extends Controller
 
         } elseif ($request->role == 'teacher') {
             Validator::validate($request->all(), [
-                'nip' => 'required,unique:teachers',
+                'nip' => 'required|unique:teachers',
                 'school_id_teacher' => 'required',
                 'phone_number_teacher' => 'required',
                 'address_teacher' => 'required',

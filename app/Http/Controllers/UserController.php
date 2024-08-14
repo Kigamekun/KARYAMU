@@ -11,6 +11,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use App\Models\Teacher;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -182,12 +183,6 @@ class UserController extends Controller
             'role' => 'required',
         ]);
 
-        User::where('id', $id)->update([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'role' => $request->role,
-        ]);
 
         if ($request->role == 'student') {
             Validator::validate($request->all(), [
@@ -241,6 +236,13 @@ class UserController extends Controller
                 'password' => bcrypt($request->password),
             ]);
         }
+
+        User::where('id', $id)->update([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'role' => $request->role,
+        ]);
 
         return redirect()->back()->with(['message' => 'Users berhasil di update', 'status' => 'success']);
     }

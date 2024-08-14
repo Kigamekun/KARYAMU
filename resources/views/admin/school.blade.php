@@ -578,7 +578,7 @@
                         <div class="mb-3">
                             <label for="name" class="fw-semibold">Nama Sekolah</label>
                             <input type="text" class="form-control" id="name" name="name"
-                                placeholder="Masukan Judul" required>
+                                placeholder="Masukan Nama Sekolah" required>
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 

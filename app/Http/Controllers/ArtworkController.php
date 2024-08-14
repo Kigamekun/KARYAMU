@@ -85,7 +85,17 @@ class ArtworkController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Artwork::all();
+
+            if (Auth::user()->role == 'admin') {
+                $data = Artwork::all();
+            } else if (Auth::user()->role == 'teacher') {
+                $school_id = Teacher::where('user_id', Auth::user()->id)->first()->school_id;
+                $data = Artwork::where('school_id', $school_id)->get();
+            } else if (Auth::user()->role == 'student') {
+                $school_id = Student::where('user_id', Auth::user()->id)->first()->school_id;
+                $data = Artwork::where('school_id', $school_id)->get();
+            }
+
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {

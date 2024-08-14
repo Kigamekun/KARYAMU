@@ -38,7 +38,7 @@ class TrainingController extends Controller
                     'schools.name as trainer_school',
                     DB::raw('COUNT(teacher_trainings.teacher_id) as total_participants')
                 )
-                ->groupBy('trainings.id', 'trainer.name', 'schools.name')
+                ->groupBy('trainings.id','trainings.title','trainings.description','trainings.activity_photo', 'schools.name','trainer.name', 'schools.name')
                 ->get();
             return DataTables::of($data)
                 ->addIndexColumn()

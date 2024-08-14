@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Student;
+use App\Models\Teacher;
 
 class UserController extends Controller
 {
@@ -131,6 +133,7 @@ class UserController extends Controller
             'role' => $request->role,
         ]);
 
+
         if ($request->role == 'student') {
 
             Validator::validate($request->all(), [
@@ -150,17 +153,17 @@ class UserController extends Controller
         } elseif ($request->role == 'teacher') {
             Validator::validate($request->all(), [
                 'nip' => 'required',
-                'school_id' => 'required',
-                'phone_number' => 'required',
-                'address' => 'required',
+                'school_id_teacher' => 'required',
+                'phone_number_teacher' => 'required',
+                'address_teacher' => 'required',
             ]);
 
             $user->teacher()->create([
                 'name' => $request->name,
                 'nip' => $request->nip,
-                'school_id' => $request->school_id,
-                'phone' => $request->phone_number,
-                'address' => $request->address,
+                'school_id' => $request->school_id_teacher,
+                'phone' => $request->phone_number_teacher,
+                'address' => $request->address_teacher,
             ]);
         }
 
@@ -193,29 +196,44 @@ class UserController extends Controller
                 'phone_number' => 'required',
                 'address' => 'required',
             ]);
+            Teacher::where('user_id', $id)->delete();
 
-            User::find($id)->student()->update([
-                'name' => $request->name,
-                'nis' => $request->nis,
-                'school_id' => $request->school_id,
-                'phone' => $request->phone_number,
-                'address' => $request->address,
-            ]);
+
+            User::find($id)->student()->updateOrCreate(
+                ['user_id' => $id], // Assuming 'user_id' is the foreign key in the 'students' table
+                [
+                    'name' => $request->name,
+                    'nis' => $request->nis,
+                    'school_id' => $request->school_id,
+                    'phone' => $request->phone_number,
+                    'address' => $request->address,
+                ]
+            );
+
         } elseif ($request->role == 'teacher') {
             Validator::validate($request->all(), [
                 'nip' => 'required',
-                'school_id' => 'required',
-                'phone_number' => 'required',
-                'address' => 'required',
+                'school_id_teacher' => 'required',
+                'phone_number_teacher' => 'required',
+                'address_teacher' => 'required',
             ]);
 
-            User::find($id)->teacher()->update([
-                'name' => $request->name,
-                'nip' => $request->nip,
-                'school_id' => $request->school_id,
-                'phone' => $request->phone_number,
-                'address' => $request->address,
-            ]);
+            Student::where('user_id', $id)->delete();
+
+            User::find($id)->teacher()->updateOrCreate(
+                ['user_id' => $id], // Assuming 'user_id' is the foreign key in the 'students' table
+                [
+                    'name' => $request->name,
+                    'nip' => $request->nip,
+                    'school_id' => $request->school_id_teacher,
+                    'phone' => $request->phone_number_teacher,
+                    'address' => $request->address_teacher,
+                ]
+            );
+
+        } else {
+            Teacher::where('user_id', $id)->delete();
+            Student::where('user_id', $id)->delete();
         }
 
         if ($request->password) {
@@ -230,6 +248,6 @@ class UserController extends Controller
     public function destroy($id)
     {
         User::where('id', $id)->delete();
-        return redirect()->route('unit.index')->with(['message' => 'Users berhasil di delete', 'status' => 'success']);
+        return redirect()->route('user.index')->with(['message' => 'Users berhasil di delete', 'status' => 'success']);
     }
 }

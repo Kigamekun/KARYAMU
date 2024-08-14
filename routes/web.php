@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\{ProfileController, ArtworkController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
+use App\Http\Controllers\{ProfileController,SubscriptionController, ArtworkController, MasterController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
 use Illuminate\Support\Facades\Route;
 use App\Models\{Artwork, Training, Teacher, School, Province};
 
@@ -26,6 +26,9 @@ Route::get('/', function () {
         'data' => $data
     ]);
 })->name('home');
+
+
+
 
 Route::get('/about', function () {
     return view('about');
@@ -70,6 +73,18 @@ Route::post('/like-item/{id}', [ArtworkController::class, 'like'])->name('like-i
 
 
 Route::middleware('auth')->group(function () {
+
+    Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
+    Route::post('/unsubscribe', [SubscriptionController::class, 'unsubscribe']);
+
+    Route::prefix('master')->group(function () {
+        Route::get('/provinsi', [MasterController::class, 'provinsi'])->name('master.provinsi');
+        Route::get('/kota/{id}', [MasterController::class, 'kota'])->name('master.kota');
+        Route::get('/kecamatan/{id}', [MasterController::class, 'kecamatan'])->name('master.kecamatan');
+        Route::get('/kelurahan/{id}', [MasterController::class, 'kelurahan'])->name('master.kelurahan');
+    });
+
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -96,6 +111,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('sekolah')->group(function () {
         Route::get('/', [SchoolController::class, 'index'])->name('sekolah.index');
+        Route::get('/{id}', [SchoolController::class, 'detail'])->name('sekolah.detail');
         Route::post('/store', [SchoolController::class, 'store'])->name('sekolah.store');
         Route::put('/update/{id}', [SchoolController::class, 'update'])->name('sekolah.update');
         Route::delete('/delete/{id}', [SchoolController::class, 'destroy'])->name('sekolah.delete');
@@ -117,6 +133,8 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('pelatihan')->group(function () {
         Route::get('/', [TrainingController::class, 'index'])->name('pelatihan.index');
+        Route::get('/{id}', [TrainingController::class, 'detail'])->name('pelatihan.detail');
+
         Route::post('/store', [TrainingController::class, 'store'])->name('pelatihan.store');
         Route::get('/{id}/edit', [TrainingController::class, 'edit'])->name('pelatihan.edit');
 

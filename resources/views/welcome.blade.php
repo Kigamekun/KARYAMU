@@ -23,7 +23,7 @@
                 @if ($data->isEmpty())
                     <div class="col-12 text-center mt-4">
                         <div class="empty-state">
-                            <img src="{{ asset('assets/img/empty.svg') }}" class="w-100" alt="">
+                            <img src="{{ asset('assets/img/empty.svg') }}" class="w-100" style="max-width: 300px" alt="">
                             <h3 class="mt-5">Tidak ada data yang tersedia</h3>
                             <p>Silakan tambahkan beberapa item untuk ditampilkan di sini.</p>
                         </div>

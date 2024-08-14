@@ -26,10 +26,18 @@
                 </center>
             </div>
         </div>
+        <div class="d-flex justify-end" style="justify-content: end;width:100%;gap:10px">
+            <button class="btn btn-primary" id="subscribeButton">Subscribe Webpush Notification</button>
+
+            <!-- Tombol Unsubscribe -->
+            <button class="btn btn-primary" id="unsubscribeButton">Unsubscribe Webpush Notification</button>
+
+        </div>
         <br>
         <div>
             <h3 class="mb-4">Pelatihan Terbaru</h3>
         </div>
+
         <div class="row">
             @foreach ($pelatihan as $index => $item)
                 <div class="col-md-4">
@@ -140,6 +148,91 @@
                         }
                     }
                 }
+            });
+        });
+    </script>
+
+    <script>
+        const publicVapidKey = "{{ env('VAPID_PUBLIC_KEY') }}";
+
+        // Utility function untuk mengonversi VAPID key ke Uint8Array
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/-/g, '+')
+                .replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        // Subscribe ke push notifications
+        document.getElementById('subscribeButton').addEventListener('click', function() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        return registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+                        });
+                    })
+                    .then(function(subscription) {
+                        return fetch('/subscribe', {
+                            method: 'POST',
+                            body: JSON.stringify(subscription),
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+                    })
+                    .then(function(response) {
+                        if (response.ok) {
+                            alert('Subscribed successfully!');
+                        } else {
+                            alert('Failed to subscribe.');
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Subscription error:', error);
+                    });
+            } else {
+                alert('Service workers are not supported in this browser.');
+            }
+        });
+
+        // Unsubscribe dari push notifications
+        document.getElementById('unsubscribeButton').addEventListener('click', function() {
+            navigator.serviceWorker.ready.then(function(registration) {
+                return registration.pushManager.getSubscription();
+            }).then(function(subscription) {
+                if (subscription) {
+                    return subscription.unsubscribe().then(function() {
+                        return fetch('/unsubscribe', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                endpoint: subscription.endpoint
+                            }),
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        });
+                    });
+                } else {
+                    alert('No subscription found.');
+                }
+            }).then(function(response) {
+                if (response && response.ok) {
+                    alert('Unsubscribed successfully!');
+                } else {
+                    alert('Failed to unsubscribe.');
+                }
+            }).catch(function(error) {
+                console.error('Unsubscription error:', error);
             });
         });
     </script>

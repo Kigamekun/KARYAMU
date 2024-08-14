@@ -101,7 +101,11 @@
                                 <i class="far fa-user"></i> Profile
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item has-icon text-danger">
+                            <form method="POST" action="{{ route('logout') }}" id="log" class="d-none">
+                                @csrf
+                            </form>
+                            <a onclick="document.getElementById('log').submit()"
+                                class="dropdown-item has-icon text-danger" style="cursor:pointer">
                                 <i class="fas fa-sign-out-alt"></i> Logout
                             </a>
                         </div>
@@ -388,6 +392,8 @@
             });
         });
     </script>
+
+
 
     @yield('js')
 </body>

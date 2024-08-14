@@ -60,6 +60,17 @@
     </div>
 
 
+    <div class="modal fade" id="detailData" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="detailDataLabel" aria-hidden="true">
+        <div class="modal-dialog" id="detailDialog">
+            <div id="modal-dialog" class="modal-content">
+                <div class="modal-body">
+                    Loading..
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal -->
     <div class="modal fade" id="createData" data-backdrop="static" data-keyboard="false" tabindex="-1"
         aria-labelledby="createDataLabel" aria-hidden="true">
@@ -255,5 +266,51 @@
                 document.getElementById('student').classList.add('d-none');
             }
         }
+    </script>
+
+    <script>
+        $('#detailData').on('shown.bs.modal', function(e) {
+            $.ajax({
+                url: '/pelatihan/' + $(e.relatedTarget).data('id'),
+                type: 'GET',
+                success: function(response) {
+                    var detl = '';
+                    response.members.forEach(member => {
+                        detl += `
+                            <tr>
+                                <td>${member.name}</td>
+                                <td>${member.school}</td>
+                            </tr>
+                        `;
+                    });
+                    var html = `
+                    <div class="modal-body">
+                        <center>
+                            <h4>${response.data.title}</h4>
+                        </center>
+                        <br>
+                        <div class="mb-3">
+                            <label for="description" class="fw-bold">Bukti Pelatihan</label>
+                            <img class="w-100 rounded" src="/storage/activity_photo/${response.data.activity_photo}"
+                                alt="${response.data.activity_photo}" </div>
+                            <div class="mb-3 mt-2">
+                                <label for="description" class="fw-bold">Deskripsi</label>
+                                <p>${response.data.description}</p>
+                            </div>
+                                <label for="description" class="fw-bold">Peserta Pelatihan</label>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    ${detl}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        </div>
+                        `;
+                    $('#modal-dialog').html(html);
+                }
+            });
+        });
     </script>
 @endsection

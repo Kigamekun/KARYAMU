@@ -117,54 +117,54 @@
                             <div class="mb-3">
                                 <label for="nip" class="fw-semibold">NIP</label>
                                 <input type="text" class="form-control" id="nip" name="nip"
-                                    placeholder="Masukan NIP" >
+                                    placeholder="Masukan NIP">
                                 <x-input-error :messages="$errors->get('nip')" class="mt-2" />
                             </div>
                             <div class="mb-3">
-                                <label for="phone_number" class="fw-semibold">No Telp</label>
-                                <input type="text" class="form-control" id="phone_number" name="phone_number"
-                                    placeholder="Masukan No Telp" >
-                                <x-input-error :messages="$errors->get('phone_number')" class="mt-2" />
+                                <label for="phone_number_teacher" class="fw-semibold">No Telp</label>
+                                <input type="text" class="form-control" id="phone_number_teacher" name="phone_number_teacher"
+                                    placeholder="Masukan No Telp">
+                                <x-input-error :messages="$errors->get('phone_number_teacher')" class="mt-2" />
                             </div>
                             <div class="mb-3">
-                                <label for="address" class="fw-semibold">Alamat</label>
-                                <input type="text" class="form-control" id="address" name="address"
-                                    placeholder="Masukan Alamat" >
-                                <x-input-error :messages="$errors->get('address')" class="mt-2" />
+                                <label for="address_teacher" class="fw-semibold">Alamat</label>
+                                <input type="text" class="form-control" id="address_teacher" name="address_teacher"
+                                    placeholder="Masukan Alamat">
+                                <x-input-error :messages="$errors->get('address_teacher')" class="mt-2" />
                             </div>
                             <div class="mb-3">
-                                <label for="school_id" class="fw-semibold">Sekolah</label>
-                                <select name="school_id" id="school_id" class="form-control" >
+                                <label for="school_id_teacher" class="fw-semibold">Sekolah</label>
+                                <select name="school_id_teacher" id="school_id_teacher" class="form-control">
                                     <option value="">Pilih Sekolah</option>
                                     @foreach ($sekolah as $item)
                                         <option value="{{ $item->id }}">{{ $item->name }}</option>
                                     @endforeach
                                 </select>
-                                <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('school_id_teacher')" class="mt-2" />
                             </div>
                         </div>
                         <div id="student" class="d-none">
                             <div class="mb-3">
                                 <label for="nis" class="fw-semibold">NIS</label>
                                 <input type="text" class="form-control" id="nis" name="nis"
-                                    placeholder="Masukan NIS" >
+                                    placeholder="Masukan NIS">
                                 <x-input-error :messages="$errors->get('nis')" class="mt-2" />
                             </div>
                             <div class="mb-3">
                                 <label for="phone_number" class="fw-semibold">No Telp</label>
                                 <input type="text" class="form-control" id="phone_number" name="phone_number"
-                                    placeholder="Masukan No Telp" >
+                                    placeholder="Masukan No Telp">
                                 <x-input-error :messages="$errors->get('phone_number')" class="mt-2" />
                             </div>
                             <div class="mb-3">
                                 <label for="address" class="fw-semibold">Alamat</label>
                                 <input type="text" class="form-control" id="address" name="address"
-                                    placeholder="Masukan Alamat" >
+                                    placeholder="Masukan Alamat">
                                 <x-input-error :messages="$errors->get('address')" class="mt-2" />
                             </div>
                             <div class="mb-3">
                                 <label for="school_id" class="fw-semibold">Sekolah</label>
-                                <select name="school_id" id="school_id" class="form-control" >
+                                <select name="school_id" id="school_id" class="form-control">
                                     <option value="">Pilih Sekolah</option>
                                     @foreach ($sekolah as $item)
                                         <option value="{{ $item->id }}">{{ $item->name }}</option>
@@ -282,7 +282,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="role" class="fw-semibold">Role</label>
-                            <select name="role" id="role" class="form-control" onchange="selectRole()" required>
+                            <select name="role" id="role" class="form-control" onchange="selectRoleEdit()" required>
                                 <option value="">Pilih Role</option>
                                  @if (auth()->user()->role == 'teacher')
                                     <option value="student" ${$(e.relatedTarget).data('role') == 'student' ? 'selected' : ''}>Siswa</option>
@@ -302,23 +302,23 @@
                                 <x-input-error :messages="$errors->get('nip')" class="mt-2" />
                             </div>
                             <div class="mb-3">
-                                <label for="phone_number" class="fw-semibold">No Telp</label>
-                                <input type="text" class="form-control" id="phone_number" name="phone_number"
+                                <label for="phone_number_teacher" class="fw-semibold">No Telp</label>
+                                <input type="text" class="form-control" id="phone_number_teacher" name="phone_number_teacher"
                                     placeholder="Masukan No Telp" value="${$(e.relatedTarget).data('phone_number')}" >
-                                <x-input-error :messages="$errors->get('phone_number')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('phone_number_teacher')" class="mt-2" />
                             </div>
                             <div class="mb-3">
                                 <label for="address" class="fw-semibold">Alamat</label>
-                                <input type="text" class="form-control" id="address" value="${$(e.relatedTarget).data('address')}" name="address"
+                                <input type="text" class="form-control" id="address" value="${$(e.relatedTarget).data('address')}" name="address_teacher"
                                     placeholder="Masukan Alamat" >
                                 <x-input-error :messages="$errors->get('address')" class="mt-2" />
                             </div>
                             <div class="mb-3">
-                                <label for="school_id" class="fw-semibold">Sekolah</label>
-                                <select name="school_id" id="school_id" class="form-control" >
+                                <label for="school_id_teacher" class="fw-semibold">Sekolah</label>
+                                <select name="school_id_teacher" id="school_id_teacher" class="form-control" >
                                    ${schoolOption}
                                 </select>
-                                <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('school_id_teacher')" class="mt-2" />
                             </div>
                         </div>
                         <div id="student-edit" class="d-none">

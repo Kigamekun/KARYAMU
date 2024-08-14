@@ -13,7 +13,8 @@ use App\Models\Teacher;
 
 class TrainingController extends Controller
 {
-    public function edit($id){
+    public function edit($id)
+    {
         $data = Training::where('id', $id)->first();
         $members = TeacherTraining::where('training_id', $id)->get()->pluck('teacher_id');
         return response()->json([
@@ -44,6 +45,10 @@ class TrainingController extends Controller
                 ->addColumn('action', function ($row) {
                     $btn = '
                         <div class="d-flex" style="gap:5px;">
+                            <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
+                            data-id="' . $row->id . '" >
+                                Detail
+                            </button>
                             <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
                             data-url="' . route('pelatihan.update', ['id' => $row->id]) . '"
                             data-id="' . $row->id . '"
@@ -106,21 +111,55 @@ class TrainingController extends Controller
         return redirect()->back()->with(['message' => 'Training berhasil ditambahkan', 'status' => 'success']);
     }
 
+    public function detail($id)
+    {
+        $data = Training::where('id', $id)->first()->toArray();
+
+        $members = TeacherTraining::where('training_id', $id)->get()->map(function ($item) {
+            return [
+                'name' => $item->teacher->name,
+                'school' => $item->teacher->school->name
+            ];
+        });
+        return response()->json([
+            'data' => $data,
+            'members' => $members
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $thumbname = time() . '-' . $file->getClientOriginalName();
-            Storage::disk('public')->put('Training/' . $thumbname, file_get_contents($file));
-            Training::where('id', $id)->update([
-                'image' => $thumbname,
-                'name' => $request->name,
+        Validator::validate($request->all(), [
+            'title' => 'required',
+            'description' => 'required',
+        ]);
+
+        $training = Training::where('id', $id)->first();
+        $thumbname = $training->activity_photo;
+
+        if ($request->hasFile('activity_photo')) {
+            $request->validate([
+                'activity_photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1048',
             ]);
-        } else {
-            Training::where('id', $id)->update([
-                'name' => $request->name,
+            $file = $request->file('activity_photo');
+            $thumbname = time() . '-' . $file->getClientOriginalName();
+            Storage::disk('public')->put('activity_photo/' . $thumbname, file_get_contents($file));
+        }
+
+        Training::where('id', $id)->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'activity_photo' => $thumbname
+        ]);
+
+        TeacherTraining::where('training_id', $id)->delete();
+        foreach ($request->members as $member) {
+            TeacherTraining::create([
+                'training_id' => $id,
+                'teacher_id' => $member
             ]);
         }
+
         return redirect()->back()->with(['message' => 'Training berhasil di update', 'status' => 'success']);
     }
 

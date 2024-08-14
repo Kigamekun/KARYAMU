@@ -15,10 +15,54 @@ use App\Models\Teacher;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Province;
 use App\Models\School;
+use App\Models\Subscription;
+use Minishlink\WebPush\WebPush;
+use Minishlink\WebPush\Subscription as WebPushSubscription;
+
 
 
 class ArtworkController extends Controller
 {
+    protected function sendPushNotification($sekolah_id, $karya)
+    {
+        // Ambil semua subscription guru yang ada di sekolah yang sama
+        $subscriptions = Subscription::join('users', 'users.id', '=', 'subscriptions.user_id')
+            ->join('teachers', 'teachers.user_id', '=', 'users.id')
+            ->where('teachers.school_id', $sekolah_id)
+            ->get();
+
+
+        $auth = [
+            'VAPID' => [
+                'subject' => 'mailto:example@yourdomain.org',
+                'publicKey' => env('VAPID_PUBLIC_KEY'), // Letakkan di .env
+                'privateKey' => env('VAPID_PRIVATE_KEY'), // Letakkan di .env
+            ],
+        ];
+
+        $webPush = new WebPush($auth);
+
+        foreach ($subscriptions as $sub) {
+            $webPushSub = WebPushSubscription::create([
+                'endpoint' => $sub->endpoint,
+                'publicKey' => $sub->public_key,
+                'authToken' => $sub->auth_token,
+            ]);
+
+            $payload = json_encode([
+                'title' => 'Karya Baru Dikirim',
+                'body' => 'Siswa telah mengirimkan karya baru yang perlu disetujui.',
+                'data' => [
+                    'karya_id' => $karya->id,
+                    'judul' => $karya->judul
+                ],
+            ]);
+
+            $webPush->sendOneNotification($webPushSub, $payload);
+        }
+
+        $webPush->flush();
+    }
 
     public function edit($id)
     {
@@ -40,7 +84,6 @@ class ArtworkController extends Controller
 
     public function index(Request $request)
     {
-
         if ($request->ajax()) {
             $data = Artwork::all();
             return DataTables::of($data)
@@ -200,6 +243,8 @@ class ArtworkController extends Controller
                     'student_id' => $student
                 ]);
             }
+
+            $this->sendPushNotification($school_id, $artwork);
         }
 
         Mail::to('startcodedigital@gmail.com')->send(new NewKarya($artwork));
@@ -334,29 +379,22 @@ class ArtworkController extends Controller
 
     public function like(Request $request, $id)
     {
-        // Find the artwork by ID
         $artwork = Artwork::find($id);
 
-        // Check if the artwork exists
         if (!$artwork) {
             return response()->json(['error' => 'Artwork not found'], 404);
         }
 
-        // Determine if the item is being liked or unliked
         $isLiked = $request->input('liked');
 
         if ($isLiked) {
-            // If the item is being unliked, decrease the like count
             $artwork->likes = max(0, $artwork->likes - 1);
         } else {
-            // If the item is being liked, increase the like count
             $artwork->likes += 1;
         }
 
-        // Save the updated artwork model
         $artwork->save();
 
-        // Return the updated like count as a JSON response
         return response()->json(['likes' => $artwork->likes]);
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class SchoolController extends Controller
 {
@@ -22,7 +23,7 @@ class SchoolController extends Controller
                         <div class="d-flex" style="gap:5px;">
                             <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
                             data-url="' . route('sekolah.update', ['id' => $row->id]) . '"
-                            data-id="' . $row->id . '" data-name="' . $row->name . '" data-image="' . asset('storage/School/' . $row->image) . '">
+                            data-id="' . $row->id . '" data-name="' . $row->name . '" data-address="' . $row->address . '" data-phone="' . $row->phone . '" data-email="' . $row->email . '" data-name="' . $row->name . '">
                                 Edit
                             </button>
                             <form id="deleteForm" action="' . route('sekolah.delete', ['id' => $row->id]) . '" method="POST">
@@ -47,51 +48,65 @@ class SchoolController extends Controller
         ]);
     }
 
+    public function detail($id)
+    {
+        $data = School::where('id', $id)->first()->toArray();
+        $kelurahan = DB::table('master_subdistrict')->where('code', $data['subdistrict_code'])->first();
+        $data['kelurahan'] = $kelurahan;
+        $data['kecamatan'] = DB::table('master_district')->where('code', $kelurahan->district_code)->first();
+        $data['kabupaten'] = DB::table('master_regency')->where('code', $data['kecamatan']->regency_code)->first();
+        $data['provinsi'] = DB::table('master_province')->where('code', $data['kabupaten']->province_code)->first();
+
+        return response()->json($data);
+    }
+
     public function store(Request $request)
     {
         Validator::validate($request->all(), [
             'name' => 'required',
-            'image' => 'required',
+            'address' => 'required',
+            'phone' => 'required',
+            'email' => 'required',
+            'dp_kelurahan' => 'required',
+
         ]);
 
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $thumbname = time() . '-' . $file->getClientOriginalName();
-            Storage::disk('public')->put('School/' . $thumbname, file_get_contents($file));
-            School::insert([
-                'image' => $thumbname,
-                'name' => $request->name,
-            ]);
-        } else {
-            School::insert([
-                'name' => $request->name,
-            ]);
-        }
+
+        School::create([
+            'name' => $request->name,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'subdistrict_code' => $request->dp_kelurahan,
+        ]);
 
         return redirect()->back()->with(['message' => 'School berhasil ditambahkan', 'status' => 'success']);
     }
 
     public function update(Request $request, $id)
     {
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $thumbname = time() . '-' . $file->getClientOriginalName();
-            Storage::disk('public')->put('School/' . $thumbname, file_get_contents($file));
-            School::where('id', $id)->update([
-                'image' => $thumbname,
-                'name' => $request->name,
-            ]);
-        } else {
-            School::where('id', $id)->update([
-                'name' => $request->name,
-            ]);
-        }
+        Validator::validate($request->all(), [
+            'name' => 'required',
+            'address' => 'required',
+            'phone' => 'required',
+            'email' => 'required',
+            'dp_kelurahan' => 'required',
+        ]);
+
+        School::where('id', $id)->update([
+            'name' => $request->name,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'subdistrict_code' => $request->dp_kelurahan,
+        ]);
+
         return redirect()->back()->with(['message' => 'School berhasil di update', 'status' => 'success']);
     }
 
     public function destroy($id)
     {
         School::where('id', $id)->delete();
-        return redirect()->route('School.index')->with(['message' => 'School berhasil di delete', 'status' => 'success']);
+        return redirect()->route('sekolah.index')->with(['message' => 'School berhasil di delete', 'status' => 'success']);
     }
 }

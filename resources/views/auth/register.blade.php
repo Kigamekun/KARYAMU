@@ -82,28 +82,61 @@
         <div class="card shadow" style="border:none;width:40%;border-radius:30px">
             <div class="card-body " style="padding: 50px 100px 50px">
                 <div class="d-flex justify-content-center align-items-center" style="flex-direction: column">
-                    <h1>Login</h1>
+                    <h1>Register</h1>
                     <p>Hallo!, Masukan detail untuk melakukan
-                        login ke akun anda</p>
+                        registrasi akun</p>
                 </div>
                 <br>
-                <form method="POST" action="{{ route('login') }}">
+                <form method="POST" action="{{ route('register') }}">
                     @csrf
-                    <div class="mb-3">
-                        <label for="login" class="fw-semibold">login/Username</label>
-                        <input
-                            style="margin-top:10px; border-radius:15px; height:50px; border: 1px solid rgba(15,97,255,.5)"
-                            type="login" class="form-control" id="login" name="login"
-                            placeholder="Masukan email atau username" required>
-                        <x-input-error :messages="$errors->get('login')" class="mt-2" />
+                    <div class="col mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="col mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="mb-3 col">
+                            <label for="password_confirmation" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="password_confirmation"
+                                name="password_confirmation" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-3 col">
+                            <label for="nis" class="form-label">NIS</label>
+                            <input type="text" class="form-control" id="nis" name="nis" required>
+                        </div>
+                        <div class="mb-3 col">
+                            <label for="school_id" class="form-label
+                                ">Sekolah </label>
+                            <select class="form-select" id="school_id" name="school_id" required>
+                                <option value="" selected>Pilih Sekolah</option>
+                                @foreach (DB::table('schools')->get() as $item)
+                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="fw-semibold">Password</label>
-                        <input
-                            style="margin-top:10px; border-radius:15px; height:50px; border: 1px solid rgba(15,97,255,.5)"
-                            type="password" class="form-control" id="password" name="password"
-                            placeholder="Masukan Password" required>
-                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone</label>
+                        <input type="text" class="form-control" id="phone" name="phone" required>
                     </div>
                     <div class="mb-3 mt-3 d-flex justify-content-between">
                         <div class="form-check
@@ -121,7 +154,7 @@
                     </div>
                     <div class="d-grid gap-2">
                         <button type="submit" style="border-radius:15px;background:#0097FF;border:none"
-                            class="p-3 btn btn-primary">Login</button>
+                            class="p-3 btn btn-primary">Register</button>
                     </div>
                 </form>
             </div>
@@ -129,6 +162,37 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
         </script>
+
+
+        @if (!is_null(Session::get('message')))
+            <script>
+                Swal.fire({
+                    position: 'center',
+                    icon: @json(Session::get('status')),
+                    title: @json(Session::get('status')),
+                    html: @json(Session::get('message')),
+                    showConfirmButton: false,
+                    timer: 2000
+                })
+            </script>
+        @endif
+        @if (!empty($errors->all()))
+            <script>
+                var err = @json($errors->all());
+                var txt = '';
+                Object.keys(err).forEach(element => {
+                    txt += err[element] + '<br>';
+                });
+                Swal.fire({
+                    position: 'center',
+                    icon: 'error',
+                    title: 'Error',
+                    html: txt,
+                    showConfirmButton: false,
+                    timer: 4000
+                })
+            </script>
+        @endif
 </body>
 
 </html>

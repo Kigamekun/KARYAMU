@@ -107,7 +107,7 @@
                 <div class="container">
                     <br>
                     <br>
-                    <div>
+                    {{-- <div>
                         <div class="d-flex justify-start " style="gap: 40px">
                             <div class="box box-primary">
                                 <div class="box-body box-profile">
@@ -135,12 +135,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                     <form class="needs-validation" novalidate="" method="POST" href="{{ route('profile.update') }}">
 
                         @csrf
                         @method('PATCH')
-                        <div class="col-md-7 col-lg-12 mt-5">
+                        <div class="col-md-7 col-lg-12 ">
                             <h3 class="mb-3">Data Diri</h3>
                             <div class="row g-3">
                                 <div class="col-sm-6">
@@ -267,6 +267,8 @@
                         <br>
                     </form>
                     <br>
+                    <br>
+
                 </div>
             </div>
         </div>

@@ -9,10 +9,12 @@ class Student extends Model
 {
 
     protected $fillable = [
+        'name',
         'nis',
         'phone',
         'address',
         'school_id',
+        'user_id',
     ];
     public function artworks()
     {

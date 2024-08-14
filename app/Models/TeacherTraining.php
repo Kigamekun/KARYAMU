@@ -16,5 +16,10 @@ class TeacherTraining extends Model
     {
         return $this->belongsTo(Training::class);
     }
+
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class);
+    }
     use HasFactory;
 }

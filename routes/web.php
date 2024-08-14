@@ -41,7 +41,8 @@ Route::get('/contact', function () {
 
 Route::prefix('karya-home')->group(function () {
     Route::get('/', [ArtworkController::class, 'karyaHome'])->name('karya-home.index');
-    Route::get('/{id}', [ArtworkController::class, 'detailHome'])->name('karya-home.detail');
+    Route::get('/detail/{id}', [ArtworkController::class, 'detailHome'])->name('karya-home.detail');
+    Route::get('/filter', [ArtworkController::class, 'filterHome'])->name('karya-home.filter');
 });
 
 

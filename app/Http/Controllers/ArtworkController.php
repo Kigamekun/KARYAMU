@@ -82,6 +82,33 @@ class ArtworkController extends Controller
         return response()->json($artwork, 200);
     }
 
+    public function filterHome(Request $request)
+    {
+        $search = $_GET['search'];
+        $selectedSchools = $_GET['schools'];
+        $types = $_GET['type'];
+
+        $query = Artwork::query();
+        if ($search) {
+            $query->where('title', 'like', '%' . $search . '%');
+        }
+
+        if ($selectedSchools) {
+            $query->whereIn('school_id', $selectedSchools);
+        }
+
+        if ($types) {
+            $query->whereIn('type', $types);
+        }
+
+        $karyas = $query->paginate(12);
+
+        return view('karya-home', [
+            'data' => $karyas
+        ]);
+
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -229,6 +256,9 @@ class ArtworkController extends Controller
                     'student_id' => $student
                 ]);
             }
+
+            $this->sendPushNotification($school_id, $artwork);
+
         } else {
             $request->validate([
                 'video' => 'required|url',

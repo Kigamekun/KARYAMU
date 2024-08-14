@@ -38,29 +38,31 @@
             <h3 class="mb-4">Pelatihan Terbaru</h3>
         </div>
 
-        <div class="row">
-            @foreach ($pelatihan as $index => $item)
-                <div class="col-md-4">
-                    <div style="border-radius:15px;" class="card">
-                        <div class="card-body">
-                            <h5 class="card-title
+        @if (Auth::user()->role != 'student')
+            <div class="row">
+                @foreach ($pelatihan as $index => $item)
+                    <div class="col-md-4">
+                        <div style="border-radius:15px;" class="card">
+                            <div class="card-body">
+                                <h5 class="card-title
                         ">{{ $item['title'] }}</h5>
-                            <div class="row mt-5">
-                                <div class="col-6">
-                                    <h4>{{ $item['participant'] }}</h4>
-                                    <p>Participants</p>
-                                    <h4>{{ $item['total'] }}</h4>
-                                    <p>Total</p>
-                                </div>
-                                <div class="col-6">
-                                    <canvas class="chart" id="myChart-{{ $index }}"></canvas>
+                                <div class="row mt-5">
+                                    <div class="col-6">
+                                        <h4>{{ $item['participant'] }}</h4>
+                                        <p>Participants</p>
+                                        <h4>{{ $item['total'] }}</h4>
+                                        <p>Total</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <canvas class="chart" id="myChart-{{ $index }}"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
-        </div>
+                @endforeach
+            </div>
+        @endif
         <br>
         <div class="search-element d-flex justify-content-between">
             <div>

@@ -27,8 +27,7 @@
                         <h5 class="card-title
                         ">Filter</h5>
                         <br>
-                        <form action="{{ route('karya.filter') }}" method="POST">
-                            @csrf
+                        <form action="{{ route('karya-home.filter') }}" method="GET">
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control" name="search" placeholder="Search"
                                     aria-label="Search" aria-describedby="button-addon2">

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
 
@@ -186,7 +186,10 @@ class UserController extends Controller
 
         if ($request->role == 'student') {
             Validator::validate($request->all(), [
-                'nis' => 'required|unique:students',
+                'nis' => [
+                    'required',
+                    Rule::unique('students')->ignore($id, 'user_id') // Mengabaikan user_id saat validasi
+                ],
                 'school_id' => 'required',
                 'phone_number' => 'required',
                 'address' => 'required',
@@ -207,7 +210,10 @@ class UserController extends Controller
 
         } elseif ($request->role == 'teacher') {
             Validator::validate($request->all(), [
-                'nip' => 'required|unique:teachers',
+                'nis' => [
+                    'required',
+                    Rule::unique('teachers')->ignore($id, 'user_id') // Mengabaikan user_id saat validasi
+                ],
                 'school_id_teacher' => 'required',
                 'phone_number_teacher' => 'required',
                 'address_teacher' => 'required',

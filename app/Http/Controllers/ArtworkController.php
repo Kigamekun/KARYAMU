@@ -99,21 +99,17 @@ class ArtworkController extends Controller
 
         } else if (isset($_GET['search'])) {
 
-            $search = $_GET['search'];
-            $selectedSchools = $_GET['schools'];
-            $types = $_GET['type'];
-
             $query = Artwork::query();
-            if ($search) {
-                $query->where('title', 'like', '%' . $search . '%');
+            if (isset($_GET['search'])) {
+                $query->where('title', 'like', '%' . $_GET['search'] . '%');
             }
 
-            if ($selectedSchools) {
-                $query->whereIn('school_id', $selectedSchools);
+            if (isset($_GET['schools'])) {
+                $query->whereIn('school_id', $_GET['schools']);
             }
 
-            if ($types) {
-                $query->whereIn('type', $types);
+            if (isset($_GET['type'])) {
+                $query->whereIn('type', $_GET['type']);
             }
 
             $data = $query->paginate(12);

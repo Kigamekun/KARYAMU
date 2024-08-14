@@ -210,7 +210,7 @@ class UserController extends Controller
 
         } elseif ($request->role == 'teacher') {
             Validator::validate($request->all(), [
-                'nis' => [
+                'nip' => [
                     'required',
                     Rule::unique('teachers')->ignore($id, 'user_id') // Mengabaikan user_id saat validasi
                 ],

@@ -165,7 +165,6 @@ class UserController extends Controller
                     'address' => $request->address,
                 ]);
             } else {
-
                 $user->student()->create([
                     'name' => $request->name,
                     'nis' => $request->nis,
@@ -224,16 +223,33 @@ class UserController extends Controller
             Teacher::where('user_id', $id)->delete();
 
 
-            User::find($id)->student()->updateOrCreate(
-                ['user_id' => $id], // Assuming 'user_id' is the foreign key in the 'students' table
-                [
-                    'name' => $request->name,
-                    'nis' => $request->nis,
-                    'school_id' => $request->school_id,
-                    'phone' => $request->phone_number,
-                    'address' => $request->address,
-                ]
-            );
+            if (Auth::user()->role == 'admin') {
+
+
+                User::find($id)->student()->updateOrCreate(
+                    ['user_id' => $id], // Assuming 'user_id' is the foreign key in the 'students' table
+                    [
+                        'name' => $request->name,
+                        'nis' => $request->nis,
+                        'school_id' => $request->school_id,
+                        'phone' => $request->phone_number,
+                        'address' => $request->address,
+                    ]
+                );
+            } else {
+
+                User::find($id)->student()->updateOrCreate(
+                    ['user_id' => $id], // Assuming 'user_id' is the foreign key in the 'students' table
+                    [
+                        'name' => $request->name,
+                        'nis' => $request->nis,
+                        'school_id' => Auth::user()->teacher->school_id,
+                        'phone' => $request->phone_number,
+                        'address' => $request->address,
+                    ]
+                );
+            }
+
 
         } elseif ($request->role == 'teacher') {
             Validator::validate($request->all(), [

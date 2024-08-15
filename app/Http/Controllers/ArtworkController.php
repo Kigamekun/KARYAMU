@@ -25,7 +25,6 @@ class ArtworkController extends Controller
 {
     protected function sendPushNotification($sekolah_id, $karya)
     {
-        // Ambil semua subscription guru yang ada di sekolah yang sama
         $subscriptions = Subscription::join('users', 'users.id', '=', 'subscriptions.user_id')
             ->join('teachers', 'teachers.user_id', '=', 'users.id')
             ->where('teachers.school_id', $sekolah_id)
@@ -34,8 +33,8 @@ class ArtworkController extends Controller
         $auth = [
             'VAPID' => [
                 'subject' => 'mailto:example@yourdomain.org',
-                'publicKey' => env('VAPID_PUBLIC_KEY'), // Letakkan di .env
-                'privateKey' => env('VAPID_PRIVATE_KEY'), // Letakkan di .env
+                'publicKey' => env('VAPID_PUBLIC_KEY'),
+                'privateKey' => env('VAPID_PRIVATE_KEY'),
             ],
         ];
 
@@ -78,7 +77,7 @@ class ArtworkController extends Controller
         $artwork = Artwork::find($id);
         $artwork->students = ArtworkStudent::where('artwork_id', $id)
             ->join('students', 'students.id', '=', 'artwork_students.student_id')
-            ->pluck('students.name') // Hanya ambil nama siswa
+            ->pluck('students.name')
             ->implode(', ');
 
         return response()->json($artwork, 200);
@@ -86,7 +85,6 @@ class ArtworkController extends Controller
 
     public function filterHome(Request $request)
     {
-
         if (isset($_GET['provinsi'])) {
             $provinceId = Province::where('name', $_GET['provinsi'])->first()->id;
             $school = School::join('master_subdistrict', 'schools.subdistrict_code', '=', 'master_subdistrict.code')
@@ -121,7 +119,6 @@ class ArtworkController extends Controller
         return view('karya-home', [
             'data' => $data
         ]);
-
     }
 
     public function index(Request $request)
@@ -242,6 +239,7 @@ class ArtworkController extends Controller
             'students' => 'required',
         ]);
         $student_id = Student::where('user_id', Auth::user()->id)->first() != null ? Student::where('user_id', Auth::user()->id)->first()->id : null;
+        $teacher_id = Teacher::where('user_id', Auth::user()->id)->first() != null ? Teacher::where('user_id', Auth::user()->id)->first()->id : null;
 
         if (Auth::user()->role == 'admin') {
             $school_id = null;
@@ -265,6 +263,7 @@ class ArtworkController extends Controller
                 'file_path' => $thumbname,
                 'is_approved' => 0,
                 'created_by_student_id' => $student_id,
+                'created_by_teacher_id' => $teacher_id,
                 'school_id' => $school_id,
             ]);
             foreach ($request->students as $student) {
@@ -408,10 +407,10 @@ class ArtworkController extends Controller
                 ->where('master_province.id', $provinceId)
                 ->pluck('schools.id')
                 ->toArray();
-            $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->paginate(12);
+            $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->paginate(12)->appends(request()->query());
 
         } else {
-            $data = Artwork::where('is_approved', 1)->paginate(12);
+            $data = Artwork::where('is_approved', 1)->paginate(12)->appends(request()->query());
         }
         return view('karya-home', [
             'data' => $data
@@ -453,7 +452,7 @@ class ArtworkController extends Controller
             $query->whereIn('type', $types);
         }
 
-        $karyas = $query->paginate(12);
+        $karyas = $query->paginate(12)->appends(request()->query());
 
         return view('karya-home', [
             'data' => $karyas

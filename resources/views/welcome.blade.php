@@ -34,6 +34,9 @@
                             <x-card :item="$item" />
                         </div>
                     @endforeach
+                    <div class="mt-5">
+                        {{ $data->links() }}
+                    </div>
                 @endif
             </div>
         </div>

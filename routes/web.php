@@ -1,12 +1,10 @@
 <?php
 
-use App\Http\Controllers\{ProfileController,SubscriptionController, ArtworkController, MasterController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
+use App\Http\Controllers\{ProfileController, SubscriptionController, ArtworkController, MasterController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
 use Illuminate\Support\Facades\Route;
 use App\Models\{Artwork, Training, Teacher, School, Province};
 
 Route::get('/', function () {
-
-
     if (isset($_GET['provinsi'])) {
         $provinceId = Province::where('name', $_GET['provinsi'])->first()->id;
         $school = School::join('master_subdistrict', 'schools.subdistrict_code', '=', 'master_subdistrict.code')
@@ -16,10 +14,9 @@ Route::get('/', function () {
             ->where('master_province.id', $provinceId)
             ->pluck('schools.id')
             ->toArray();
-        $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->get();
-
+        $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->paginate(12)->appends(request()->query());
     } else {
-        $data = Artwork::where('is_approved', 1)->get();
+        $data = Artwork::where('is_approved', 1)->paginate(12)->appends(request()->query());
     }
 
     return view('welcome', [
@@ -31,7 +28,6 @@ Route::get('/', function () {
 
 Route::get('/generate-register-link', [UserController::class, 'createLinkRegisterGuru'])->name('generate.register.link');
 
-// Rute untuk menampilkan halaman register guru dengan link yang terenkripsi
 Route::get('/register-guru', [UserController::class, 'showRegisterGuru'])->name('register.guru');
 Route::post('/create-guru', [UserController::class, 'createGuru'])->name('register.create-guru');
 
@@ -63,13 +59,13 @@ Route::get('/dashboard', function () {
             ->where('master_province.id', $provinceId)
             ->pluck('schools.id')
             ->toArray();
-        $data = Artwork::orderBy('created_at','DESC')->limit(6)->whereIn('school_id', $school)->get();
+        $data = Artwork::orderBy('created_at', 'DESC')->limit(6)->whereIn('school_id', $school)->get();
 
     } else {
-        $data = Artwork::orderBy('created_at','DESC')->limit(6)->get();
+        $data = Artwork::orderBy('created_at', 'DESC')->limit(6)->get();
     }
 
-    $trainings = Training::orderBy('created_at','DESC')->limit(6)->get();
+    $trainings = Training::orderBy('created_at', 'DESC')->limit(6)->get();
 
     // Dapatkan jumlah teachers
     $totalTeachers = Teacher::count();
@@ -105,11 +101,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/kelurahan/{id}', [MasterController::class, 'kelurahan'])->name('master.kelurahan');
     });
 
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 
     Route::prefix('karya')->group(function () {
         Route::get('/', [ArtworkController::class, 'index'])->name('karya.index');
@@ -136,20 +130,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/store', [SchoolController::class, 'store'])->name('sekolah.store');
         Route::put('/update/{id}', [SchoolController::class, 'update'])->name('sekolah.update');
         Route::delete('/delete/{id}', [SchoolController::class, 'destroy'])->name('sekolah.delete');
-    });
-
-    Route::prefix('guru')->group(function () {
-        Route::get('/', [TeacherController::class, 'index'])->name('guru.index');
-        Route::post('/store', [TeacherController::class, 'store'])->name('guru.store');
-        Route::put('/update/{id}', [TeacherController::class, 'update'])->name('guru.update');
-        Route::delete('/delete/{id}', [TeacherController::class, 'destroy'])->name('guru.delete');
-    });
-
-    Route::prefix('siswa')->group(function () {
-        Route::get('/', [StudentController::class, 'index'])->name('siswa.index');
-        Route::post('/store', [StudentController::class, 'store'])->name('siswa.store');
-        Route::put('/update/{id}', [StudentController::class, 'update'])->name('siswa.update');
-        Route::delete('/delete/{id}', [StudentController::class, 'destroy'])->name('siswa.delete');
     });
 
     Route::prefix('pelatihan')->group(function () {

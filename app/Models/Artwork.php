@@ -14,6 +14,7 @@ class Artwork extends Model
         'video_link',
         'video_id',
         'created_by_student_id',
+        'created_by_teacher_id',
         'approved_by_teacher_id',
         'type',
         'is_approved',

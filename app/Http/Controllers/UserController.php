@@ -216,7 +216,6 @@ class UserController extends Controller
                     'required',
                     Rule::unique('students')->ignore($id, 'user_id') // Mengabaikan user_id saat validasi
                 ],
-                'school_id' => 'required',
                 'phone_number' => 'required',
                 'address' => 'required',
             ]);

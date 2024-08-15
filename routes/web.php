@@ -53,7 +53,21 @@ Route::prefix('karya-home')->group(function () {
 
 
 Route::get('/dashboard', function () {
-    $data = Artwork::orderBy('created_at','DESC')->limit(6)->get();
+
+    if (isset($_GET['provinsi'])) {
+        $provinceId = Province::where('name', $_GET['provinsi'])->first()->id;
+        $school = School::join('master_subdistrict', 'schools.subdistrict_code', '=', 'master_subdistrict.code')
+            ->join('master_district', 'master_subdistrict.district_code', '=', 'master_district.code')
+            ->join('master_regency', 'master_district.regency_code', '=', 'master_regency.code')
+            ->join('master_province', 'master_regency.province_code', '=', 'master_province.code')
+            ->where('master_province.id', $provinceId)
+            ->pluck('schools.id')
+            ->toArray();
+        $data = Artwork::orderBy('created_at','DESC')->limit(6)->whereIn('school_id', $school)->get();
+
+    } else {
+        $data = Artwork::orderBy('created_at','DESC')->limit(6)->get();
+    }
 
     $trainings = Training::orderBy('created_at','DESC')->limit(6)->get();
 

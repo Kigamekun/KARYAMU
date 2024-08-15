@@ -35,10 +35,9 @@
         </div>
         <br>
         @if (Auth::user()->role != 'student')
-
-        <div>
-            <h3 class="mb-4">Pelatihan Terbaru</h3>
-        </div>
+            <div>
+                <h3 class="mb-4">Pelatihan Terbaru</h3>
+            </div>
 
             <div class="row">
                 @foreach ($pelatihan as $index => $item)
@@ -73,40 +72,50 @@
         <br>
         <div class="container-fluid">
             <div class="row ">
-                @foreach ($data as $item)
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <div class="card h-100" style="border-radius:15px;">
-                            <div class="position-relative">
-                                @if ($item->type == 'image')
-                                    <img src="{{ asset('storage/artwork/' . $item->file_path) }}"
-                                        style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
-                                        class="card-img-top" alt="...">
-                                @elseif ($item->type == 'video')
-                                    <div class="play-button">
-                                        <img src="https://img.youtube.com/vi/{{ $item->video_id }}/hqdefault.jpg"
+                @if (!$data->isEmpty())
+                    @foreach ($data as $item)
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100" style="border-radius:15px;">
+                                <div class="position-relative">
+                                    @if ($item->type == 'image')
+                                        <img src="{{ asset('storage/artwork/' . $item->file_path) }}"
                                             style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
-                                            class="card-img-top" alt="YouTube Thumbnail">
-                                    </div>
-                                @endif
-                                <div class="design-div bookmark">
-                                    <center style="margin-top: -22px;color: white;">
-                                        <i class="fa-regular fa-image"></i>
-                                    </center>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div style="height: 80px">
-                                    <h5 class="card-title">{{ $item->title }}</h5>
-                                    <div style="display: flex;gap:10px;align-items:center;" class="text-muted">
-                                        <div style="width: 10px;height:10px;background:#0097FF;border-radius:50%"></div>
-                                        {{ DB::table('schools')->where('id', $item->school_id)->first()->name }}
+                                            class="card-img-top" alt="...">
+                                    @elseif ($item->type == 'video')
+                                        <div class="play-button">
+                                            <img src="https://img.youtube.com/vi/{{ $item->video_id }}/hqdefault.jpg"
+                                                style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
+                                                class="card-img-top" alt="YouTube Thumbnail">
+                                        </div>
+                                    @endif
+                                    <div class="design-div bookmark">
+                                        <center style="margin-top: -22px;color: white;">
+                                            <i class="fa-regular fa-image"></i>
+                                        </center>
                                     </div>
                                 </div>
-                                <p class="card-text trun mt-3" style="height: 50px">{{ $item->description }}</p>
+                                <div class="card-body">
+                                    <div style="height: 80px">
+                                        <h5 class="card-title">{{ $item->title }}</h5>
+                                        <div style="display: flex;gap:10px;align-items:center;" class="text-muted">
+                                            <div style="width: 10px;height:10px;background:#0097FF;border-radius:50%"></div>
+                                            {{ DB::table('schools')->where('id', $item->school_id)->first()->name }}
+                                        </div>
+                                    </div>
+                                    <p class="card-text trun mt-3" style="height: 50px">{{ $item->description }}</p>
+                                </div>
                             </div>
                         </div>
+                    @endforeach
+                @else
+                    <div class="col-12 text-center mt-4">
+                        <div class="empty-state">
+                            <img src="{{ asset('assets/img/empty.svg') }}" alt="">
+                            <h3 class="mt-5">Tidak ada data yang tersedia</h3>
+                            <p>Silakan tambahkan beberapa item untuk ditampilkan di sini.</p>
+                        </div>
                     </div>
-                @endforeach
+                @endif
             </div>
         </div>
     </div>

@@ -421,6 +421,11 @@ class ArtworkController extends Controller
     public function detailHome($id)
     {
         $artwork = Artwork::find($id);
+
+        if (!$artwork) {
+            return redirect()->route('karya-home.index')->with(['message' => 'Karya tidak ditemukan', 'status' => 'danger']);
+        }
+
         $terkait = Artwork::where('is_approved', 1)->limit(3)->get();
 
         return view('karya-detail', [

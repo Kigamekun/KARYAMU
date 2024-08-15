@@ -192,7 +192,7 @@ class ArtworkController extends Controller
                             $status = '<badge class="badge badge-success">Publish</badge>';
                             break;
                         case 0:
-                            $status = '<badge class="badge badge-danger">Draft</badge>';
+                            $status = '<badge class="badge badge-error">Draft</badge>';
                             break;
                         default:
                             # code...
@@ -240,7 +240,7 @@ class ArtworkController extends Controller
         ]);
 
         if(Student::whereIn('id', $request->students)->count() != count($request->students)){
-            return redirect()->back()->with(['message' => 'Data student tidak ada', 'status' => 'danger']);
+            return redirect()->back()->with(['message' => 'Data student tidak ada', 'status' => 'error']);
         }
 
         $student_id = Student::where('user_id', Auth::user()->id)->first() != null ? Student::where('user_id', Auth::user()->id)->first()->id : null;
@@ -291,7 +291,7 @@ class ArtworkController extends Controller
             ]);
             $videoId = $this->extractVideoId($request->video);
             if (!$videoId) {
-                return redirect()->back()->with(['message' => 'Link video tidak valid', 'status' => 'danger']);
+                return redirect()->back()->with(['message' => 'Link video tidak valid', 'status' => 'error']);
             }
             $artwork = Artwork::create([
                 'title' => $request->title,
@@ -354,7 +354,7 @@ class ArtworkController extends Controller
         ]);
 
         if(Student::whereIn('id', $request->students)->count() != count($request->students)){
-            return redirect()->back()->with(['message' => 'Data student tidak ada', 'status' => 'danger']);
+            return redirect()->back()->with(['message' => 'Data student tidak ada', 'status' => 'error']);
         }
 
         if ($request->type == 'image') {
@@ -378,7 +378,7 @@ class ArtworkController extends Controller
         } else {
             $videoId = $this->extractVideoId($request->video);
             if (!$videoId) {
-                return redirect()->back()->with(['message' => 'Link video tidak valid', 'status' => 'danger']);
+                return redirect()->back()->with(['message' => 'Link video tidak valid', 'status' => 'error']);
             }
             Artwork::where('id', $id)->update([
                 'title' => $request->title,
@@ -433,7 +433,7 @@ class ArtworkController extends Controller
         $artwork = Artwork::find($id);
 
         if (!$artwork) {
-            return redirect()->route('karya-home.index')->with(['message' => 'Karya tidak ditemukan', 'status' => 'danger']);
+            return redirect()->route('karya-home.index')->with(['message' => 'Karya tidak ditemukan', 'status' => 'error']);
         }
 
         $terkait = Artwork::where('is_approved', 1)->limit(3)->get();

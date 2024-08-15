@@ -94,7 +94,7 @@ class TrainingController extends Controller
         ]);
 
         if(Teacher::whereIn('id', $request->members)->count() != count($request->members)){
-            return redirect()->back()->with(['message' => 'Data guru tidak ada', 'status' => 'danger']);
+            return redirect()->back()->with(['message' => 'Data guru tidak ada', 'status' => 'error']);
         }
 
         $teacher_id = auth()->user()->teacher->id;
@@ -150,7 +150,7 @@ class TrainingController extends Controller
         ]);
 
         if(Teacher::whereIn('id', $request->members)->count() != count($request->members)){
-            return redirect()->back()->with(['message' => 'Data guru tidak ada', 'status' => 'danger']);
+            return redirect()->back()->with(['message' => 'Data guru tidak ada', 'status' => 'error']);
         }
 
         $training = Training::where('id', $id)->first();

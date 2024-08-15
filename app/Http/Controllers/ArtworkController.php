@@ -239,7 +239,7 @@ class ArtworkController extends Controller
             'students' => 'required',
         ]);
 
-        if(Student::whereIn('id', $request->students)->count() == count($request->students)){
+        if(Student::whereIn('id', $request->students)->count() != count($request->students)){
             return redirect()->back()->with(['message' => 'Data student tidak ada', 'status' => 'danger']);
         }
 
@@ -353,7 +353,7 @@ class ArtworkController extends Controller
             'students' => 'required',
         ]);
 
-        if(Student::whereIn('id', $request->students)->count() == count($request->students)){
+        if(Student::whereIn('id', $request->students)->count() != count($request->students)){
             return redirect()->back()->with(['message' => 'Data student tidak ada', 'status' => 'danger']);
         }
 

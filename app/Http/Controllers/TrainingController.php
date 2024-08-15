@@ -93,6 +93,10 @@ class TrainingController extends Controller
             'members' => 'required',
         ]);
 
+        if(Teacher::whereIn('id', $request->members)->count() != count($request->members)){
+            return redirect()->back()->with(['message' => 'Data guru tidak ada', 'status' => 'danger']);
+        }
+
         $teacher_id = auth()->user()->teacher->id;
 
         $file = $request->file('activity_photo');
@@ -144,6 +148,10 @@ class TrainingController extends Controller
             'members.*' => 'required',
             'members' => 'required',
         ]);
+
+        if(Teacher::whereIn('id', $request->members)->count() != count($request->members)){
+            return redirect()->back()->with(['message' => 'Data guru tidak ada', 'status' => 'danger']);
+        }
 
         $training = Training::where('id', $id)->first();
         $thumbname = $training->activity_photo;

@@ -18,6 +18,7 @@ class TrainingController extends Controller
 {
     public function edit($id)
     {
+        $id = Crypt::decrypt($id);
         $data = Training::where('id', $id)->first();
         $members = TeacherTraining::where('training_id', $id)->get()->pluck('teacher_id');
         return response()->json([

@@ -190,8 +190,9 @@
                 type: 'GET',
                 success: function(response) {
                     let memberOption = '';
+                    console.log(response.members);
+
                     members.forEach(member => {
-                        console.log(member)
                         if (response.members.includes(member.id)) {
                             memberOption +=
                                 `<option value="${member.id}" selected>${member.name}</option>`;

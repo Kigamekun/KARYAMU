@@ -89,6 +89,8 @@ class TrainingController extends Controller
             'title' => 'required',
             'description' => 'required',
             'activity_photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1048',
+            'members.*' => 'required',
+            'members' => 'required',
         ]);
 
         $teacher_id = auth()->user()->teacher->id;
@@ -139,6 +141,8 @@ class TrainingController extends Controller
         Validator::validate($request->all(), [
             'title' => 'required',
             'description' => 'required',
+            'members.*' => 'required',
+            'members' => 'required',
         ]);
 
         $training = Training::where('id', $id)->first();

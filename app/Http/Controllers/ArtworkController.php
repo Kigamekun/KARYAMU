@@ -296,6 +296,7 @@ class ArtworkController extends Controller
                 'video_id' => $videoId,
                 'is_approved' => 0,
                 'created_by_student_id' => $student_id,
+                'created_by_teacher_id' => $teacher_id,
                 'school_id' => $school_id,
             ]);
             foreach ($request->students as $student) {

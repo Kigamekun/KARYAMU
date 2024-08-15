@@ -42,6 +42,16 @@ class ProfileController extends Controller
             ]);
         }
 
+        if (Auth::user()->student !== null) {
+            Auth::user()->student->update([
+                'name' => $request->name,
+            ]);
+        } elseif (Auth::user()->teacher !== null) {
+            Auth::user()->teacher->update([
+                'name' => $request->name,
+            ]);
+        }
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 

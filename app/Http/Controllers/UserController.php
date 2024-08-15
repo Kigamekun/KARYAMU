@@ -16,6 +16,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\ArtworkStudent;
+use App\Models\Artwork;
 
 
 class UserController extends Controller
@@ -214,7 +216,7 @@ class UserController extends Controller
             Validator::validate($request->all(), [
                 'nis' => [
                     'required',
-                    Rule::unique('students')->ignore($id, 'user_id') // Mengabaikan user_id saat validasi
+                    Rule::unique('students')->ignore($id, 'user_id')
                 ],
                 'phone_number' => 'required',
                 'address' => 'required',
@@ -223,10 +225,8 @@ class UserController extends Controller
 
 
             if (Auth::user()->role == 'admin') {
-
-
                 User::find($id)->student()->updateOrCreate(
-                    ['user_id' => $id], // Assuming 'user_id' is the foreign key in the 'students' table
+                    ['user_id' => $id],
                     [
                         'name' => $request->name,
                         'nis' => $request->nis,
@@ -236,9 +236,8 @@ class UserController extends Controller
                     ]
                 );
             } else {
-
                 User::find($id)->student()->updateOrCreate(
-                    ['user_id' => $id], // Assuming 'user_id' is the foreign key in the 'students' table
+                    ['user_id' => $id],
                     [
                         'name' => $request->name,
                         'nis' => $request->nis,
@@ -248,23 +247,31 @@ class UserController extends Controller
                     ]
                 );
             }
-
-
         } elseif ($request->role == 'teacher') {
             Validator::validate($request->all(), [
                 'nip' => [
                     'required',
-                    Rule::unique('teachers')->ignore($id, 'user_id') // Mengabaikan user_id saat validasi
+                    Rule::unique('teachers')->ignore($id, 'user_id')
                 ],
                 'school_id_teacher' => 'required',
                 'phone_number_teacher' => 'required',
                 'address_teacher' => 'required',
             ]);
 
+            $artworkStudent = ArtworkStudent::where('student_id', $id)->first();
+            $artworkId = $artworkStudent->artwork_id;
+            $artworkStudent->delete();
+
+            $remainingReferences = ArtworkStudent::where('artwork_id', $artworkId)->count();
+
+            if ($remainingReferences === 0) {
+                Artwork::find($artworkId)->delete();
+            }
+
             Student::where('user_id', $id)->delete();
 
             User::find($id)->teacher()->updateOrCreate(
-                ['user_id' => $id], // Assuming 'user_id' is the foreign key in the 'students' table
+                ['user_id' => $id],
                 [
                     'name' => $request->name,
                     'nip' => $request->nip,

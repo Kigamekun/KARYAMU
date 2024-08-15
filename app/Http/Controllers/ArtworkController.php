@@ -238,6 +238,11 @@ class ArtworkController extends Controller
             'students.*' => 'required',
             'students' => 'required',
         ]);
+
+        if(Student::whereIn('id', $request->students)->count() == count($request->students)){
+            return redirect()->back()->with(['message' => 'Data student tidak ada', 'status' => 'danger']);
+        }
+
         $student_id = Student::where('user_id', Auth::user()->id)->first() != null ? Student::where('user_id', Auth::user()->id)->first()->id : null;
         $teacher_id = Teacher::where('user_id', Auth::user()->id)->first() != null ? Teacher::where('user_id', Auth::user()->id)->first()->id : null;
 
@@ -314,14 +319,14 @@ class ArtworkController extends Controller
             }
         }
 
-        try {
-            $teach = Teacher::where('school_id', $school_id)->join('users', 'users.id', '=', 'teachers.user_id')->select('users.email')->get();
-            foreach ($teach as $teacher) {
-                Mail::to($teacher->email)->send(new NewKarya($artwork));
-            }
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
+        // try {
+        //     $teach = Teacher::where('school_id', $school_id)->join('users', 'users.id', '=', 'teachers.user_id')->select('users.email')->get();
+        //     foreach ($teach as $teacher) {
+        //         Mail::to($teacher->email)->send(new NewKarya($artwork));
+        //     }
+        // } catch (\Throwable $th) {
+        //     //throw $th;
+        // }
 
         return redirect()->back()->with(['message' => 'Artwork berhasil ditambahkan', 'status' => 'success']);
     }
@@ -347,6 +352,11 @@ class ArtworkController extends Controller
             'students.*' => 'required',
             'students' => 'required',
         ]);
+
+        if(Student::whereIn('id', $request->students)->count() == count($request->students)){
+            return redirect()->back()->with(['message' => 'Data student tidak ada', 'status' => 'danger']);
+        }
+
         if ($request->type == 'image') {
             if ($request->hasFile('image')) {
                 $file = $request->file('image');

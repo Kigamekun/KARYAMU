@@ -259,14 +259,14 @@ class UserController extends Controller
             ]);
 
             $stut = Student::where('user_id', $id);
-            $artworkStudent = ArtworkStudent::where('student_id', $stut->first()->id)->first();
-            $artworkId = $artworkStudent->artwork_id;
-            $artworkStudent->delete();
+            $artworkStudent = ArtworkStudent::where('student_id', $stut->first()->id)->get();
 
-            $remainingReferences = ArtworkStudent::where('artwork_id', $artworkId)->count();
-
-            if ($remainingReferences === 0) {
-                Artwork::find($artworkId)->delete();
+            foreach ($artworkStudent as $art) {
+                $artworkId = $art->artwork_id;
+                $remainingReferences = ArtworkStudent::where('artwork_id', $artworkId)->count() - 1;
+                if ($remainingReferences === 0) {
+                    Artwork::find($artworkId)->delete();
+                }
             }
 
             $stut->delete();

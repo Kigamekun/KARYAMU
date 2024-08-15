@@ -272,7 +272,12 @@ class ArtworkController extends Controller
                 ]);
             }
 
-            $this->sendPushNotification($school_id, $artwork);
+            try {
+                $this->sendPushNotification($school_id, $artwork);
+
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
 
         } else {
             $request->validate([
@@ -299,10 +304,22 @@ class ArtworkController extends Controller
                 ]);
             }
 
-            $this->sendPushNotification($school_id, $artwork);
+            try {
+                $this->sendPushNotification($school_id, $artwork);
+
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
         }
 
-        Mail::to('startcodedigital@gmail.com')->send(new NewKarya($artwork));
+        try {
+            $teach = Teacher::where('school_id', $school_id)->join('users', 'users.id', '=', 'teachers.user_id')->select('users.email')->get();
+            foreach ($teach as $teacher) {
+                Mail::to($teacher->email)->send(new NewKarya($artwork));
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
 
         return redirect()->back()->with(['message' => 'Artwork berhasil ditambahkan', 'status' => 'success']);
     }

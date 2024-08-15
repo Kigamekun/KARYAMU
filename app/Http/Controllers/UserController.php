@@ -258,7 +258,8 @@ class UserController extends Controller
                 'address_teacher' => 'required',
             ]);
 
-            $artworkStudent = ArtworkStudent::where('student_id', $id)->first();
+            $stut = Student::where('user_id', $id);
+            $artworkStudent = ArtworkStudent::where('student_id', $stut->first()->id)->first();
             $artworkId = $artworkStudent->artwork_id;
             $artworkStudent->delete();
 
@@ -268,7 +269,7 @@ class UserController extends Controller
                 Artwork::find($artworkId)->delete();
             }
 
-            Student::where('user_id', $id)->delete();
+            $stut->delete();
 
             User::find($id)->teacher()->updateOrCreate(
                 ['user_id' => $id],

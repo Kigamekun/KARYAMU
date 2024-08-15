@@ -65,6 +65,8 @@ class ArtworkController extends Controller
 
     public function edit($id)
     {
+        $id = Crypt::decrypt($id);
+
         $artwork = Artwork::find($id);
         $artwork->students = ArtworkStudent::where('artwork_id', $id)->get()->pluck('student_id');
         return response()->json($artwork, 200);

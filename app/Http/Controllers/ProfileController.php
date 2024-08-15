@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
+
 
 class ProfileController extends Controller
 {
@@ -33,6 +35,12 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        if ($request->password !== null) {
+            $request->user()->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

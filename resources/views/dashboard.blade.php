@@ -34,11 +34,12 @@
 
         </div>
         <br>
+        @if (Auth::user()->role != 'student')
+
         <div>
             <h3 class="mb-4">Pelatihan Terbaru</h3>
         </div>
 
-        @if (Auth::user()->role != 'student')
             <div class="row">
                 @foreach ($pelatihan as $index => $item)
                     <div class="col-md-4">

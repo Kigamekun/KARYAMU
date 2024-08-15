@@ -53,9 +53,9 @@ Route::prefix('karya-home')->group(function () {
 
 
 Route::get('/dashboard', function () {
-    $data = Artwork::all();
+    $data = Artwork::orderBy('created_at','DESC')->limit(6)->get();
 
-    $trainings = Training::all();
+    $trainings = Training::orderBy('created_at','DESC')->limit(6)->get();
 
     // Dapatkan jumlah teachers
     $totalTeachers = Teacher::count();

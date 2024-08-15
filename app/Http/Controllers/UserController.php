@@ -13,6 +13,11 @@ use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Crypt;
+
+
 class UserController extends Controller
 {
 
@@ -21,7 +26,11 @@ class UserController extends Controller
         if ($request->ajax()) {
             $data = User::with(['student', 'teacher']);
             if (Auth::user()->role == 'teacher') {
-                $data = $data->where('role', 'student');
+                $data = User::with('student')
+                    ->where('role', 'student')
+                    ->whereHas('student', function ($query) {
+                        $query->where('school_id', Auth::user()->teacher->school_id);
+                    });
             }
             $data = $data->get()->map(function ($user) {
                 if ($user->role == 'student') {
@@ -69,11 +78,14 @@ class UserController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
+                    $id = Crypt::encrypt($row['id']);
+
+
                     $btn = '
                         <div class="d-flex" style="gap:5px;">
                             <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
-                            data-url="' . route('user.update', ['id' => $row['id']]) . '"
-                            data-id="' . $row['id'] . '" data-name="' . $row['name'] . '"
+                            data-url="' . route('user.update', ['id' => $id]) . '"
+                            data-id="' . $id . '" data-name="' . $row['name'] . '"
                             data-username="' . $row['username'] . '"
                             data-email="' . $row['email'] . '" data-role="' . $row['role'] . '"
                             data-nis="' . $row['nis'] . '" data-nip="' . $row['nip'] . '"
@@ -81,7 +93,7 @@ class UserController extends Controller
                             data-school_id="' . $row['school_id'] . '">
                                 Edit
                             </button>
-                            <form id="deleteForm" action="' . route('user.delete', ['id' => $row['id']]) . '" method="POST">
+                            <form id="deleteForm" action="' . route('user.delete', ['id' => $id]) . '" method="POST">
                             ' . csrf_field() . '
                             ' . method_field('DELETE') . '
                                 <button type="button" title="DELETE" class="btn btn-sm btn-primary btn-delete" onclick="confirmDelete(event)">
@@ -134,23 +146,35 @@ class UserController extends Controller
             'role' => $request->role,
         ]);
 
-
         if ($request->role == 'student') {
 
             Validator::validate($request->all(), [
                 'nis' => 'required|unique:students',
-                'school_id' => 'required',
                 'phone_number' => 'required',
                 'address' => 'required',
             ]);
 
-            $user->student()->create([
-                'name' => $request->name,
-                'nis' => $request->nis,
-                'school_id' => $request->school_id,
-                'phone' => $request->phone_number,
-                'address' => $request->address,
-            ]);
+
+            if (Auth::user()->role == 'admin') {
+
+                $user->student()->create([
+                    'name' => $request->name,
+                    'nis' => $request->nis,
+                    'school_id' => $request->school_id,
+                    'phone' => $request->phone_number,
+                    'address' => $request->address,
+                ]);
+            } else {
+
+                $user->student()->create([
+                    'name' => $request->name,
+                    'nis' => $request->nis,
+                    'school_id' => Auth::user()->teacher->school_id,
+                    'phone' => $request->phone_number,
+                    'address' => $request->address,
+                ]);
+            }
+
         } elseif ($request->role == 'teacher') {
             Validator::validate($request->all(), [
                 'nip' => 'required|unique:teachers',
@@ -176,6 +200,9 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
+        $id = Crypt::decrypt($id);
+
+
         Validator::validate($request->all(), [
             'name' => 'required',
             'username' => 'required',
@@ -255,7 +282,85 @@ class UserController extends Controller
 
     public function destroy($id)
     {
+        $id = Crypt::decrypt($id);
+
         User::where('id', $id)->delete();
         return redirect()->route('user.index')->with(['message' => 'Users berhasil di delete', 'status' => 'success']);
     }
+
+    public function createLinkRegisterGuru()
+    {
+        $token = bin2hex(random_bytes(16));
+
+        $expiresAt = now()->addHour();
+
+        $encryptedData = encrypt(json_encode([
+            'token' => $token,
+            'expires_at' => $expiresAt
+        ]));
+
+        $url = route('register.guru', ['data' => $encryptedData]);
+
+        return response()->json(['url' => $url]);
+    }
+
+    public function showRegisterGuru(Request $request)
+    {
+        $encryptedData = $request->query('data');
+
+        try {
+            // Decrypt and decode the data
+            $data = json_decode(decrypt($encryptedData), true);
+
+            // Check if the link has expired
+            if (now()->greaterThan($data['expires_at'])) {
+                return abort(403, 'Link ini sudah kadaluwarsa.');
+            }
+
+            // Proceed with showing the registration form
+            return view('auth.register-guru');
+
+        } catch (\Exception $e) {
+            return abort(403, 'Link tidak valid.');
+        }
+    }
+
+    public function createGuru(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'password' => ['required', 'confirmed'],
+            'nip' => 'required',
+            'school_id' => 'required',
+            'phone' => 'required',
+            'address' => 'required',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'teacher',
+        ]);
+
+        Teacher::create([
+            'name' => $request->name,
+            'nip' => $request->nip,
+            'school_id' => $request->school_id,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'user_id' => $user->id,
+        ]);
+
+        event(new Registered($user));
+
+        Auth::login($user);
+
+        return redirect(route('dashboard', absolute: false));
+    }
+
+
 }

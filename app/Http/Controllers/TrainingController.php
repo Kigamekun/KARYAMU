@@ -11,6 +11,9 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Models\Teacher;
 
+use Illuminate\Support\Facades\Crypt;
+
+
 class TrainingController extends Controller
 {
     public function edit($id)
@@ -43,20 +46,22 @@ class TrainingController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
+                    $id = Crypt::encrypt($row->id);
+
                     $btn = '
                         <div class="d-flex" style="gap:5px;">
                             <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
-                            data-id="' . $row->id . '" >
+                            data-id="' . $id . '" >
                                 Detail
                             </button>
                             <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
-                            data-url="' . route('pelatihan.update', ['id' => $row->id]) . '"
-                            data-id="' . $row->id . '"
+                            data-url="' . route('pelatihan.update', ['id' => $id]) . '"
+                            data-id="' . $id . '"
                             data-title="' . $row->title . '"
                             data-description="' . $row->description . '" data-activity_photo="' . asset('storage/activity_photo/' . $row->activity_photo) . '">
                                 Edit
                             </button>
-                            <form id="deleteForm" action="' . route('pelatihan.delete', ['id' => $row->id]) . '" method="POST">
+                            <form id="deleteForm" action="' . route('pelatihan.delete', ['id' => $id]) . '" method="POST">
                             ' . csrf_field() . '
                             ' . method_field('DELETE') . '
                                 <button type="button" title="DELETE" class="btn btn-sm btn-primary btn-delete" onclick="confirmDelete(event)">
@@ -110,6 +115,8 @@ class TrainingController extends Controller
 
     public function detail($id)
     {
+        $id = Crypt::decrypt($id);
+
         $data = Training::where('id', $id)->first()->toArray();
 
         $members = TeacherTraining::where('training_id', $id)->get()->map(function ($item) {
@@ -126,6 +133,8 @@ class TrainingController extends Controller
 
     public function update(Request $request, $id)
     {
+        $id = Crypt::decrypt($id);
+
         Validator::validate($request->all(), [
             'title' => 'required',
             'description' => 'required',
@@ -162,6 +171,8 @@ class TrainingController extends Controller
 
     public function destroy($id)
     {
+        $id = Crypt::decrypt($id);
+
         Training::where('id', $id)->delete();
         return redirect()->route('pelatihan.index')->with(['message' => 'Training berhasil di delete', 'status' => 'success']);
     }

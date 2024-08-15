@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
+
 
 class SchoolController extends Controller
 {
@@ -19,14 +21,16 @@ class SchoolController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
+                    $id = Crypt::encrypt($row->id);
+
                     $btn = '
                         <div class="d-flex" style="gap:5px;">
                             <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
-                            data-url="' . route('sekolah.update', ['id' => $row->id]) . '"
-                            data-id="' . $row->id . '" data-name="' . $row->name . '" data-address="' . $row->address . '" data-phone="' . $row->phone . '" data-email="' . $row->email . '" data-name="' . $row->name . '">
+                            data-url="' . route('sekolah.update', ['id' => $id]) . '"
+                            data-id="' . $id . '" data-name="' . $row->name . '" data-address="' . $row->address . '" data-phone="' . $row->phone . '" data-email="' . $row->email . '" data-name="' . $row->name . '">
                                 Edit
                             </button>
-                            <form id="deleteForm" action="' . route('sekolah.delete', ['id' => $row->id]) . '" method="POST">
+                            <form id="deleteForm" action="' . route('sekolah.delete', ['id' => $id]) . '" method="POST">
                             ' . csrf_field() . '
                             ' . method_field('DELETE') . '
                                 <button type="button" title="DELETE" class="btn btn-sm btn-primary btn-delete" onclick="confirmDelete(event)">
@@ -50,6 +54,7 @@ class SchoolController extends Controller
 
     public function detail($id)
     {
+        $id = Crypt::decrypt($id);
         $data = School::where('id', $id)->first()->toArray();
         $kelurahan = DB::table('master_subdistrict')->where('code', $data['subdistrict_code'])->first();
         $data['kelurahan'] = $kelurahan;
@@ -85,6 +90,8 @@ class SchoolController extends Controller
 
     public function update(Request $request, $id)
     {
+        $id = Crypt::decrypt($id);
+
         Validator::validate($request->all(), [
             'name' => 'required',
             'address' => 'required',
@@ -106,6 +113,8 @@ class SchoolController extends Controller
 
     public function destroy($id)
     {
+        $id = Crypt::decrypt($id);
+
         School::where('id', $id)->delete();
         return redirect()->route('sekolah.index')->with(['message' => 'School berhasil di delete', 'status' => 'success']);
     }

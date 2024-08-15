@@ -22,6 +22,11 @@ class RegisteredUserController extends Controller
         return view('auth.register');
     }
 
+    public function createGuru(): View
+    {
+        return view('auth.register-guru');
+    }
+
     /**
      * Handle an incoming registration request.
      *

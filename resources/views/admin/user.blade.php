@@ -28,6 +28,10 @@
                         <button class="btn btn-primary" data-toggle="modal" data-target="#createData">
                             Tambah Data
                         </button>
+
+                        @if (Auth::user()->role == 'admin')
+                            <button class="btn btn-primary" id="generate-link-btn">Generate Register Link</button>
+                        @endif
                     </div>
                 </div>
                 <br>
@@ -122,8 +126,8 @@
                             </div>
                             <div class="mb-3">
                                 <label for="phone_number_teacher" class="fw-semibold">No Telp</label>
-                                <input type="text" class="form-control" id="phone_number_teacher" name="phone_number_teacher"
-                                    placeholder="Masukan No Telp">
+                                <input type="text" class="form-control" id="phone_number_teacher"
+                                    name="phone_number_teacher" placeholder="Masukan No Telp">
                                 <x-input-error :messages="$errors->get('phone_number_teacher')" class="mt-2" />
                             </div>
                             <div class="mb-3">
@@ -164,12 +168,20 @@
                             </div>
                             <div class="mb-3">
                                 <label for="school_id" class="fw-semibold">Sekolah</label>
-                                <select name="school_id" id="school_id" class="form-control">
-                                    <option value="">Pilih Sekolah</option>
-                                    @foreach ($sekolah as $item)
-                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                    @endforeach
-                                </select>
+                                @if (Auth::user()->role == 'admin')
+                                    <select name="school_id" id="school_id" class="form-control">
+                                        <option value="">Pilih Sekolah</option>
+                                        @foreach ($sekolah as $item)
+                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <select name="school_id" id="school_id" class="form-control" disabled>
+                                        <option value="">Pilih Sekolah</option>
+                                        <option value="{{ Auth::user()->teacher->school_id }}" selected>
+                                            {{ Auth::user()->teacher->school->name }}</option>
+                                    </select>
+                                @endif
                                 <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                             </div>
                         </div>
@@ -316,7 +328,7 @@
                             <div class="mb-3">
                                 <label for="school_id_teacher" class="fw-semibold">Sekolah</label>
                                 <select name="school_id_teacher" id="school_id_teacher" class="form-control" >
-                                   ${schoolOption}
+                                    ${schoolOption}
                                 </select>
                                 <x-input-error :messages="$errors->get('school_id_teacher')" class="mt-2" />
                             </div>
@@ -342,8 +354,8 @@
                             </div>
                             <div class="mb-3">
                                 <label for="school_id" class="fw-semibold">Sekolah</label>
-                                <select name="school_id" id="school_id" class="form-control" >
-                                     ${schoolOption}
+                                <select name="school_id" id="school_id" class="form-control" disabled>
+                                        ${schoolOption}
                                 </select>
                                 <x-input-error :messages="$errors->get('school_id')" class="mt-2" />
                             </div>
@@ -391,4 +403,30 @@
             }
         }
     </script>
+
+    @if (Auth::user()->role == 'admin')
+        <script>
+            document.getElementById('generate-link-btn').addEventListener('click', function() {
+                // Send AJAX request to generate the register link
+                fetch('/generate-register-link')
+                    .then(response => response.json())
+                    .then(data => {
+                        const link = data.url;
+
+                        // Copy the link to the clipboard
+                        navigator.clipboard.writeText(link).then(() => {
+                            alert('Link has been copied to clipboard!');
+                        }).catch(err => {
+                            console.error('Failed to copy the text: ', err);
+                        });
+
+                        // Optional: Display the link on the page
+                        document.getElementById('link-output').textContent = link;
+                    })
+                    .catch(error => {
+                        console.error('Error generating the link:', error);
+                    });
+            });
+        </script>
+    @endif
 @endsection

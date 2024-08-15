@@ -18,7 +18,7 @@ use App\Models\School;
 use App\Models\Subscription;
 use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription as WebPushSubscription;
-
+use Illuminate\Support\Facades\Crypt;
 
 
 class ArtworkController extends Controller
@@ -30,7 +30,6 @@ class ArtworkController extends Controller
             ->join('teachers', 'teachers.user_id', '=', 'users.id')
             ->where('teachers.school_id', $sekolah_id)
             ->get();
-
 
         $auth = [
             'VAPID' => [
@@ -73,6 +72,7 @@ class ArtworkController extends Controller
 
     public function detail($id)
     {
+        $id = Crypt::decrypt($id);
         $artwork = Artwork::find($id);
         $artwork->students = ArtworkStudent::where('artwork_id', $id)
             ->join('students', 'students.id', '=', 'artwork_students.student_id')
@@ -84,7 +84,6 @@ class ArtworkController extends Controller
 
     public function filterHome(Request $request)
     {
-
 
         if (isset($_GET['provinsi'])) {
             $provinceId = Province::where('name', $_GET['provinsi'])->first()->id;
@@ -140,9 +139,11 @@ class ArtworkController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
+
+                    $id = Crypt::encrypt($row->id);
                     $btn = '<div class="d-flex" style="gap:5px;">';
                     if ($row->is_approved == 0 and Auth::user()->role == 'teacher') {
-                        $btn .= '<form id="approveForm" action="' . route('karya.approve', ['id' => $row->id]) . '" method="POST">
+                        $btn .= '<form id="approveForm" action="' . route('karya.approve', ['id' => $id]) . '" method="POST">
                         ' . csrf_field() . '
                         ' . method_field('PUT') . '
                             <button type="button" title="APPROVE" class="btn btn-sm btn-success btn-approve" onclick="confirmApprove(event)">
@@ -151,18 +152,18 @@ class ArtworkController extends Controller
                         </form>';
                         $btn .= '
                         <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
-                            data-id="' . $row->id . '" >
+                            data-id="' . $id . '" >
                                 Detail
                             </button>
                             <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
-                            data-url="' . route('karya.update', ['id' => $row->id]) . '"
-                            data-id="' . $row->id . '" data-title="' . $row->title . '" data-description="' . $row->description . '" data-type="' . $row->type . '" data-video_link="' . $row->video_link . '" data-file_path="' . asset('storage/artwork/' . $row->file_path) . '">
+                            data-url="' . route('karya.update', ['id' => $id]) . '"
+                            data-id="' . $id . '" data-title="' . $row->title . '" data-description="' . $row->description . '" data-type="' . $row->type . '" data-video_link="' . $row->video_link . '" data-file_path="' . asset('storage/artwork/' . $row->file_path) . '">
                                 Edit
                             </button>
                         ';
                     }
                     $btn .= '
-                    <form id="deleteForm" action="' . route('karya.delete', ['id' => $row->id]) . '" method="POST">
+                    <form id="deleteForm" action="' . route('karya.delete', ['id' => $id]) . '" method="POST">
                             ' . csrf_field() . '
                             ' . method_field('DELETE') . '
                                 <button type="button" title="DELETE" class="btn btn-sm btn-primary btn-delete" onclick="confirmDelete(event)">
@@ -308,6 +309,7 @@ class ArtworkController extends Controller
 
     public function approve($id)
     {
+        $id = Crypt::decrypt($id);
         Artwork::where('id', $id)->update([
             'is_approved' => 1,
             'approved_by_teacher_id' => Teacher::where('user_id', Auth::user()->id)->first()->id
@@ -317,6 +319,8 @@ class ArtworkController extends Controller
 
     public function update(Request $request, $id)
     {
+        $id = Crypt::decrypt($id);
+
         Validator::validate($request->all(), [
             'title' => 'required',
             'description' => 'required',
@@ -369,6 +373,7 @@ class ArtworkController extends Controller
 
     public function destroy($id)
     {
+        $id = Crypt::decrypt($id);
         Artwork::where('id', $id)->delete();
         return redirect()->route('karya.index')->with(['message' => 'Artwork berhasil di delete', 'status' => 'success']);
     }

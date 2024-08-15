@@ -29,6 +29,12 @@ Route::get('/', function () {
 
 
 
+Route::get('/generate-register-link', [UserController::class, 'createLinkRegisterGuru'])->name('generate.register.link');
+
+// Rute untuk menampilkan halaman register guru dengan link yang terenkripsi
+Route::get('/register-guru', [UserController::class, 'showRegisterGuru'])->name('register.guru');
+Route::post('/create-guru', [UserController::class, 'createGuru'])->name('register.create-guru');
+
 
 Route::get('/about', function () {
     return view('about');

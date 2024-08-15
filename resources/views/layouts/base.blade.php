@@ -119,7 +119,7 @@
                         <div class=" d-flex justify-center w-100">
                             <div class="my-4"
                                 style="justify-content:center;align-items:center;width:100%;flex-direction: column;display:flex;">
-                                <a href="index.html" style="font-size: 25px;color:#0097FF">
+                                <a href="/" style="font-size: 25px;color:#0097FF">
                                     <i class="fa-solid fa-graduation-cap"></i>
                                     KaryaMu</a>
                                 <span style="font-size: 10px">Aplikasi Management Karya</span>
@@ -143,7 +143,7 @@
                         </div>
                     </div>
                     <div class="sidebar-brand sidebar-brand-sm">
-                        <a href="index.html" style="color: #0097FF"> <i class="fa-solid fa-graduation-cap"></i>
+                        <a href="/" style="color: #0097FF"> <i class="fa-solid fa-graduation-cap"></i>
                         </a>
                     </div>
                     <div class="d-flex align-center justify-between"

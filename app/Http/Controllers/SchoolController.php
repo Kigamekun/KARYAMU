@@ -47,7 +47,7 @@ class SchoolController extends Controller
                 ->rawColumns(['action', 'img'])
                 ->make(true);
         }
-        return view('admin.School', [
+        return view('admin.school', [
             'data' => School::all()
         ]);
     }

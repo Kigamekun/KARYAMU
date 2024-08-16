@@ -150,16 +150,18 @@ class ArtworkController extends Controller
                             </button>
                         </form>';
                         $btn .= '
-                        <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
-                            data-id="' . $id . '" >
-                                Detail
-                            </button>
+
                             <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
                             data-url="' . route('karya.update', ['id' => $id]) . '"
                             data-id="' . $id . '" data-title="' . $row->title . '" data-description="' . $row->description . '" data-type="' . $row->type . '" data-video_link="' . $row->video_link . '" data-file_path="' . asset('storage/artwork/' . $row->file_path) . '">
                                 Edit
                             </button>
                         ';
+                    } else {
+                        $btn .= ' <button type="button" title="Detail" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
+                            data-id="' . $id . '" >
+                                Detail
+                            </button>';
                     }
                     $btn .= '
                     <form id="deleteForm" action="' . route('karya.delete', ['id' => $id]) . '" method="POST">
@@ -239,7 +241,7 @@ class ArtworkController extends Controller
             'students' => 'required',
         ]);
 
-        if(Student::whereIn('id', $request->students)->count() != count($request->students)){
+        if (Student::whereIn('id', $request->students)->count() != count($request->students)) {
             return redirect()->back()->with(['message' => 'Data student tidak ada', 'status' => 'error']);
         }
 
@@ -353,7 +355,7 @@ class ArtworkController extends Controller
             'students' => 'required',
         ]);
 
-        if(Student::whereIn('id', $request->students)->count() != count($request->students)){
+        if (Student::whereIn('id', $request->students)->count() != count($request->students)) {
             return redirect()->back()->with(['message' => 'Data student tidak ada', 'status' => 'error']);
         }
 

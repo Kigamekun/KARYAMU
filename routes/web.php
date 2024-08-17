@@ -156,6 +156,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('pelatihan')->group(function () {
         Route::get('/', [TrainingController::class, 'index'])->name('pelatihan.index');
         Route::get('/{id}', [TrainingController::class, 'detail'])->name('pelatihan.detail');
+        Route::get('/detail-imbas/{id}', [TrainingController::class, 'detailImbas'])->name('pelatihan.detail-imbas');
 
         Route::post('/store', [TrainingController::class, 'store'])->name('pelatihan.store');
         Route::get('/{id}/edit', [TrainingController::class, 'edit'])->name('pelatihan.edit');

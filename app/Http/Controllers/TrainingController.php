@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Models\Teacher;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Crypt;
 
@@ -30,73 +31,154 @@ class TrainingController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $teacherId = auth()->user()->teacher->id;
-            $data = Training::join('teachers as trainer', 'trainer.id', '=', 'trainings.trainer_teacher_id')
-                ->leftJoin('schools', 'schools.id', '=', 'trainer.school_id')
-                ->leftJoin('teacher_trainings', 'teacher_trainings.training_id', '=', 'trainings.id')
-                ->leftJoin('teachers as participant', 'participant.id', '=', 'teacher_trainings.teacher_id')
-                ->select(
-                    'trainings.id',
-                    'trainings.description',
-                    'trainings.activity_photo',
-                    'trainer.name as trainer_name',
-                    'schools.name as trainer_school',
-                    DB::raw('COUNT(teacher_trainings.teacher_id) as total_participants'),
-                    DB::raw('IF(teacher_trainings.role = "instructor", "instructor", "participant") as role')
-                )
-                ->where('teacher_trainings.teacher_id', '=', $teacherId)
-                ->groupBy(
-                    'trainings.id',
-                    'trainings.description',
-                    'trainings.activity_photo',
-                    'trainer.name',
-                    'schools.name',
-                    'teacher_trainings.role'
-                )
-                ->get();
-            return DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('action', function ($row) {
-                    $id = Crypt::encrypt($row->id);
+            if (Auth::user()->role == 'admin') {
+                $data = Training::join('teachers as trainer', 'trainer.id', '=', 'trainings.trainer_teacher_id')
+                    ->leftJoin('schools', 'schools.id', '=', 'trainer.school_id')
+                    ->leftJoin('teacher_trainings', 'teacher_trainings.training_id', '=', 'trainings.id')
+                    ->leftJoin('teachers as participant', 'participant.id', '=', 'teacher_trainings.teacher_id')
+                    ->select(
+                        'trainings.id',
+                        'trainings.description',
+                        'trainings.activity_photo',
+                        'trainer.name as trainer_name',
+                        'schools.name as trainer_school',
+                        DB::raw('COUNT(teacher_trainings.teacher_id) as total_participants'),
+                        DB::raw('IF(teacher_trainings.role = "instructor", "instructor", "participant") as role')
+                    )
+                    ->where('teacher_trainings.role', '=', 'instructor')
+                    ->groupBy(
+                        'trainings.id',
+                        'trainings.description',
+                        'trainings.activity_photo',
+                        'trainer.name',
+                        'schools.name',
+                        'teacher_trainings.role'
+                    )
+                    ->get();
 
-                    if ($row->role == 'instructor') {
-                        $btn = '
-                        <div class="d-flex" style="gap:5px;">
-                            <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
-                            data-id="' . $id . '" >
-                                Detail
-                            </button>
-                            <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
-                            data-url="' . route('pelatihan.update', ['id' => $id]) . '"
-                            data-id="' . $id . '"
-                            data-description="' . $row->description . '" data-activity_photo="' . asset('storage/activity_photo/' . $row->activity_photo) . '">
-                                Edit
-                            </button>
-                            <form id="deleteForm" action="' . route('pelatihan.delete', ['id' => $id]) . '" method="POST">
-                            ' . csrf_field() . '
-                            ' . method_field('DELETE') . '
-                                <button type="button" title="DELETE" class="btn btn-sm btn-primary btn-delete" onclick="confirmDelete(event)">
-                                    Delete
+
+
+
+                return DataTables::of($data)
+                    ->addIndexColumn()
+                    ->addColumn('action', function ($row) {
+                        $id = Crypt::encrypt($row->id);
+
+                        if ($row->role == 'instructor') {
+                            $btn = '
+                            <div class="d-flex" style="gap:5px;">
+                            <a href="' . route('pelatihan.detail-imbas', ['id' => $id]) . '" class="btn btn-sm btn-success"
+                                >
+                                    Lihat Imbas
+                                </a>
+
+                                <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
+                                data-id="' . $id . '" >
+                                    Detail
                                 </button>
-                            </form>
-                        </div>';
-                    } else {
-                        $btn = '
-                        <div class="d-flex" style="gap:5px;">
-                            <button type="button" title="Detail" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
-                            data-id="' . $id . '" >
-                                Detail
-                            </button>
-                        </div>';
+                                <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
+                                data-url="' . route('pelatihan.update', ['id' => $id]) . '"
+                                data-id="' . $id . '"
+                                data-description="' . $row->description . '" data-activity_photo="' . asset('storage/activity_photo/' . $row->activity_photo) . '">
+                                    Edit
+                                </button>
+                                <form id="deleteForm" action="' . route('pelatihan.delete', ['id' => $id]) . '" method="POST">
+                                ' . csrf_field() . '
+                                ' . method_field('DELETE') . '
+                                    <button type="button" title="DELETE" class="btn btn-sm btn-primary btn-delete" onclick="confirmDelete(event)">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>';
+                        } else {
+                            $btn = '
+                            <div class="d-flex" style="gap:5px;">
+                                <button type="button" title="Detail" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
+                                data-id="' . $id . '" >
+                                    Detail
+                                </button>
+                            </div>';
 
-                    }
-                    return $btn;
-                })
-                ->addColumn('role', function ($row) {
-                    return $row->role == 'instructor' ? '<div class="badge badge-success">Instruktur</div>' : '<div class="badge badge-primary">Peserta</div>';
-                })
-                ->rawColumns(['action','role'])
-                ->make(true);
+                        }
+                        return $btn;
+                    })
+                    ->addColumn('role', function ($row) {
+                        return $row->role == 'instructor' ? '<div class="badge badge-success">Instruktur</div>' : '<div class="badge badge-primary">Peserta</div>';
+                    })
+                    ->rawColumns(['action', 'role'])
+                    ->make(true);
+
+            } else {
+                $teacherId = auth()->user()->teacher->id;
+                $data = Training::join('teachers as trainer', 'trainer.id', '=', 'trainings.trainer_teacher_id')
+                    ->leftJoin('schools', 'schools.id', '=', 'trainer.school_id')
+                    ->leftJoin('teacher_trainings', 'teacher_trainings.training_id', '=', 'trainings.id')
+                    ->leftJoin('teachers as participant', 'participant.id', '=', 'teacher_trainings.teacher_id')
+                    ->select(
+                        'trainings.id',
+                        'trainings.description',
+                        'trainings.activity_photo',
+                        'trainer.name as trainer_name',
+                        'schools.name as trainer_school',
+                        DB::raw('COUNT(teacher_trainings.teacher_id) as total_participants'),
+                        DB::raw('IF(teacher_trainings.role = "instructor", "instructor", "participant") as role')
+                    )
+                    ->where('teacher_trainings.teacher_id', '=', $teacherId)
+                    ->groupBy(
+                        'trainings.id',
+                        'trainings.description',
+                        'trainings.activity_photo',
+                        'trainer.name',
+                        'schools.name',
+                        'teacher_trainings.role'
+                    )
+                    ->get();
+
+                return DataTables::of($data)
+                    ->addIndexColumn()
+                    ->addColumn('action', function ($row) {
+                        $id = Crypt::encrypt($row->id);
+
+                        if ($row->role == 'instructor') {
+                            $btn = '
+                            <div class="d-flex" style="gap:5px;">
+                                <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
+                                data-id="' . $id . '" >
+                                    Detail
+                                </button>
+                                <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
+                                data-url="' . route('pelatihan.update', ['id' => $id]) . '"
+                                data-id="' . $id . '"
+                                data-description="' . $row->description . '" data-activity_photo="' . asset('storage/activity_photo/' . $row->activity_photo) . '">
+                                    Edit
+                                </button>
+                                <form id="deleteForm" action="' . route('pelatihan.delete', ['id' => $id]) . '" method="POST">
+                                ' . csrf_field() . '
+                                ' . method_field('DELETE') . '
+                                    <button type="button" title="DELETE" class="btn btn-sm btn-primary btn-delete" onclick="confirmDelete(event)">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>';
+                        } else {
+                            $btn = '
+                            <div class="d-flex" style="gap:5px;">
+                                <button type="button" title="Detail" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
+                                data-id="' . $id . '" >
+                                    Detail
+                                </button>
+                            </div>';
+
+                        }
+                        return $btn;
+                    })
+                    ->addColumn('role', function ($row) {
+                        return $row->role == 'instructor' ? '<div class="badge badge-success">Instruktur</div>' : '<div class="badge badge-primary">Peserta</div>';
+                    })
+                    ->rawColumns(['action', 'role'])
+                    ->make(true);
+            }
+
         }
 
         $members = Teacher::all();
@@ -328,5 +410,29 @@ class TrainingController extends Controller
         return $result;
     }
 
+    public function detailImbas($id)
+    {
+        $id = Crypt::decrypt($id);
+
+        $data = Training::where('id', $id)->first()->toArray();
+
+        $members = TeacherTraining::where('training_id', $id)->get()->map(function ($item) {
+            return [
+                'name' => $item->teacher->name,
+                'school' => $item->teacher->school->name
+            ];
+        });
+        $maxLevel = 1; // Initialize the max level
+
+        $impactedTeachers = $this->getImpactedTeachers($data['trainer_teacher_id'], 1, $maxLevel);
+
+        return view('admin.detail-imbas', [
+            'data' => $data,
+            'members' => $members,
+            'impactedTeachers' => $impactedTeachers,
+            'maxLevel' => $maxLevel
+        ]);
+
+    }
 
 }

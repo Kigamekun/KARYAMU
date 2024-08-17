@@ -2,6 +2,7 @@
 
 @section('css')
     <script src="https://unpkg.com/slim-select@latest/dist/slimselect.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://unpkg.com/slim-select@latest/dist/slimselect.css" rel="stylesheet">
     </link>
 @endsection
@@ -44,11 +45,13 @@
                                         aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                                         <div class="accordion-body">
                                             <h6>Sekolah</h6>
-                                            <select id="selectElement" name="schools[]" multiple>
-                                                @foreach (DB::table('schools')->get() as $item)
+                                            <select id="selectElement" class="w-100 mb-2 " name="schools[]" multiple>
+                                                {{-- @foreach (DB::table('schools')->get() as $item)
                                                     <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                                @endforeach
+                                                @endforeach --}}
+
                                             </select>
+                                            <br>
                                             <br>
                                             <h6>Tipe</h6>
                                             <div class="form-check">
@@ -102,9 +105,28 @@
 @endsection
 
 @section('js')
-    <script>
-        new SlimSelect({
-            select: '#selectElement'
-        })
-    </script>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $('#selectElement').select2({
+        ajax: {
+            url: '/get-schools', // URL endpoint Anda untuk mengambil data sekolah
+            dataType: 'json',
+            delay: 250,
+            processResults: function (data) {
+                return {
+                    results: data.map(item => ({
+                        id: item.id,
+                        text: item.name
+                    }))
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
+        placeholder: 'Pilih sekolah',
+        allowClear: true
+    });
+</script>
+
 @endsection

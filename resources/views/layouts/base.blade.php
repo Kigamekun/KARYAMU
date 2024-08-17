@@ -65,28 +65,52 @@
                                     class="fas fa-search"></i></a></li>
                     </ul>
                 </form>
+                @php
+
+                    $notif = DB::table('notifications')->where('user_id', Auth::id())->where('is_read',0)->orderBy('created_at','DESC')->limit(5)->get();
+                @endphp
                 <ul class="navbar-nav navbar-right">
                     <li class="dropdown dropdown-list-toggle"><a href="#" data-toggle="dropdown"
-                            class="nav-link notification-toggle nav-link-lg beep"><i class="far fa-bell"></i></a>
+                            class="nav-link notification-toggle nav-link-lg {{ $notif->count() != 0 ? 'beep' : '' }}"><i class="far fa-bell"></i></a>
                         <div class="dropdown-menu dropdown-list dropdown-menu-right">
                             <div class="dropdown-header">Notifications
                                 <div class="float-right">
-                                    <a href="#">Mark All As Read</a>
+                                    <a href="{{ route('notification.mark-as-read') }}">Mark All As Read</a>
+
+
                                 </div>
                             </div>
                             <div class="dropdown-list-content dropdown-list-icons">
-                                <a href="#" class="dropdown-item">
-                                    <div class="dropdown-item-icon bg-info text-white">
-                                        <i class="fas fa-bell"></i>
-                                    </div>
-                                    <div class="dropdown-item-desc">
-                                        Welcome to Stisla template!
-                                        <div class="time">Yesterday</div>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="dropdown-footer text-center">
-                                <a href="#">View All <i class="fas fa-chevron-right"></i></a>
+                                @foreach ($notif as $item)
+                                    <a href="/karya" class="dropdown-item">
+                                        <div class="dropdown-item-icon bg-info text-white">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <div class="dropdown-item-desc">
+                                            {{ $item->message }}
+                                            @php
+                                                // Ambil tanggal sekarang
+                                                $now = Carbon\Carbon::now();
+
+                                                // Format tanggal dibuat
+                                                $createdAt = Carbon\Carbon::parse($item->created_at);
+                                                $diffInDays = $now->diffInDays($createdAt);
+                                            @endphp
+
+                                            <div class="time">
+                                                @if ($diffInDays === 1)
+                                                    Yesterday
+                                                @elseif ($diffInDays === 2)
+                                                    2 days ago
+                                                @elseif ($diffInDays > 7)
+                                                    {{ $createdAt->format('F j, Y') }}
+                                                @else
+                                                    {{ $createdAt->diffForHumans() }}
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
                             </div>
                         </div>
                     </li>

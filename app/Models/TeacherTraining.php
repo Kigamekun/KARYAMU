@@ -7,19 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class TeacherTraining extends Model
 {
-    protected $fillable = [
-        'teacher_id',
-        'training_id',
-    ];
-
-    public function training()
-    {
-        return $this->belongsTo(Training::class);
-    }
+    protected $fillable = ['teacher_id', 'training_id', 'role', 'influenced_by','original_training_id'];
 
     public function teacher()
     {
         return $this->belongsTo(Teacher::class);
     }
-    use HasFactory;
+
+    public function training()
+    {
+        return $this->belongsTo(Training::class, 'training_id');
+    }
+
+    public function influencedBy()
+    {
+        return $this->belongsTo(Teacher::class, 'influenced_by');
+    }
 }

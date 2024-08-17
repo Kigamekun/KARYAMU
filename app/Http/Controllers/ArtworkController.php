@@ -19,6 +19,7 @@ use App\Models\Subscription;
 use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription as WebPushSubscription;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 
 class ArtworkController extends Controller
@@ -194,7 +195,7 @@ class ArtworkController extends Controller
                             $status = '<badge class="badge badge-success">Publish</badge>';
                             break;
                         case 0:
-                            $status = '<badge class="badge badge-error">Draft</badge>';
+                            $status = '<badge class="badge badge-danger">Draft</badge>';
                             break;
                         default:
                             # code...
@@ -321,14 +322,19 @@ class ArtworkController extends Controller
             }
         }
 
-        // try {
-        //     $teach = Teacher::where('school_id', $school_id)->join('users', 'users.id', '=', 'teachers.user_id')->select('users.email')->get();
-        //     foreach ($teach as $teacher) {
-        //         Mail::to($teacher->email)->send(new NewKarya($artwork));
-        //     }
-        // } catch (\Throwable $th) {
-        //     //throw $th;
-        // }
+        try {
+            $teach = Teacher::where('school_id', $school_id)->join('users', 'users.id', '=', 'teachers.user_id')->select('users.id','users.email')->get();
+            foreach ($teach as $teacher) {
+                Mail::to($teacher->email)->send(new NewKarya($artwork));
+                DB::table('notifications')->insert([
+                    'user_id' => $teacher->id,
+                    'message' => 'Artwork baru telah di submit',
+                    'is_read' => 0,
+                ]);
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
 
         return redirect()->back()->with(['message' => 'Artwork berhasil ditambahkan', 'status' => 'success']);
     }

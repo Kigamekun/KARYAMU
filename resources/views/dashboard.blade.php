@@ -1,5 +1,13 @@
 @extends('layouts.base')
 
+
+@section('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.bootstrap4.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css"
+        integrity="sha512-EZSUkJWTjzDlspOoPSpUFR0o0Xy7jdzW//6qhUkoZ9c4StFkVsp9fbbd0O06p9ELS3H486m4wmrCELjza4JEog=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+@endsection
+
 @section('content')
     <style>
         #chart-container {
@@ -34,7 +42,7 @@
 
         </div>
         <br>
-        @if (Auth::user()->role != 'student')
+        {{-- @if (Auth::user()->role != 'student')
             <div>
                 <h3 class="mb-4">Pelatihan Terbaru</h3>
             </div>
@@ -44,14 +52,14 @@
                     <div class="col-md-4">
                         <div style="border-radius:15px;" class="card">
                             <div class="card-body">
-                                <h5 class="card-title
-                        ">{{ $item['title'] }}</h5>
+                                <span class="card-title
+                        ">{{ $item['description'] }}</span>
                                 <div class="row mt-5">
                                     <div class="col-6">
                                         <h4>{{ $item['participant'] }}</h4>
-                                        <p>Participants</p>
+                                        <p>Jumlah Guru Terimbas</p>
                                         <h4>{{ $item['total'] }}</h4>
-                                        <p>Total</p>
+                                        <p>Total Guru</p>
                                     </div>
                                     <div class="col-6">
                                         <canvas class="chart" id="myChart-{{ $index }}"></canvas>
@@ -63,7 +71,76 @@
                 @endforeach
             </div>
         @endif
-        <br>
+        <br> --}}
+
+
+
+        <div>
+            <h3 class="mb-4">Laporan Imbas Pelatihan Guru</h3>
+        </div>
+        <div class="container-fluid">
+            <div style="border-radius:15px;" class="card">
+                <div class="card-body">
+                    <div class="container">
+                        <table class="table table-bordered" id="impactTable">
+                            <thead>
+                                <tr>
+                                    <th>Peserta</th>
+                                    <th>Keterangan Pelatihan</th>
+                                    <th>Tingkatan</th>
+                                    <th>Detail Imbas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($impactedTeachers as $impact)
+                                    @php
+                                        $indentation = ($impact['level'] - 1) * 20; // Mengatur padding kiri berdasarkan level
+                                        $isLastLevel = $impact['level'] == $maxLevel; // Cek apakah ini level terakhir
+                                        $parentId = $impact['level'] == 1 ? 0 : $impact['influenced_by']['teacher_id'];
+                                    @endphp
+                                    <tr style="border:2px solid #dee2e6; padding-left: {{ $indentation }}px;"
+                                        class="parent-row" data-id="{{ $impact['teacher_id'] }}"
+                                        data-parent="{{ $parentId }}" data-level="{{ $impact['level'] }}">
+                                        <td>
+                                            <div
+                                                style="margin-left: {{ $indentation }}px; padding-left:10px; border-left: 2px solid #dee2e6;">
+                                                {{ $impact['teacher_name'] }}
+                                            </div>
+                                        </td>
+                                        <td>{{ $impact['training_description'] }}</td>
+                                        <td>{{ $impact['level'] }}</td>
+                                        <td>
+                                            @if (!$isLastLevel)
+                                                <button class="btn btn-sm btn-primary toggle-detail">
+                                                    <i class="fa-solid fa-chevron-down"></i>
+                                                </button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         <div class="search-element d-flex justify-content-between">
             <div>
                 <h3 class="mb-4">Karya Terbaru</h3>
@@ -124,6 +201,10 @@
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.1.3/js/dataTables.bootstrap4.js"></script>
     <script>
         const pelatihan = @json($pelatihan);
         pelatihan.forEach((item, index) => {
@@ -133,7 +214,7 @@
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Participant', 'Not Participant'],
+                    labels: ['Jumlah Guru Terimbas', 'Sisa Guru'],
                     datasets: [{
                         label: 'Teachers',
                         data: [item.participant, item.total - item.participant],
@@ -247,5 +328,83 @@
                 console.error('Unsubscription error:', error);
             });
         });
+    </script>
+    {{-- <script>
+        $(document).ready(function() {
+            var table = $('#impactTable').DataTable({
+                "paginate": false,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": false,
+                "info": false,
+                "autoWidth": false
+            });
+
+            // Hide all detail rows initially
+            $('#impactTable tbody tr').each(function() {
+                var $row = $(this);
+                if ($row.data('level') > 1) {
+                    $row.hide(); // Hide non-top level rows
+                }
+            });
+
+            // Toggle detail rows
+            $('#impactTable').on('click', '.toggle-detail', function() {
+                var $row = $(this).closest('tr');
+                var id = $row.data('id');
+
+                // Find all child rows of the current row
+                $('#impactTable tbody tr').each(function() {
+                    var $childRow = $(this);
+                    if ($childRow.data('parent') === id) {
+                        $childRow.toggle(); // Show/hide child rows
+                    }
+                });
+            });
+        });
+    </script> --}}
+
+    <script>
+      $(document).ready(function() {
+    var table = $('#impactTable').DataTable({
+        "paginate": false,
+        "lengthChange": false,
+        "searching": false,
+        "ordering": false,
+        "info": false,
+        "autoWidth": false
+    });
+
+    // Hide all detail rows initially
+    $('#impactTable tbody tr').each(function() {
+        var $row = $(this);
+        if ($row.data('level') > 1) {
+            $row.hide(); // Hide non-top level rows
+        }
+    });
+
+    // Toggle detail rows
+    $('#impactTable').on('click', '.toggle-detail', function() {
+        var $row = $(this).closest('tr');
+        var id = $row.data('id');
+
+        // Find all child rows of the current row
+        $('#impactTable tbody tr').each(function() {
+            var $childRow = $(this);
+            if ($childRow.data('parent') === id) {
+                $childRow.toggle(); // Show/hide child rows
+            }
+        });
+
+        // Change icon of the toggle button
+        var icon = $(this).find('i');
+        if (icon.hasClass('fa-chevron-down')) {
+            icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        } else {
+            icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        }
+    });
+});
+
     </script>
 @endsection

@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\{ProfileController, SubscriptionController, ArtworkController, MasterController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
+use App\Http\Controllers\{ProfileController,NotificationController, SubscriptionController, ArtworkController, MasterController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
 use Illuminate\Support\Facades\Route;
-use App\Models\{Artwork, Training, Teacher, School, Province};
+use App\Models\{Artwork, Training, Teacher, School, Province, TeacherTraining};
 
 Route::get('/', function () {
     if (isset($_GET['provinsi'])) {
@@ -24,7 +24,16 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+Route::get('/get-schools', function (Request $request) {
+    $search = $_GET['q'];
+    return DB::table('schools')
+        ->select('id', 'name')
+        ->where('name', 'like', "%{$search}%")
+        ->limit(50) // Hanya ambil 50 hasil per permintaan
+        ->get();
+});
 
+Route::get('/trainings/impact/{teacherId}', [TrainingController::class, 'showImpact']);
 
 Route::get('/generate-register-link', [UserController::class, 'createLinkRegisterGuru'])->name('generate.register.link');
 
@@ -64,32 +73,44 @@ Route::get('/dashboard', function () {
     } else {
         $data = Artwork::orderBy('created_at', 'DESC')->limit(6)->get();
     }
+    if (Auth::user()->role == 'teacher') {
+        $teacher_id = Auth::user()->teacher->id;
 
-    $trainings = Training::orderBy('created_at', 'DESC')->limit(6)->get();
+        $totalTeachers = Teacher::count();
+        $trainings = Training::orderBy('trainings.created_at', 'DESC')->join('teacher_trainings', 'trainings.id', '=', 'teacher_trainings.training_id')->where('teacher_trainings.teacher_id', $teacher_id)->get();
 
-    // Dapatkan jumlah teachers
-    $totalTeachers = Teacher::count();
 
-    $pelatihan = $trainings->map(function ($training) use ($totalTeachers) {
-        $participants = $training->teacherTrainings()->count();
-        return [
-            'title' => $training->title,
-            'participant' => $participants,
-            'total' => $totalTeachers,
-        ];
-    });
+        $pelatihan = $trainings->map(function ($training) use ($totalTeachers) {
+            $participants = TeacherTraining::where('training_id', $training->training_id)->count();
+            return [
+                'description' => $training->description,
+                'participant' => $participants,
+                'total' => $totalTeachers,
+            ];
+        });
+
+        $maxLevel = 1; // Initialize the max level
+
+        $impactedTeachers = app('App\Http\Controllers\TrainingController')->getImpactedTeachers($teacher_id, 1, $maxLevel);
+
+    } else {
+        $pelatihan = [];
+        $impactedTeachers = [];
+        $maxLevel = 0;
+    }
 
     return view('dashboard', [
         'data' => $data,
-        'pelatihan' => $pelatihan
+        'pelatihan' => $pelatihan,
+        'impactedTeachers' => $impactedTeachers,
+        'maxLevel' => $maxLevel
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 
 Route::post('/like-item/{id}', [ArtworkController::class, 'like'])->name('like-item');
 
-
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
     Route::post('/unsubscribe', [SubscriptionController::class, 'unsubscribe']);
@@ -141,6 +162,11 @@ Route::middleware('auth')->group(function () {
 
         Route::put('/update/{id}', [TrainingController::class, 'update'])->name('pelatihan.update');
         Route::delete('/delete/{id}', [TrainingController::class, 'destroy'])->name('pelatihan.delete');
+    });
+
+    Route::prefix('notification')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('notification.index');
+        Route::get('/markAsRead', [NotificationController::class, 'markAsRead'])->name('notification.mark-as-read');
     });
 
 });

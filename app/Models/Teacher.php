@@ -26,5 +26,13 @@ class Teacher extends Model
     {
         return $this->belongsTo(School::class);
     }
+
+    public function teachers()
+    {
+        return $this->belongsToMany(Teacher::class, 'teacher_trainings')
+            ->withPivot('role', 'influenced_by')
+            ->withTimestamps();
+    }
+
     use HasFactory;
 }

@@ -37,9 +37,9 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Title</th>
-                                <th>School</th>
+                                <th>Keterangan</th>
                                 <th>Member</th>
+                                <th>Role</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -85,13 +85,8 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="title" class="fw-semibold">Title</label>
-                            <input type="text" class="form-control" id="title" name="title"
-                                placeholder="Masukan Judul" required>
-                            <x-input-error :messages="$errors->get('title')" class="mt-2" />
-                        </div>
-                        <div class="mb-3">
-                            <label for="description" class="fw-semibold">Deskripsi</label>
+                            <label for="description" class="fw-semibold">Deskripsi<span
+                                class="text-danger">*</span></label>
                             <textarea class="form-control" id="description" name="description" placeholder="Masukan Deskripsi" required></textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
@@ -99,11 +94,12 @@
                             <label for="activity_photo" class="fw-semibold">Activity Photo<span
                                     class="text-danger">*</span></label>
                             <input type="file" class=" dropify" id="activity_photo" name="activity_photo"
-                                placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M">
+                                placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="500K">
                             <x-input-error :messages="$errors->get('activity_photo')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="members" class="fw-semibold">Pilih Peserta</label>
+                            <label for="members" class="fw-semibold">Pilih Peserta<span
+                                class="text-danger">*</span></label>
                             <select class="form-control select2" id="members" name="members[]" multiple="multiple">
                                 @foreach ($members as $member)
                                     <option value="{{ $member->id }}">{{ $member->name }}</option>
@@ -161,17 +157,18 @@
                         name: 'DT_RowIndex',
                         searchable: false,
                     },
+
                     {
-                        data: 'title',
-                        name: 'title'
-                    },
-                    {
-                        data: 'trainer_school',
-                        name: 'trainer_school',
+                        data: 'description',
+                        name: 'description',
                     },
                     {
                         data: 'total_participants',
                         name: 'total_participants',
+                    },
+                    {
+                        data: 'role',
+                        name: 'role',
                     },
                     {
                         data: 'action',
@@ -203,20 +200,15 @@
                     });
                     var html = `
                         <div class="modal-header">
-                                <h5 class="modal-title" id="staticBackdropLabel">Edit User</h5>
+                                <h5 class="modal-title" id="staticBackdropLabel">Edit Pelatihan</h5>
                         </div>
                         <form action="${$(e.relatedTarget).data('url')}" method="post" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="modal-body">
                                     <div class="mb-3">
-                                        <label for="title" class="fw-semibold">Title</label>
-                                        <input type="text" class="form-control" id="title" name="title"
-                                            placeholder="Masukan Judul" value="${$(e.relatedTarget).data('title')}" required>
-                                        <x-input-error :messages="$errors->get('title')" class="mt-2" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="description" class="fw-semibold">Deskripsi</label>
+                                        <label for="description" class="fw-semibold">Deskripsi<span
+                                class="text-danger">*</span></label>
                                         <textarea class="form-control" id="description" name="description" placeholder="Masukan Deskripsi" required>${$(e.relatedTarget).data('description')}</textarea>
                                         <x-input-error :messages="$errors->get('description')" class="mt-2" />
                                     </div>
@@ -224,7 +216,7 @@
                                         <label for="activity_photo" class="fw-semibold">Activity Photo<span
                                                 class="text-danger">*</span></label>
                                         <input type="file" class=" dropify" id="activity_photo" name="activity_photo"
-                                            placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M" data-default-file="${$(e.relatedTarget).data('activity_photo')}">
+                                            placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="500K" data-default-file="${$(e.relatedTarget).data('activity_photo')}">
                                         <x-input-error :messages="$errors->get('activity_photo')" class="mt-2" />
                                     </div>
                                     <div class="mb-3">
@@ -289,10 +281,6 @@
                     });
                     var html = `
                     <div class="modal-body">
-                        <center>
-                            <h4>${response.data.title}</h4>
-                        </center>
-                        <br>
                         <div class="mb-3">
                             <label for="description" class="fw-bold">Bukti Pelatihan</label>
                             <img class="w-100 rounded" src="/storage/activity_photo/${response.data.activity_photo}"

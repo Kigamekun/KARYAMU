@@ -247,6 +247,8 @@ class TrainingController extends Controller
             }
 
             return redirect()->back()->with(['message' => 'Training berhasil ditambahkan', 'status' => 'success']);
+        } else {
+            return redirect()->back()->with(['message' => 'Guru tidak memiliki pelatihan', 'status' => 'error']);
         }
     }
 

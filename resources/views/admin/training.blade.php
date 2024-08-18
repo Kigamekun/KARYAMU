@@ -24,9 +24,20 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h3>Data Pelatihan</h3>
                     <div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#createData">
-                            Tambah Data
-                        </button>
+                        @if (Auth::user()->role == 'admin')
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#createData">
+                                Tambah Data
+                            </button>
+                        @elseif (Auth::user()->role == 'teacher' &&
+                                DB::table('teacher_trainings')->where('teacher_id', Auth::user()->teacher->id)->count() == 0)
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#createData" disabled>
+                                Tambah Data
+                            </button>
+                        @else
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#createData">
+                                Tambah Data
+                            </button>
+                        @endif
                     </div>
                 </div>
                 <br>

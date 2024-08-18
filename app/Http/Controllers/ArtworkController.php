@@ -143,13 +143,16 @@ class ArtworkController extends Controller
                     $id = Crypt::encrypt($row->id);
                     $btn = '<div class="d-flex" style="gap:5px;">';
                     if ($row->is_approved == 0 and (Auth::user()->role == 'admin' or Auth::user()->role == 'teacher')) {
-                        $btn .= '<form id="approveForm" action="' . route('karya.approve', ['id' => $id]) . '" method="POST">
-                        ' . csrf_field() . '
-                        ' . method_field('PUT') . '
-                            <button type="button" title="APPROVE" class="btn btn-sm btn-success btn-approve" onclick="confirmApprove(event)">
-                                Approve
-                            </button>
-                        </form>';
+                        if (Auth::user()->role != 'admin') {
+                            $btn .= '<form id="approveForm" action="' . route('karya.approve', ['id' => $id]) . '" method="POST">
+                            ' . csrf_field() . '
+                            ' . method_field('PUT') . '
+                                <button type="button" title="APPROVE" class="btn btn-sm btn-success btn-approve" onclick="confirmApprove(event)">
+                                    Approve
+                                </button>
+                            </form>';
+                        }
+
                         $btn .= '
 
                             <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"

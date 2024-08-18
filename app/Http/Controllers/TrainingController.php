@@ -96,28 +96,28 @@ class TrainingController extends Controller
             } else {
                 $teacherId = auth()->user()->teacher->id;
                 $data = Training::join('teachers as trainer', 'trainer.id', '=', 'trainings.trainer_teacher_id')
-                ->leftJoin('schools', 'schools.id', '=', 'trainer.school_id')
-                ->leftJoin('teacher_trainings', 'teacher_trainings.training_id', '=', 'trainings.id')
-                ->leftJoin('teachers as participant', 'participant.id', '=', 'teacher_trainings.teacher_id')
-                ->select(
-                    'trainings.id',
-                    'trainings.description',
-                    'trainings.activity_photo',
-                    'trainer.name as trainer_name',
-                    'schools.name as trainer_school',
-                    DB::raw('(SELECT COUNT(tt.teacher_id) FROM teacher_trainings tt WHERE tt.training_id = trainings.id) as total_participants'),
-                    DB::raw('IF(teacher_trainings.role = "instructor", "instructor", "participant") as role')
-                )
-                ->where('teacher_trainings.teacher_id', '=', $teacherId)
-                ->groupBy(
-                    'trainings.id',
-                    'trainings.description',
-                    'trainings.activity_photo',
-                    'trainer.name',
-                    'schools.name',
-                    'teacher_trainings.role'
-                )
-                ->get();
+                    ->leftJoin('schools', 'schools.id', '=', 'trainer.school_id')
+                    ->leftJoin('teacher_trainings', 'teacher_trainings.training_id', '=', 'trainings.id')
+                    ->leftJoin('teachers as participant', 'participant.id', '=', 'teacher_trainings.teacher_id')
+                    ->select(
+                        'trainings.id',
+                        'trainings.description',
+                        'trainings.activity_photo',
+                        'trainer.name as trainer_name',
+                        'schools.name as trainer_school',
+                        DB::raw('(SELECT COUNT(tt.teacher_id) FROM teacher_trainings tt WHERE tt.training_id = trainings.id) as total_participants'),
+                        DB::raw('IF(teacher_trainings.role = "instructor", "instructor", "participant") as role')
+                    )
+                    ->where('teacher_trainings.teacher_id', '=', $teacherId)
+                    ->groupBy(
+                        'trainings.id',
+                        'trainings.description',
+                        'trainings.activity_photo',
+                        'trainer.name',
+                        'schools.name',
+                        'teacher_trainings.role'
+                    )
+                    ->get();
 
 
                 return DataTables::of($data)
@@ -167,7 +167,11 @@ class TrainingController extends Controller
 
         }
 
-        $members = Teacher::all();
+        $members = Teacher::leftJoin('teacher_trainings', 'teachers.id', '=', 'teacher_trainings.teacher_id')
+            ->whereNull('teacher_trainings.teacher_id')
+            ->select('teachers.id', 'teachers.name')
+            ->get();
+
         return view('admin.training', [
             'data' => Training::all(),
             'members' => $members

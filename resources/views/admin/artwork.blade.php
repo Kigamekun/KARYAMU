@@ -91,8 +91,8 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="createData" data-backdrop="static" data-keyboard="false" tabindex="-1"
-        aria-labelledby="createDataLabel" aria-hidden="true">
+    <div class="modal fade" id="createData" data-backdrop="static" data-keyboard="false" aria-labelledby="createDataLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div id="modal-content" class="modal-content">
                 <div class="modal-header">
@@ -113,6 +113,17 @@
                             <textarea class="form-control" id="description" name="description" placeholder="Masukan Deskripsi" required></textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
+
+                        @if (Auth::user()->role == 'admin')
+                            <div class="mb-3">
+                                <label for="creator" class="fw-semibold">Pilih Pembuat Karya</label>
+                                <select class="js-example-basic-single" id="creator" name="creator" required>
+
+                                </select>
+                                <x-input-error :messages="$errors->get('creator')" class="mt-2" />
+                            </div>
+                        @endif
+
                         <div class="mb-3">
                             <label for="type" class="fw-semibold">Tipe<span class="ml-1 text-danger">*</span></label>
                             <select class="form-control" onchange="selectType()" id="type" name="type" required>
@@ -122,7 +133,8 @@
                             <x-input-error :messages="$errors->get('type')" class="mt-2" />
                         </div>
                         <div class="mb-3" id="image-upload">
-                            <label for="image" class="fw-semibold">Image<span class="ml-1 text-danger">*</span></label>
+                            <label for="image" class="fw-semibold">Image<span
+                                    class="ml-1 text-danger">*</span></label>
                             <input type="file" class=" dropify" id="image" name="image" placeholder="Isi file"
                                 data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M">
                             <x-input-error :messages="$errors->get('image')" class="mt-2" />
@@ -135,11 +147,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="students" class="fw-semibold">Pilih Siswa</label>
-                            <select class="form-control select2" id="students" name="students[]" multiple="multiple"
-                                required>
-                                @foreach ($students as $student)
-                                    <option value="{{ $student->id }}">{{ $student->name }}</option>
-                                @endforeach
+                            <select class="select2" id="students" name="students[]" multiple="multiple" required>
+
                             </select>
                             <x-input-error :messages="$errors->get('students')" class="mt-2" />
                         </div>
@@ -164,19 +173,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"
         integrity="sha512-8QFTrG0oeOiyWo/VM9Y8kgxdlCryqhIxVeRpWSezdRRAvarxVtwLnGroJgnVW9/XBRduxO/z1GblzPrMQoeuew=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-
-    <!-- Tambahkan di dalam footer, sebelum tag penutup body -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-    <script>
-        $(document).ready(function() {
-            $('.select2').select2({
-                placeholder: "Pilih siswa yang berkontribusi",
-                allowClear: true
-            });
-        });
-    </script>
 
     <script>
         $('.dropify').dropify();
@@ -226,15 +222,11 @@
                 type: 'GET',
                 success: function(response) {
                     let memberOption = '';
-                    students.forEach(member => {
-                        if (response.students.includes(member.id)) {
-                            memberOption +=
-                                `<option value="${member.id}" selected>${member.name}</option>`;
-                        } else {
-                            memberOption +=
-                                `<option value="${member.id}">${member.name}</option>`;
-                        }
+                    response.students.forEach(student => {
+                        memberOption +=
+                            `<option value="${student.id}" selected>${student.name}</option>`;
                     });
+
                     var html = `
             <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Edit karya</h5>
@@ -291,8 +283,22 @@
                     $('#modal-content').html(html);
                     $('.dropify').dropify();
                     $('.main-content .select4').select2({
-                        tags: true,
-                        placeholder: "Pilih peserta yang berpartisipasi",
+                        ajax: {
+                            url: '/get-students',
+                            dataType: 'json',
+                            delay: 250,
+                            processResults: function(data) {
+                                return {
+                                    results: data.map(item => ({
+                                        id: item.id,
+                                        text: item.name
+                                    }))
+                                };
+                            },
+                            cache: true
+                        },
+                        minimumInputLength: 3,
+                        placeholder: 'Pilih siswa',
                         allowClear: true
                     });
                 }
@@ -325,25 +331,18 @@
                         <span class="badge badge-pill badge-primary p-2">${response.type}</span>
                         </p>
                 </div>
-
-                  ${response.type == 'image' ? `
-                                       <div class="mb-3">
-                                            <label for="video_link" class="fw-semibold">Video Link</label>
-                                            <p>                            <img src="storage/artwork/${response.file_path}" alt="${response.title}" style="width: 100%;border-radius:15px">
-                                </p>
-                                        </div>
-                                        ` : ''}
+                ${response.type == 'image' ? ` <div class="mb-3"><label for="video_link" class="fw-semibold">Video Link</label><p><img src="storage/artwork/${response.file_path}" alt="${response.title}" style="width: 100%;border-radius:15px"></p></div>` : ''}
 
                 ${response.type == 'video' ? `
-                                       <div class="mb-3">
-                                            <label for="video_link" class="fw-semibold">Video Link</label>
-                                            <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
-                                                    <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
-                                                        style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
-                                                        class="card-img-top" alt="YouTube Thumbnail">
-                                                </a></p>
-                                        </div>
-                                        ` : ''}
+                            <div class="mb-3">
+                                <label for="video_link" class="fw-semibold">Video Link</label>
+                                <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
+                                        <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
+                                            style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
+                                            class="card-img-top" alt="YouTube Thumbnail">
+                                    </a></p>
+                            </div>
+                            ` : ''}
 
                 <div class="mb-3">
                     <label for="status" class="fw-semibold">Status</label>
@@ -356,7 +355,7 @@
 
 
             </div>
-             <div class="modal-footer">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                 </div>
             `;
@@ -399,6 +398,52 @@
                     Swal.showLoading();
                 }
             });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $('#students').select2({
+            ajax: {
+                url: '/get-students', // URL endpoint Anda untuk mengambil data sekolah
+                dataType: 'json',
+                delay: 250,
+                processResults: function(data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.id,
+                            text: item.name
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
+            placeholder: 'Pilih siswa',
+            allowClear: true
+        });
+    </script>
+
+    <script>
+        $('#creator').select2({
+            ajax: {
+                url: '/get-students', // URL endpoint Anda untuk mengambil data sekolah
+                dataType: 'json',
+                delay: 250,
+                processResults: function(data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.id,
+                            text: item.name
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
+            placeholder: 'Pilih siswanya',
+            allowClear: true
         });
     </script>
 @endsection

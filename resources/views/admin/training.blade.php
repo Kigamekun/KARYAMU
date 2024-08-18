@@ -24,11 +24,9 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h3>Data Pelatihan</h3>
                     <div>
-                        @if (Auth::user()->role != 'admin')
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#createData">
-                                Tambah Data
-                            </button>
-                        @endif
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#createData">
+                            Tambah Data
+                        </button>
                     </div>
                 </div>
                 <br>
@@ -74,8 +72,8 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="createData" data-backdrop="static" data-keyboard="false" tabindex="-1"
-        aria-labelledby="createDataLabel" aria-hidden="true">
+    <div class="modal fade" id="createData" data-backdrop="static" data-keyboard="false" aria-labelledby="createDataLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div id="modal-content" class="modal-content">
                 <div class="modal-header">
@@ -85,25 +83,32 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="description" class="fw-semibold">Deskripsi<span
-                                class="text-danger">*</span></label>
+                            <label for="description" class="fw-semibold">Deskripsi<span class="text-danger">*</span></label>
                             <textarea class="form-control" id="description" name="description" placeholder="Masukan Deskripsi" required></textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
+                        @if (Auth::user()->role == 'admin')
+                            <div class="mb-3">
+                                <label for="creator" class="fw-semibold">Pilih Pembuat Pelatihan</label>
+                                <select class="js-example-basic-single" id="creator" name="creator" required>
+
+                                </select>
+                                <x-input-error :messages="$errors->get('creator')" class="mt-2" />
+                            </div>
+                        @endif
                         <div class="mb-3" id="image-upload">
                             <label for="activity_photo" class="fw-semibold">Activity Photo<span
                                     class="text-danger">*</span></label>
                             <input type="file" class=" dropify" id="activity_photo" name="activity_photo"
-                                placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="500K">
+                                placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]'
+                                data-max-file-size="500K">
                             <x-input-error :messages="$errors->get('activity_photo')" class="mt-2" />
                         </div>
                         <div class="mb-3">
                             <label for="members" class="fw-semibold">Pilih Peserta<span
-                                class="text-danger">*</span></label>
+                                    class="text-danger">*</span></label>
                             <select class="form-control select2" id="members" name="members[]" multiple="multiple">
-                                @foreach ($members as $member)
-                                    <option value="{{ $member->id }}">{{ $member->name }}</option>
-                                @endforeach
+
                             </select>
                             <x-input-error :messages="$errors->get('members')" class="mt-2" />
                         </div>
@@ -128,18 +133,6 @@
         integrity="sha512-8QFTrG0oeOiyWo/VM9Y8kgxdlCryqhIxVeRpWSezdRRAvarxVtwLnGroJgnVW9/XBRduxO/z1GblzPrMQoeuew=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <!-- Tambahkan di dalam footer, sebelum tag penutup body -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-    <script>
-        $(document).ready(function() {
-            $('.main-content .select2').select2({
-                tags: true,
-                placeholder: "Pilih peserta yang berpartisipasi",
-                allowClear: true
-            });
-        });
-    </script>
 
     <script>
         $('.dropify').dropify();
@@ -187,17 +180,12 @@
                 type: 'GET',
                 success: function(response) {
                     let memberOption = '';
-                    console.log(response.members);
 
-                    members.forEach(member => {
-                        if (response.members.includes(member.id)) {
-                            memberOption +=
-                                `<option value="${member.id}" selected>${member.name}</option>`;
-                        } else {
-                            memberOption +=
-                                `<option value="${member.id}">${member.name}</option>`;
-                        }
+                    response.members.forEach(member => {
+                        memberOption +=
+                            `<option value="${member.id}" selected>${member.name}</option>`;
                     });
+
                     var html = `
                         <div class="modal-header">
                                 <h5 class="modal-title" id="staticBackdropLabel">Edit Pelatihan</h5>
@@ -236,8 +224,22 @@
                     $('#modal-content').html(html);
                     $('.dropify').dropify();
                     $('.main-content .select4').select2({
-                        tags: true,
-                        placeholder: "Pilih peserta yang berpartisipasi",
+                        ajax: {
+                            url: '/get-teachers',
+                            dataType: 'json',
+                            delay: 250,
+                            processResults: function(data) {
+                                return {
+                                    results: data.map(item => ({
+                                        id: item.id,
+                                        text: item.name
+                                    }))
+                                };
+                            },
+                            cache: true
+                        },
+                        minimumInputLength: 3,
+                        placeholder: 'Pilih siswa',
                         allowClear: true
                     });
                 },
@@ -303,6 +305,53 @@
                     $('#modal-dialog').html(html);
                 }
             });
+        });
+    </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $('#members').select2({
+            ajax: {
+                url: '/get-teachers', // URL endpoint Anda untuk mengambil data sekolah
+                dataType: 'json',
+                delay: 250,
+                processResults: function(data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.id,
+                            text: item.name
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
+            placeholder: 'Pilih peserta pelatihan',
+            allowClear: true
+        });
+    </script>
+
+    <script>
+        $('#creator').select2({
+            ajax: {
+                url: '/get-teachers', // URL endpoint Anda untuk mengambil data sekolah
+                dataType: 'json',
+                delay: 250,
+                processResults: function(data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.id,
+                            text: item.name
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
+            placeholder: 'Pilih pembuat pelatihan',
+            allowClear: true
         });
     </script>
 @endsection

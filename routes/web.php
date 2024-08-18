@@ -33,6 +33,25 @@ Route::get('/get-schools', function (Request $request) {
         ->get();
 });
 
+Route::get('/get-students', function (Request $request) {
+    $search = $_GET['q'];
+    return DB::table('students')
+        ->select('id', 'name')
+        ->where('name', 'like', "%{$search}%")
+        ->limit(50) // Hanya ambil 50 hasil per permintaan
+        ->get();
+});
+
+Route::get('/get-teachers', function (Request $request) {
+    $search = $_GET['q'];
+    return DB::table('teachers')
+        ->select('id', 'name')
+        ->where('name', 'like', "%{$search}%")
+        ->limit(50) // Hanya ambil 50 hasil per permintaan
+        ->get();
+});
+
+
 Route::get('/trainings/impact/{teacherId}', [TrainingController::class, 'showImpact']);
 
 Route::get('/generate-register-link', [UserController::class, 'createLinkRegisterGuru'])->name('generate.register.link');

@@ -67,11 +67,17 @@
                 </form>
                 @php
 
-                    $notif = DB::table('notifications')->where('user_id', Auth::id())->where('is_read',0)->orderBy('created_at','DESC')->limit(5)->get();
+                    $notif = DB::table('notifications')
+                        ->where('user_id', Auth::id())
+                        ->where('is_read', 0)
+                        ->orderBy('created_at', 'DESC')
+                        ->limit(5)
+                        ->get();
                 @endphp
                 <ul class="navbar-nav navbar-right">
                     <li class="dropdown dropdown-list-toggle"><a href="#" data-toggle="dropdown"
-                            class="nav-link notification-toggle nav-link-lg {{ $notif->count() != 0 ? 'beep' : '' }}"><i class="far fa-bell"></i></a>
+                            class="nav-link notification-toggle nav-link-lg {{ $notif->count() != 0 ? 'beep' : '' }}"><i
+                                class="far fa-bell"></i></a>
                         <div class="dropdown-menu dropdown-list dropdown-menu-right">
                             <div class="dropdown-header">Notifications
                                 <div class="float-right">
@@ -266,22 +272,20 @@
     </div>
 
     <!-- General JS Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
     </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.6/jquery.nicescroll.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script src="{{ asset('assets/js/stisla.js') }}"></script>
 
     <!-- JS Libraies -->
-    <script src="{{ asset('node_modules/jquery-sparkline/jquery.sparkline.min.js') }}"></script>
     <script src="{{ asset('node_modules/owl.carousel/dist/owl.carousel.min.js') }}"></script>
     <script src="{{ asset('node_modules/summernote/dist/summernote-bs4.js') }}"></script>
-    <script src="{{ asset('node_modules/chocolat/dist/js/jquery.chocolat.min.js') }}"></script>
 
     <!-- Template JS File -->
     <script src="{{ asset('assets/js/scripts.js') }}"></script>
@@ -316,6 +320,7 @@
             }
         }
     </script>
+
     <script>
         function confirmLogout(event) {
             event.preventDefault();
@@ -339,6 +344,7 @@
             }
         }
     </script>
+
     <script>
         function confirmApprove(event) {
             event.preventDefault();
@@ -363,9 +369,6 @@
         }
     </script>
 
-
-
-
     @if (!is_null(Session::get('message')))
         <script>
             Swal.fire({
@@ -378,6 +381,7 @@
             })
         </script>
     @endif
+
     @if (!empty($errors->all()))
         <script>
             var err = @json($errors->all());
@@ -416,8 +420,6 @@
             });
         });
     </script>
-
-
 
     @yield('js')
 </body>

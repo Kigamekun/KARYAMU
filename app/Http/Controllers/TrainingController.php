@@ -21,7 +21,13 @@ class TrainingController extends Controller
     {
         $id = Crypt::decrypt($id);
         $data = Training::where('id', $id)->first();
-        $members = TeacherTraining::where('training_id', $id)->get()->pluck('teacher_id');
+
+        $members = Teacher::leftJoin('teacher_trainings', 'teachers.id', '=', 'teacher_trainings.teacher_id')
+            ->select('teachers.id', 'teachers.name')
+            ->where('teacher_trainings.training_id', $id)
+            ->where('teacher_trainings.role', 'participant')
+            ->get();
+
         return response()->json([
             'data' => $data,
             'members' => $members
@@ -191,7 +197,18 @@ class TrainingController extends Controller
             return redirect()->back()->with(['message' => 'Data guru tidak ada', 'status' => 'error']);
         }
 
-        $teacher_id = auth()->user()->teacher->id;
+        // check if members is are have a pelatihan
+        foreach ($request->members as $member) {
+            if (TeacherTraining::where('teacher_id', $member)->exists()) {
+                return redirect()->back()->with(['message' => 'Data guru sudah memiliki pelatihan', 'status' => 'error']);
+            }
+        }
+
+        if (Auth::user()->role == 'teacher') {
+            $teacher_id = auth()->user()->teacher->id;
+        } else {
+            $teacher_id = $request->creator;
+        }
 
 
         if (!is_null($teach = TeacherTraining::where('teacher_id', $teacher_id)->where('role', 'participant')->first())) {

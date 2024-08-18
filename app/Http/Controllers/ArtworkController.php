@@ -68,7 +68,7 @@ class ArtworkController extends Controller
         $id = Crypt::decrypt($id);
 
         $artwork = Artwork::find($id);
-        $artwork->students = ArtworkStudent::where('artwork_id', $id)->get()->pluck('student_id');
+        $artwork->students = ArtworkStudent::where('artwork_id', $id)->join('students', 'students.id', '=', 'artwork_students.student_id')->select('students.name','students.id')->get()->toArray();
         return response()->json($artwork, 200);
     }
 
@@ -142,7 +142,7 @@ class ArtworkController extends Controller
 
                     $id = Crypt::encrypt($row->id);
                     $btn = '<div class="d-flex" style="gap:5px;">';
-                    if ($row->is_approved == 0 and Auth::user()->role == 'teacher') {
+                    if ($row->is_approved == 0 and (Auth::user()->role == 'admin' or Auth::user()->role == 'teacher')) {
                         $btn .= '<form id="approveForm" action="' . route('karya.approve', ['id' => $id]) . '" method="POST">
                         ' . csrf_field() . '
                         ' . method_field('PUT') . '
@@ -250,7 +250,10 @@ class ArtworkController extends Controller
         $teacher_id = Teacher::where('user_id', Auth::user()->id)->first() != null ? Teacher::where('user_id', Auth::user()->id)->first()->id : null;
 
         if (Auth::user()->role == 'admin') {
-            $school_id = null;
+            $stud = Student::find($request->creator);
+            $school_id = $stud->school_id;
+            $student_id = $request->creator;
+
         } else if (Auth::user()->role == 'teacher') {
             $school_id = Teacher::where('user_id', Auth::user()->id)->first()->school_id;
         } else if (Auth::user()->role == 'student') {
@@ -323,7 +326,7 @@ class ArtworkController extends Controller
         }
 
         try {
-            $teach = Teacher::where('school_id', $school_id)->join('users', 'users.id', '=', 'teachers.user_id')->select('users.id','users.email')->get();
+            $teach = Teacher::where('school_id', $school_id)->join('users', 'users.id', '=', 'teachers.user_id')->select('users.id', 'users.email')->get();
             foreach ($teach as $teacher) {
                 Mail::to($teacher->email)->send(new NewKarya($artwork));
                 DB::table('notifications')->insert([

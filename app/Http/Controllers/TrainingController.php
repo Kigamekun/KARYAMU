@@ -283,7 +283,12 @@ class TrainingController extends Controller
             return redirect()->back()->with(['message' => 'Data guru tidak ada', 'status' => 'error']);
         }
 
-        $teacher_id = auth()->user()->teacher->id;
+        if (Auth::user()->role == 'teacher') {
+            $teacher_id = auth()->user()->teacher->id;
+        } else {
+            $training = Training::where('id', $id)->first();
+            $teacher_id = $training->trainer_teacher_id;
+        }
 
         if (!is_null($teach = TeacherTraining::where('teacher_id', $teacher_id)->where('role', 'participant')->first())) {
 

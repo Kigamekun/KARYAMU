@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css"
         integrity="sha512-EZSUkJWTjzDlspOoPSpUFR0o0Xy7jdzW//6qhUkoZ9c4StFkVsp9fbbd0O06p9ELS3H486m4wmrCELjza4JEog=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="/assets/js/dist/photoswipe.css">
 @endsection
 
 @section('content')
@@ -75,55 +77,100 @@
 
 
 
-        <div>
-            <h3 class="mb-4">Laporan Imbas Pelatihan Guru</h3>
-        </div>
-        <div class="container-fluid">
-            <div style="border-radius:15px;" class="card">
-                <div class="card-body">
-                    <div class="container">
-                        <table class="table table-bordered" id="impactTable">
-                            <thead>
-                                <tr>
-                                    <th>Peserta</th>
-                                    <th>Keterangan Pelatihan</th>
-                                    <th>Tingkatan</th>
-                                    <th>Detail Imbas</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($impactedTeachers as $impact)
-                                    @php
-                                        $indentation = ($impact['level'] - 1) * 20; // Mengatur padding kiri berdasarkan level
-                                        $isLastLevel = $impact['level'] == $maxLevel; // Cek apakah ini level terakhir
-                                        $parentId = $impact['level'] == 1 ? 0 : $impact['influenced_by']['teacher_id'];
-                                    @endphp
-                                    <tr style="border:2px solid #dee2e6; padding-left: {{ $indentation }}px;"
-                                        class="parent-row" data-id="{{ $impact['teacher_id'] }}"
-                                        data-parent="{{ $parentId }}" data-level="{{ $impact['level'] }}">
-                                        <td>
-                                            <div
-                                                style="margin-left: {{ $indentation }}px; padding-left:10px; border-left: 2px solid #dee2e6;">
-                                                {{ $impact['teacher_name'] }}
+        @if (Auth::user()->role == 'teacher')
+            <div>
+                <h3 class="mb-4">Laporan Imbas Pelatihan Guru</h3>
+            </div>
+
+
+            @if (!is_null($pelatihan))
+                <div class="container-fluid">
+                    <div style="border-radius:15px;" class="card">
+                        <div class="card-body">
+                            <div class="container">
+                                <div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="d-flex flex-wrap" style="gap: 10px">
+                                            <div class="pswp-gallery" id="my-gallery">
+                                                <a href="/storage/activity_photo/{{ $pelatihan->activity_photo }}"
+                                                    data-pswp-width="4000" data-pswp-height="2500" target="_blank">
+                                                    <img src="/storage/activity_photo/{{ $pelatihan->activity_photo }}"
+                                                        style="width:100px;object-fit:cover;height:100px;border-radius:10px"
+                                                        alt="">
+                                                </a>
                                             </div>
-                                        </td>
-                                        <td>{{ $impact['training_description'] }}</td>
-                                        <td>{{ $impact['level'] }}</td>
-                                        <td>
-                                            @if (!$isLastLevel)
-                                                <button class="btn btn-sm btn-primary toggle-detail">
-                                                    <i class="fa-solid fa-chevron-down"></i>
-                                                </button>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                            <div>
+                                                <h6>Deskripsi Pelatihan</h6>
+                                                <p>
+                                                    {{ $pelatihan->description }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <h1 style="font-size: 50px">
+                                            {{ count($impactedTeachers) }} <span style="font-size: 10px">Guru
+                                                Terimbas</span>
+                                        </h1>
+                                    </div>
+                                </div>
+                                <br>
+                                <br>
+
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="impactTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Peserta</th>
+                                                <th>Keterangan Pelatihan</th>
+                                                <th>Tingkatan</th>
+                                                <th>Detail Imbas</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($impactedTeachers as $impact)
+                                                @php
+                                                    $indentation = ($impact['level'] - 1) * 20; // Mengatur padding kiri berdasarkan level
+                                                    $isLastLevel = $impact['level'] == $maxLevel; // Cek apakah ini level terakhir
+                                                    $parentId =
+                                                        $impact['level'] == 1
+                                                            ? 0
+                                                            : $impact['influenced_by']['teacher_id'];
+                                                @endphp
+                                                <tr style="border:2px solid #dee2e6; padding-left: {{ $indentation }}px;"
+                                                    class="parent-row" data-id="{{ $impact['teacher_id'] }}"
+                                                    data-parent="{{ $parentId }}" data-level="{{ $impact['level'] }}">
+                                                    <td>
+                                                        <div
+                                                            style="margin-left: {{ $indentation }}px; padding-left:10px; border-left: 2px solid #dee2e6;">
+                                                            {{ $impact['teacher_name'] }}
+                                                        </div>
+                                                    </td>
+                                                    <td>{{ $impact['training_description'] }}</td>
+                                                    <td>{{ $impact['level'] }}</td>
+                                                    <td>
+                                                        @if (!$isLastLevel)
+                                                            <button class="btn btn-sm btn-primary toggle-detail">
+                                                                <i class="fa-solid fa-chevron-down"></i>
+                                                            </button>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            @else
+                <div class="container-fluid">
+                    <div style="border-radius:15px;" class="card">
+                        <div class="card-body">
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endif
 
 
 
@@ -365,46 +412,55 @@
     </script> --}}
 
     <script>
-      $(document).ready(function() {
-    var table = $('#impactTable').DataTable({
-        "paginate": false,
-        "lengthChange": false,
-        "searching": false,
-        "ordering": false,
-        "info": false,
-        "autoWidth": false
-    });
+        $(document).ready(function() {
+            var table = $('#impactTable').DataTable({
+                "paginate": false,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": false,
+                "info": false,
+                "autoWidth": false
+            });
 
-    // Hide all detail rows initially
-    $('#impactTable tbody tr').each(function() {
-        var $row = $(this);
-        if ($row.data('level') > 1) {
-            $row.hide(); // Hide non-top level rows
-        }
-    });
+            // Hide all detail rows initially
+            $('#impactTable tbody tr').each(function() {
+                var $row = $(this);
+                if ($row.data('level') > 1) {
+                    $row.hide(); // Hide non-top level rows
+                }
+            });
 
-    // Toggle detail rows
-    $('#impactTable').on('click', '.toggle-detail', function() {
-        var $row = $(this).closest('tr');
-        var id = $row.data('id');
+            // Toggle detail rows
+            $('#impactTable').on('click', '.toggle-detail', function() {
+                var $row = $(this).closest('tr');
+                var id = $row.data('id');
 
-        // Find all child rows of the current row
-        $('#impactTable tbody tr').each(function() {
-            var $childRow = $(this);
-            if ($childRow.data('parent') === id) {
-                $childRow.toggle(); // Show/hide child rows
-            }
+                // Find all child rows of the current row
+                $('#impactTable tbody tr').each(function() {
+                    var $childRow = $(this);
+                    if ($childRow.data('parent') === id) {
+                        $childRow.toggle(); // Show/hide child rows
+                    }
+                });
+
+                // Change icon of the toggle button
+                var icon = $(this).find('i');
+                if (icon.hasClass('fa-chevron-down')) {
+                    icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+                } else {
+                    icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+                }
+            });
         });
+    </script>
 
-        // Change icon of the toggle button
-        var icon = $(this).find('i');
-        if (icon.hasClass('fa-chevron-down')) {
-            icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
-        } else {
-            icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
-        }
-    });
-});
-
+    <script type="module">
+        import PhotoSwipeLightbox from '/assets/js/dist/photoswipe-lightbox.esm.js';
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: '#my-gallery',
+            children: 'a',
+            pswpModule: () => import('/assets/js/dist/photoswipe.esm.js')
+        });
+        lightbox.init();
     </script>
 @endsection

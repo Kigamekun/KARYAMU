@@ -42,21 +42,16 @@ class TrainingController extends Controller
                         'trainings.activity_photo',
                         'trainer.name as trainer_name',
                         'schools.name as trainer_school',
-                        DB::raw('COUNT(teacher_trainings.teacher_id) as total_participants'),
-                        DB::raw('IF(teacher_trainings.role = "instructor", "instructor", "participant") as role')
+                        DB::raw('COUNT(teacher_trainings.teacher_id) as total_participants')
                     )
-                    ->where('teacher_trainings.role', '=', 'instructor')
                     ->groupBy(
                         'trainings.id',
                         'trainings.description',
                         'trainings.activity_photo',
                         'trainer.name',
-                        'schools.name',
-                        'teacher_trainings.role'
+                        'schools.name'
                     )
                     ->get();
-
-
 
 
                 return DataTables::of($data)
@@ -64,8 +59,7 @@ class TrainingController extends Controller
                     ->addColumn('action', function ($row) {
                         $id = Crypt::encrypt($row->id);
 
-                        if ($row->role == 'instructor') {
-                            $btn = '
+                        $btn = '
                             <div class="d-flex" style="gap:5px;">
                             <a href="' . route('pelatihan.detail-imbas', ['id' => $id]) . '" class="btn btn-sm btn-success"
                                 >
@@ -90,16 +84,7 @@ class TrainingController extends Controller
                                     </button>
                                 </form>
                             </div>';
-                        } else {
-                            $btn = '
-                            <div class="d-flex" style="gap:5px;">
-                                <button type="button" title="Detail" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
-                                data-id="' . $id . '" >
-                                    Detail
-                                </button>
-                            </div>';
 
-                        }
                         return $btn;
                     })
                     ->addColumn('role', function ($row) {
@@ -111,28 +96,29 @@ class TrainingController extends Controller
             } else {
                 $teacherId = auth()->user()->teacher->id;
                 $data = Training::join('teachers as trainer', 'trainer.id', '=', 'trainings.trainer_teacher_id')
-                    ->leftJoin('schools', 'schools.id', '=', 'trainer.school_id')
-                    ->leftJoin('teacher_trainings', 'teacher_trainings.training_id', '=', 'trainings.id')
-                    ->leftJoin('teachers as participant', 'participant.id', '=', 'teacher_trainings.teacher_id')
-                    ->select(
-                        'trainings.id',
-                        'trainings.description',
-                        'trainings.activity_photo',
-                        'trainer.name as trainer_name',
-                        'schools.name as trainer_school',
-                        DB::raw('COUNT(teacher_trainings.teacher_id) as total_participants'),
-                        DB::raw('IF(teacher_trainings.role = "instructor", "instructor", "participant") as role')
-                    )
-                    ->where('teacher_trainings.teacher_id', '=', $teacherId)
-                    ->groupBy(
-                        'trainings.id',
-                        'trainings.description',
-                        'trainings.activity_photo',
-                        'trainer.name',
-                        'schools.name',
-                        'teacher_trainings.role'
-                    )
-                    ->get();
+                ->leftJoin('schools', 'schools.id', '=', 'trainer.school_id')
+                ->leftJoin('teacher_trainings', 'teacher_trainings.training_id', '=', 'trainings.id')
+                ->leftJoin('teachers as participant', 'participant.id', '=', 'teacher_trainings.teacher_id')
+                ->select(
+                    'trainings.id',
+                    'trainings.description',
+                    'trainings.activity_photo',
+                    'trainer.name as trainer_name',
+                    'schools.name as trainer_school',
+                    DB::raw('(SELECT COUNT(tt.teacher_id) FROM teacher_trainings tt WHERE tt.training_id = trainings.id) as total_participants'),
+                    DB::raw('IF(teacher_trainings.role = "instructor", "instructor", "participant") as role')
+                )
+                ->where('teacher_trainings.teacher_id', '=', $teacherId)
+                ->groupBy(
+                    'trainings.id',
+                    'trainings.description',
+                    'trainings.activity_photo',
+                    'trainer.name',
+                    'schools.name',
+                    'teacher_trainings.role'
+                )
+                ->get();
+
 
                 return DataTables::of($data)
                     ->addIndexColumn()

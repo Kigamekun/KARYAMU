@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\{ProfileController,NotificationController, SubscriptionController, ArtworkController, MasterController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
+use App\Http\Controllers\{ProfileController, NotificationController, SubscriptionController, ArtworkController, MasterController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
 use Illuminate\Support\Facades\Route;
 use App\Models\{Artwork, Training, Teacher, School, Province, TeacherTraining};
 
@@ -69,25 +69,15 @@ Route::get('/dashboard', function () {
             ->pluck('schools.id')
             ->toArray();
         $data = Artwork::orderBy('created_at', 'DESC')->limit(6)->whereIn('school_id', $school)->get();
-
     } else {
         $data = Artwork::orderBy('created_at', 'DESC')->limit(6)->get();
     }
+
     if (Auth::user()->role == 'teacher') {
         $teacher_id = Auth::user()->teacher->id;
 
         $totalTeachers = Teacher::count();
-        $trainings = Training::orderBy('trainings.created_at', 'DESC')->join('teacher_trainings', 'trainings.id', '=', 'teacher_trainings.training_id')->where('teacher_trainings.teacher_id', $teacher_id)->get();
-
-
-        $pelatihan = $trainings->map(function ($training) use ($totalTeachers) {
-            $participants = TeacherTraining::where('training_id', $training->training_id)->count();
-            return [
-                'description' => $training->description,
-                'participant' => $participants,
-                'total' => $totalTeachers,
-            ];
-        });
+        $pelatihan = Training::where('trainer_teacher_id', $teacher_id)->first();
 
         $maxLevel = 1; // Initialize the max level
 

@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css"
         integrity="sha512-yVvxUQV0QESBt1SyZbNJMAwyKvFTLMyXSyBHDO4BG5t7k/Lw34tyqlSDlKIrIENIzCl+RVUNjmCPG+V/GMesRw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="/assets/js/dist/photoswipe.css">
 @endsection
 
 @section('content')
@@ -526,6 +528,41 @@
 
                 </div>
                 <br>
+                <div>
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex" style="gap: 10px">
+                            <div class="pswp-gallery" id="my-gallery">
+                                <a href="/storage/activity_photo/{{ $data['activity_photo'] }}" data-pswp-width="4000"
+                                    data-pswp-height="2500" target="_blank">
+                                    <img src="/storage/activity_photo/{{ $data['activity_photo'] }}"
+                                        style="width:100px;object-fit:cover;height:100px;border-radius:10px" alt="">
+                                </a>
+                            </div>
+                            <div>
+                                <h6>Deskripsi Pelatihan  {{ $data['date'] }}</h6>
+                                <p>
+                                    {{ $data['description'] }}
+                                </p>
+
+                                @php
+                                    $teach = DB::table('teachers')->select('name')->where('id', $data['trainer_teacher_id'])->first();
+                                @endphp
+                                <p>
+                                <div class="badge badge-primary">{{ $teach->name }}</div>
+                                </p>
+                                <p>
+
+                                </p>
+
+                            </div>
+                        </div>
+                        <h1 style="font-size: 50px">
+                            {{ count($impactedTeachers) }} <span style="font-size: 10px">Guru Terimbas</span>
+                        </h1>
+                    </div>
+                </div>
+                <br>
+                <br>
 
                 <div class="table-responsive">
                     <table class="table table-bordered" id="impactTable">
@@ -624,5 +661,14 @@
                 }
             });
         });
+    </script>
+    <script type="module">
+        import PhotoSwipeLightbox from '/assets/js/dist/photoswipe-lightbox.esm.js';
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: '#my-gallery',
+            children: 'a',
+            pswpModule: () => import('/assets/js/dist/photoswipe.esm.js')
+        });
+        lightbox.init();
     </script>
 @endsection

@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\{ProfileController, NotificationController, SubscriptionController, ArtworkController, MasterController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
 use Illuminate\Support\Facades\Route;
-use App\Models\{Artwork, Training, Teacher, School, Province, TeacherTraining};
+use App\Models\{Artwork, Training, Teacher, School, Province, TeacherTraining,Student};
 
 Route::get('/', function () {
     if (isset($_GET['provinsi'])) {
@@ -35,11 +35,21 @@ Route::get('/get-schools', function (Request $request) {
 
 Route::get('/get-students', function (Request $request) {
     $search = $_GET['q'];
-    return DB::table('students')
-        ->select('id', 'name')
-        ->where('name', 'like', "%{$search}%")
-        ->limit(50) // Hanya ambil 50 hasil per permintaan
-        ->get();
+    if (Auth::user()->role == 'teacher') {
+        $teacher_id = Auth::user()->teacher->id;
+        $students = Student::where('teacher_id', $teacher_id)
+            ->select('id', 'name')
+            ->where('name', 'like', "%{$search}%")
+            ->limit(50) // Hanya ambil 50 hasil per permintaan
+            ->get();
+    } else {
+        $students = Student::select('id', 'name')
+            ->where('name', 'like', "%{$search}%")
+            ->limit(50) // Hanya ambil 50 hasil per permintaan
+            ->get();
+    }
+
+    return $students;
 });
 
 Route::get('/get-teachers', function (Request $request) {

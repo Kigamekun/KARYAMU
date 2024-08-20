@@ -36,7 +36,9 @@ Route::get('/get-schools', function (Request $request) {
 Route::get('/get-students', function (Request $request) {
     $search = $_GET['q'];
     if (Auth::user()->role == 'teacher') {
-        $students = Student::where('school_id', Auth::user()->school_id)
+        $school_id = Auth::user()->teacher->school_id;
+
+        $students = Student::where('school_id', $school_id)
             ->select('id', 'name')
             ->where('name', 'like', "%{$search}%")
             ->limit(50) // Hanya ambil 50 hasil per permintaan

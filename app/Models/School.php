@@ -14,6 +14,7 @@ class School extends Model
         'phone',
         'email',
         'subdistrict_code',
+        'province_code',
     ];
 
     public function subdistrict()

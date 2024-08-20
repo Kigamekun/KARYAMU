@@ -73,6 +73,7 @@ class SchoolController extends Controller
             'phone' => 'required',
             'email' => 'required',
             'dp_kelurahan' => 'required',
+            'dp_provinsi' => 'required',
 
         ]);
 
@@ -83,6 +84,8 @@ class SchoolController extends Controller
             'phone' => $request->phone,
             'email' => $request->email,
             'subdistrict_code' => $request->dp_kelurahan,
+            'province_code' => $request->dp_provinsi,
+
         ]);
 
         return redirect()->back()->with(['message' => 'School berhasil ditambahkan', 'status' => 'success']);
@@ -98,6 +101,7 @@ class SchoolController extends Controller
             'phone' => 'required',
             'email' => 'required',
             'dp_kelurahan' => 'required',
+            'dp_provinsi' => 'required',
         ]);
 
         School::where('id', $id)->update([
@@ -106,6 +110,8 @@ class SchoolController extends Controller
             'phone' => $request->phone,
             'email' => $request->email,
             'subdistrict_code' => $request->dp_kelurahan,
+            'province_code' => $request->dp_provinsi,
+
         ]);
 
         return redirect()->back()->with(['message' => 'School berhasil di update', 'status' => 'success']);

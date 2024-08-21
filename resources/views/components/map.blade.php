@@ -20,11 +20,11 @@
         $totalArtworks = $worksByProvince[$provinceCode] ?? 0;
 
         if ($totalArtworks < 10 && $totalArtworks >= 1) {
-            $color = 'red';
+            $color = '#D32F2F';
         } elseif ($totalArtworks <= 20 && $totalArtworks >= 10) {
-            $color = 'yellow';
+            $color = '#F57C00';
         } elseif ($totalArtworks > 50) {
-            $color = 'green';
+            $color = '#388E3C';
         } else {
             $color = '#565358'; // Warna default untuk provinsi dengan 0 karya
         }

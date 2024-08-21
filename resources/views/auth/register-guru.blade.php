@@ -90,38 +90,45 @@
                 <form method="POST" action="{{ route('register.create-guru') }}">
                     @csrf
                     <div class="col mb-3">
-                        <label for="name" class="form-label">Name</label>
+                        <label for="name" class="form-label">Name<span
+                            class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     <div class="row">
                         <div class="col mb-3">
-                            <label for="username" class="form-label">Username</label>
+                            <label for="username" class="form-label">Username<span
+                                class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="username" name="username" required>
                         </div>
                         <div class="col mb-3">
-                            <label for="email" class="form-label">Email</label>
+                            <label for="email" class="form-label">Email<span
+                                class="text-danger">*</span></label>
                             <input type="email" class="form-control" id="email" name="email" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="mb-3 col">
-                            <label for="password" class="form-label">Password</label>
+                            <label for="password" class="form-label">Password<span
+                                class="text-danger">*</span></label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
                         <div class="mb-3 col">
-                            <label for="password_confirmation" class="form-label">Confirm Password</label>
+                            <label for="password_confirmation" class="form-label">Confirm Password<span
+                                class="text-danger">*</span></label>
                             <input type="password" class="form-control" id="password_confirmation"
                                 name="password_confirmation" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="mb-3 col">
-                            <label for="nip" class="form-label">NIP</label>
+                            <label for="nip" class="form-label">NIP<span
+                                class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="nip" name="nip" required>
                         </div>
                         <div class="mb-3 col">
                             <label for="school_id" class="form-label
-                                ">Sekolah </label>
+                                ">Sekolah <span
+                                class="text-danger">*</span></label>
                             <select class="form-select" id="school_id" name="school_id" required>
                                 <option value="" selected>Pilih Sekolah</option>
                                 @foreach (DB::table('schools')->get() as $item)
@@ -131,11 +138,13 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="address" class="form-label">Address</label>
+                        <label for="address" class="form-label">Address<span
+                            class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="address" name="address" required>
                     </div>
                     <div class="mb-3">
-                        <label for="phone" class="form-label">Phone</label>
+                        <label for="phone" class="form-label">Phone<span
+                            class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="phone" name="phone" required>
                     </div>
                     <div class="mb-3 mt-3 d-flex justify-content-between">

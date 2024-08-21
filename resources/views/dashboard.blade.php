@@ -166,6 +166,13 @@
                 <div class="container-fluid">
                     <div style="border-radius:15px;" class="card">
                         <div class="card-body">
+                            <div class="col-12 text-center mt-4">
+                                <div class="empty-state">
+                                    <img src="{{ asset('assets/img/empty.svg') }}" alt="">
+                                    <h3 class="mt-5">Tidak Ada Imbas Pelatihan.</h3>
+                                    <p>Silakan bagikan ilmu yang telah anda dapatkan melalui pelatihan kemudian tambahkan data pelatihan.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

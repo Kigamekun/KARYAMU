@@ -23,7 +23,7 @@
             $color = '#D32F2F';
         } elseif ($totalArtworks <= 20 && $totalArtworks >= 10) {
             $color = '#F57C00';
-        } elseif ($totalArtworks > 50) {
+        } elseif ($totalArtworks > 20) {
             $color = '#388E3C';
         } else {
             $color = '#565358'; // Warna default untuk provinsi dengan 0 karya

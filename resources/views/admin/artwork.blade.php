@@ -96,7 +96,10 @@
         <div class="modal-dialog">
             <div id="modal-content" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Buat Karya</h5>
+                    <div>
+                        <h5 class="modal-title" id="staticBackdropLabel">Buat Karya</h5>
+                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
+                    </div>
                 </div>
                 <form action="{{ route('karya.store') }}" id="buatKarya" method="post" enctype="multipart/form-data">
                     @csrf
@@ -116,7 +119,7 @@
 
                         @if (Auth::user()->role == 'admin')
                             <div class="mb-3">
-                                <label for="creator" class="fw-semibold">Pilih Pembuat Karya</label>
+                                <label for="creator" class="fw-semibold">Pilih Pembuat Karya<span class="ml-1 text-danger">*</span></label>
                                 <select class="js-example-basic-single" id="creator" name="creator" required>
 
                                 </select>
@@ -140,13 +143,13 @@
                             <x-input-error :messages="$errors->get('image')" class="mt-2" />
                         </div>
                         <div class="mb-3 d-none" id="video-upload">
-                            <label for="video" class="fw-semibold">Video<span class="text-danger">*</span></label>
+                            <label for="video" class="fw-semibold">Video<span class="ml-1 text-danger">*</span></label>
                             <input type="text" class="form-control" id="video" name="video"
                                 placeholder="Masukan URL Video">
                             <x-input-error :messages="$errors->get('video')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="students" class="fw-semibold">Pilih Siswa</label>
+                            <label for="students" class="fw-semibold">Pilih Siswa<span class="ml-1 text-danger">*</span></label>
                             <select class="select2" id="students" name="students[]" multiple="multiple" required>
 
                             </select>
@@ -228,9 +231,12 @@
                     });
 
                     var html = `
-            <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Edit karya</h5>
-            </div>
+                 <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="staticBackdropLabel">Edit Karya</h5>
+                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
+                    </div>
+                </div>
             <form action="${$(e.relatedTarget).data('url')}" method="post" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -255,19 +261,19 @@
                             <x-input-error :messages="$errors->get('type')" class="mt-2" />
                         </div>
                         <div class="mb-3 ${$(e.relatedTarget).data('type') == 'video' ? 'd-none' : ''}" id="image-upload-edit">
-                            <label for="image" class="fw-semibold">Image<span class="text-danger">*</span></label>
+                            <label for="image" class="fw-semibold">Image<span class="ml-1 text-danger">*</span></label>
                             <input type="file" class=" dropify" id="image" name="image" placeholder="Isi file"
                                 data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M" data-default-file="${$(e.relatedTarget).data('file_path')}">
                             <x-input-error :messages="$errors->get('image')" class="mt-2" />
                         </div>
                         <div class="mb-3 ${$(e.relatedTarget).data('type') == 'image' ? 'd-none' : ''}" id="video-upload-edit">
-                            <label for="video" class="fw-semibold">Video<span class="text-danger">*</span></label>
+                            <label for="video" class="fw-semibold">Video<span class="ml-1 text-danger">*</span></label>
                             <input type="text" class="form-control" id="video" name="video"
                                 placeholder="Masukan URL Video" value="${$(e.relatedTarget).data('video_link')}">
                             <x-input-error :messages="$errors->get('video')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="students" class="fw-semibold">Pilih Siswa</label>
+                            <label for="students" class="fw-semibold">Pilih Siswa <span class="ml-1 text-danger">*</span></label>
                             <select class="form-control select4" id="students" name="students[]" multiple="multiple" required>
                                 ${memberOption}
                             </select>

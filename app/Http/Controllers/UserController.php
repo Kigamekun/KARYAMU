@@ -152,8 +152,6 @@ class UserController extends Controller
 
             Validator::validate($request->all(), [
                 'nis' => 'required|unique:students',
-                'phone_number' => 'required',
-                'address' => 'required',
             ]);
 
 
@@ -180,8 +178,6 @@ class UserController extends Controller
             Validator::validate($request->all(), [
                 'nip' => 'required|unique:teachers',
                 'school_id_teacher' => 'required',
-                'phone_number_teacher' => 'required',
-                'address_teacher' => 'required',
             ]);
 
             $user->teacher()->create([
@@ -357,8 +353,6 @@ class UserController extends Controller
             'password' => ['required', 'confirmed'],
             'nip' => 'required',
             'school_id' => 'required',
-            'phone' => 'required',
-            'address' => 'required',
         ]);
 
         $user = User::create([

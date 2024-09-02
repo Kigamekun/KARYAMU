@@ -81,40 +81,41 @@
     <div class="main-content" style="width: 100%;height:100vh;display:flex;justify-content:center;align-items:center; ">
         <div class="card shadow" style="border:none;width:40%;border-radius:30px">
             <div class="card-body " style="padding: 50px 100px 50px">
-                <div class="d-flex justify-content-center align-items-center" style="flex-direction: column">
+                <div class="d-flex justify-content-center align-items-start" style="flex-direction: column">
                     <h1>Register</h1>
-                    <p>Hallo!, Masukan detail untuk melakukan
-                        registrasi akun</p>
+                    <span>Masukan data untuk melakukan registrasi akun.</span>
+                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
+
                 </div>
                 <br>
                 <form method="POST" action="{{ route('register') }}">
                     @csrf
                     <div class="col mb-3">
                         <label for="name" class="form-label">Name<span
-                            class="text-danger">*</span></label>
+                            class="ms-1 text-danger">*</span></label>
                         <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     <div class="row">
                         <div class="col mb-3">
                             <label for="username" class="form-label">Username<span
-                                class="text-danger">*</span></label>
+                                class="ms-1 text-danger">*</span></label>
                             <input type="text" class="form-control" id="username" name="username" required>
                         </div>
                         <div class="col mb-3">
                             <label for="email" class="form-label">Email<span
-                                class="text-danger">*</span></label>
+                                class="ms-1 text-danger">*</span></label>
                             <input type="email" class="form-control" id="email" name="email" required>
                         </div>
                     </div>
                     <div class="row">
                         <div class="mb-3 col">
                             <label for="password" class="form-label">Password<span
-                                class="text-danger">*</span></label>
+                                class="ms-1 text-danger">*</span></label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
                         <div class="mb-3 col">
                             <label for="password_confirmation" class="form-label">Confirm Password<span
-                                class="text-danger">*</span></label>
+                                class="ms-1 text-danger">*</span></label>
                             <input type="password" class="form-control" id="password_confirmation"
                                 name="password_confirmation" required>
                         </div>
@@ -122,13 +123,13 @@
                     <div class="row">
                         <div class="mb-3 col">
                             <label for="nis" class="form-label">NISN<span
-                                class="text-danger">*</span></label>
+                                class="ms-1 text-danger">*</span></label>
                             <input type="text" class="form-control" id="nis" name="nis" required>
                         </div>
                         <div class="mb-3 col">
                             <label for="school_id" class="form-label
                                 ">Sekolah <span
-                                class="text-danger">*</span></label>
+                                class="ms-1 text-danger">*</span></label>
                             <select class="form-select" id="school_id" name="school_id" required>
                                 <option value="" selected>Pilih Sekolah</option>
                                 @foreach (DB::table('schools')->get() as $item)
@@ -139,13 +140,14 @@
                     </div>
                     <div class="mb-3">
                         <label for="address" class="form-label">Address<span
-                            class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="address" name="address" required>
+                            class="ms-1 text-danger">*</span></label>
+                            <textarea name="address" class="form-control" id="address" cols="30" rows="2"></textarea>
+
                     </div>
                     <div class="mb-3">
                         <label for="phone" class="form-label">Phone<span
-                            class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="phone" name="phone" required>
+                            class="ms-1 text-danger">*</span></label>
+                        <input type="text" class="form-control" id="phone" name="phone">
                     </div>
                     <div class="mb-3 mt-3 d-flex justify-content-between">
                         <div class="form-check

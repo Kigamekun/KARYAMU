@@ -88,19 +88,22 @@
         <div class="modal-dialog">
             <div id="modal-content" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Buat Pelatihan</h5>
+                    <div>
+                        <h5 class="modal-title" id="staticBackdropLabel">Buat Pelatihan</h5>
+                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
+                    </div>
                 </div>
                 <form action="{{ route('pelatihan.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="description" class="fw-semibold">Deskripsi<span class="text-danger">*</span></label>
+                            <label for="description" class="fw-semibold">Deskripsi<span class="ml-1 text-danger">*</span></label>
                             <textarea class="form-control" id="description" name="description" placeholder="Masukan Deskripsi" required></textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
                         @if (Auth::user()->role == 'admin')
                             <div class="mb-3">
-                                <label for="creator" class="fw-semibold">Pilih Pembuat Pelatihan</label>
+                                <label for="creator" class="fw-semibold">Pilih Pembuat Pelatihan<span class="ml-1 text-danger">*</span></label>
                                 <select class="js-example-basic-single" id="creator" name="creator" required>
 
                                 </select>
@@ -108,16 +111,14 @@
                             </div>
                         @endif
                         <div class="mb-3" id="image-upload">
-                            <label for="activity_photo" class="fw-semibold">Activity Photo<span
-                                    class="text-danger">*</span></label>
+                            <label for="activity_photo" class="fw-semibold">Activity Photo<span class="ml-1 text-danger">*</span></label>
                             <input type="file" class=" dropify" id="activity_photo" name="activity_photo"
                                 placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]'
                                 data-max-file-size="500K">
                             <x-input-error :messages="$errors->get('activity_photo')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="members" class="fw-semibold">Pilih Peserta<span
-                                    class="text-danger">*</span></label>
+                            <label for="members" class="fw-semibold">Pilih Peserta<span class="ml-1 text-danger">*</span></label>
                             <select class="form-control select2" id="members" name="members[]" multiple="multiple">
 
                             </select>
@@ -199,27 +200,28 @@
 
                     var html = `
                         <div class="modal-header">
-                                <h5 class="modal-title" id="staticBackdropLabel">Edit Pelatihan</h5>
-                        </div>
+                    <div>
+                        <h5 class="modal-title" id="staticBackdropLabel">Edit Pelatihan</h5>
+                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
+                    </div>
+                </div>
                         <form action="${$(e.relatedTarget).data('url')}" method="post" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="modal-body">
                                     <div class="mb-3">
-                                        <label for="description" class="fw-semibold">Deskripsi<span
-                                class="text-danger">*</span></label>
+                                        <label for="description" class="fw-semibold">Deskripsi<span class="ml-1 text-danger">*</span></label>
                                         <textarea class="form-control" id="description" name="description" placeholder="Masukan Deskripsi" required>${$(e.relatedTarget).data('description')}</textarea>
                                         <x-input-error :messages="$errors->get('description')" class="mt-2" />
                                     </div>
                                     <div class="mb-3" id="image-upload">
-                                        <label for="activity_photo" class="fw-semibold">Activity Photo<span
-                                                class="text-danger">*</span></label>
+                                        <label for="activity_photo" class="fw-semibold">Activity Photo<span class="ml-1 text-danger">*</span></label>
                                         <input type="file" class=" dropify" id="activity_photo" name="activity_photo"
                                             placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="500K" data-default-file="${$(e.relatedTarget).data('activity_photo')}">
                                         <x-input-error :messages="$errors->get('activity_photo')" class="mt-2" />
                                     </div>
                                     <div class="mb-3">
-                                        <label for="members" class="fw-semibold">Pilih Peserta</label>
+                                        <label for="members" class="fw-semibold">Pilih Peserta<span class="ml-1 text-danger">*</span></label>
                                         <select class="form-control select4" id="members" name="members[]" multiple="multiple">
                                         ${memberOption}
                                         </select>

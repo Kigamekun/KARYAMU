@@ -570,13 +570,16 @@
         <div class="modal-dialog">
             <div id="modal-content" class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Buat Sekolah</h5>
+                    <div>
+                        <h5 class="modal-title" id="staticBackdropLabel">Buat Sekolah</h5>
+                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
+                    </div>
                 </div>
                 <form action="{{ route('sekolah.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="name" class="fw-semibold">Nama Sekolah</label>
+                            <label for="name" class="fw-semibold">Nama Sekolah<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name"
                                 placeholder="Masukan Nama Sekolah" required>
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
@@ -602,25 +605,25 @@
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="dp_provinsi" class="fw-semibold">Provinsi</label>
+                            <label for="dp_provinsi" class="fw-semibold">Provinsi<span class="ml-1 text-danger">*</span></label>
                             <select class="form-select form-control" id="dp_provinsi" name="dp_provinsi" required>
                             </select>
                             <x-input-error :messages="$errors->get('dp_provinsi')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="dp_kota" class="fw-semibold">Kota</label>
+                            <label for="dp_kota" class="fw-semibold">Kota<span class="ml-1 text-danger">*</span></label>
                             <select class="form-select w-100 form-control" id="dp_kota" name="dp_kota" required>
                             </select>
                             <x-input-error :messages="$errors->get('dp_kota')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="dp_kecamatan" class="fw-semibold">Kecamatan</label>
+                            <label for="dp_kecamatan" class="fw-semibold">Kecamatan<span class="ml-1 text-danger">*</span></label>
                             <select class="form-select form-control" id="dp_kecamatan" name="dp_kecamatan" required>
                             </select>
                             <x-input-error :messages="$errors->get('dp_kecamatan')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="dp_kelurahan" class="fw-semibold">Kelurahan</label>
+                            <label for="dp_kelurahan" class="fw-semibold">Kelurahan<span class="ml-1 text-danger">*</span></label>
                             <select class="form-select form-control" id="dp_kelurahan" name="dp_kelurahan" required>
                             </select>
                             <x-input-error :messages="$errors->get('dp_kelurahan')" class="mt-2" />
@@ -803,14 +806,17 @@
 
                     var html = `
                         <div class="modal-header">
-                            <h5 class="modal-title" id="staticBackdropLabel">Edit Data Sekolah</h5>
-                        </div>
+                    <div>
+                        <h5 class="modal-title" id="staticBackdropLabel">Edit Sekolah</h5>
+                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
+                    </div>
+                </div>
                         <form action="${url}" method="post" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="modal-body">
                                 <div class="mb-3">
-                                    <label for="name" class="fw-semibold">Nama Sekolah</label>
+                                    <label for="name" class="fw-semibold">Nama Sekolah<span class="ml-1 text-danger">*</span></label>
                                     <input type="text" class="form-control" id="name" name="name"
                                         placeholder="Masukan Nama Sekolah" value="${response.name}" required>
                                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
@@ -834,28 +840,28 @@
                                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                                 </div>
                                 <div class="mb-3">
-                                    <label for="dp_provinsi" class="fw-semibold">Provinsi</label>
+                                    <label for="dp_provinsi" class="fw-semibold">Provinsi<span class="ml-1 text-danger">*</span></label>
                                     <select class="form-select form-control" id="dp_provinsi_edit" name="dp_provinsi" required>
                                         <!-- Options will be appended here -->
                                     </select>
                                     <x-input-error :messages="$errors->get('dp_provinsi')" class="mt-2" />
                                 </div>
                                 <div class="mb-3">
-                                    <label for="dp_kota" class="fw-semibold">Kota</label>
+                                    <label for="dp_kota" class="fw-semibold">Kota<span class="ml-1 text-danger">*</span></label>
                                     <select class="form-select form-control" id="dp_kota_edit" name="dp_kota" required>
                                         <!-- Options will be appended here -->
                                     </select>
                                     <x-input-error :messages="$errors->get('dp_kota')" class="mt-2" />
                                 </div>
                                 <div class="mb-3">
-                                    <label for="dp_kecamatan" class="fw-semibold">Kecamatan</label>
+                                    <label for="dp_kecamatan" class="fw-semibold">Kecamatan<span class="ml-1 text-danger">*</span></label>
                                     <select class="form-select form-control" id="dp_kecamatan_edit" name="dp_kecamatan" required>
                                         <!-- Options will be appended here -->
                                     </select>
                                     <x-input-error :messages="$errors->get('dp_kecamatan')" class="mt-2" />
                                 </div>
                                 <div class="mb-3">
-                                    <label for="dp_kelurahan" class="fw-semibold">Kelurahan</label>
+                                    <label for="dp_kelurahan" class="fw-semibold">Kelurahan<span class="ml-1 text-danger">*</span></label>
                                     <select class="form-select form-control" id="dp_kelurahan_edit" name="dp_kelurahan" required>
                                         <!-- Options will be appended here -->
                                     </select>

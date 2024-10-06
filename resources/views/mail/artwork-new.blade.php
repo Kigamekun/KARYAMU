@@ -23,13 +23,13 @@
                     <tr>
                         <td align="center" style="padding: 10px 20px;">
                             <h1 style="font-family: Arial, sans-serif; font-weight: 500; color: #333333; margin: 0;">
-                                KaryaMu</h1>
+                                Gencerling</h1>
                         </td>
                     </tr>
                     <tr>
                         <td align="center" style="padding: 10px 20px;">
                             <h3 style="font-family: Arial, sans-serif; font-weight: 400; color: #333333; margin: 0;">
-                                Karya baru telah terupload mohon cek dashboard karyamu untuk approve karya tersebut.
+                                Karya baru telah terupload mohon cek dashboard Gencerling untuk approve karya tersebut.
                             </h3>
                         </td>
                     </tr>
@@ -66,7 +66,7 @@
                     <tr>
                         <td
                             style="padding: 20px; text-align: center; font-family: Arial, sans-serif; font-size: 12px; color: #666666;">
-                            &copy; 2024 KaryaMu. All rights reserved.
+                            &copy; 2024 Gencerling. All rights reserved.
                         </td>
                     </tr>
                 </table>

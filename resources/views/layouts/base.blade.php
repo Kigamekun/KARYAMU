@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>KARYAMU - Aplikasi Management Karya</title>
+    <title>Gencerling - Generasi Cerdas Lingkungan</title>
 
     <!-- General CSS Files -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -53,6 +53,37 @@
             color: #fff
         }
     </style>
+
+    @php
+        function timeAgo($dateTime)
+        {
+            $now = Carbon\Carbon::now()->setTimezone('Asia/Jakarta');
+            $createdAt = Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $dateTime, 'Asia/Jakarta');
+
+            $diffInSeconds = abs($now->diffInSeconds($createdAt));
+
+            if ($diffInSeconds < 60) {
+                // Less than a minute ago
+                return 'Beberapa detik yang lalu';
+            } elseif ($diffInSeconds < 3600) {
+                // Less than an hour ago
+                $minutes = floor($diffInSeconds / 60);
+                return $minutes . ' menit yang lalu';
+            } elseif ($diffInSeconds < 86400) {
+                // Less than a day ago
+                $hours = floor($diffInSeconds / 3600);
+                return $hours . ' jam yang lalu';
+            } elseif ($diffInSeconds < 604800) {
+                // Less than a week ago
+                $days = floor($diffInSeconds / 86400);
+                return $days . ' hari yang lalu';
+            } else {
+                // More than a week ago
+                $weeks = floor($diffInSeconds / 604800);
+                return $weeks . ' minggu yang lalu';
+            }
+        }
+    @endphp
     <div id="app">
         <div class="main-wrapper">
             <div class="navbar-bg"></div>
@@ -70,7 +101,7 @@
                     $notif = DB::table('notifications')
                         ->where('user_id', Auth::id())
                         ->where('is_read', 0)
-                        ->orderBy('created_at', 'DESC')
+                        ->orderBy('created_at', 'ASC')
                         ->limit(5)
                         ->get();
                 @endphp
@@ -94,25 +125,9 @@
                                         </div>
                                         <div class="dropdown-item-desc">
                                             {{ $item->message }}
-                                            @php
-                                                // Ambil tanggal sekarang
-                                                $now = Carbon\Carbon::now();
-
-                                                // Format tanggal dibuat
-                                                $createdAt = Carbon\Carbon::parse($item->created_at);
-                                                $diffInDays = $now->diffInDays($createdAt);
-                                            @endphp
 
                                             <div class="time">
-                                                @if ($diffInDays === 1)
-                                                    Yesterday
-                                                @elseif ($diffInDays === 2)
-                                                    2 days ago
-                                                @elseif ($diffInDays > 7)
-                                                    {{ $createdAt->format('F j, Y') }}
-                                                @else
-                                                    {{ $createdAt->diffForHumans() }}
-                                                @endif
+                                                {{ timeAgo($item->created_at) }}
                                             </div>
                                         </div>
                                     </a>
@@ -151,8 +166,8 @@
                                 style="justify-content:center;align-items:center;width:100%;flex-direction: column;display:flex;">
                                 <a href="/" style="font-size: 25px;color:#0097FF">
                                     <i class="fa-solid fa-graduation-cap"></i>
-                                    KaryaMu</a>
-                                <span style="font-size: 10px">Aplikasi Management Karya</span>
+                                    Gencerling</a>
+                                <span style="font-size: 10px">Generasi Cerdas Lingkungan</span>
                             </div>
                         </div>
                         <div class=" d-flex justify-center w-100">
@@ -184,7 +199,7 @@
                                 <li class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                                     <a href="{{ route('dashboard') }}" class="nav-link ">
                                         <i class="fa-solid fa-grip ml-3 mr-3"></i>
-                                        <span>Dashboard</span>
+                                        <span>Beranda</span>
                                     </a>
                                 </li>
                                 @switch(Auth::user()->role)
@@ -271,12 +286,16 @@
         </div>
     </div>
 
+
+
     <!-- General JS Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
     </script>
+
+
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
     </script>
@@ -292,7 +311,6 @@
     <script src="{{ asset('assets/js/custom.js') }}"></script>
 
     <!-- Page Specific JS File -->
-    {{-- <script src="{{ asset('assets/js/page/index.js') }}"></script> --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
@@ -353,6 +371,30 @@
                 Swal.fire({
                     title: 'Konfirmasi Approve',
                     text: 'Apakah Anda yakin approve karya ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya',
+                    cancelButtonText: 'Tidak'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        console.log(form.action);
+                        form.submit();
+                    }
+                });
+            } else {
+                console.log("Form tidak ditemukan");
+            }
+        }
+    </script>
+
+    <script>
+        function confirmUnpublish(event) {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            if (form !== null) {
+                Swal.fire({
+                    title: 'Konfirmasi Unpublish',
+                    text: 'Apakah Anda yakin unpublish karya ini?',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Ya',

@@ -48,6 +48,7 @@ class UserController extends Controller
                         'phone_number' => $user->student->phone ?? null,
                         'address' => $user->student->address ?? null,
                         'school_id' => $user->student->school_id ?? null,
+                        'school_name' => $user->student->school->name ?? null,
                     ];
                 } elseif ($user->role == 'teacher') {
                     return [
@@ -61,6 +62,7 @@ class UserController extends Controller
                         'phone_number' => $user->teacher->phone ?? null,
                         'address' => $user->teacher->address ?? null,
                         'school_id' => $user->teacher->school_id ?? null,
+                        'school_name' => $user->teacher->school->name ?? null,
                     ];
                 } else {
                     return [
@@ -73,7 +75,8 @@ class UserController extends Controller
                         'address' => null,
                         'school_id' => null,
                         'nis' => null,
-                        'nip' => null
+                        'nip' => null,
+                        'school_name' => null,
                     ];
                 }
             });
@@ -91,7 +94,7 @@ class UserController extends Controller
                             data-username="' . $row['username'] . '"
                             data-email="' . $row['email'] . '" data-role="' . $row['role'] . '"
                             data-nis="' . $row['nis'] . '" data-nip="' . $row['nip'] . '"
-                            data-phone_number="' . $row['phone_number'] . '" data-address="' . $row['address'] . '"
+                            data-phone_number="' . $row['phone_number'] . '" data-address="' . $row['address'] . '" data-school_name="' . $row['school_name'] . '"
                             data-school_id="' . $row['school_id'] . '">
                                 Edit
                             </button>
@@ -126,7 +129,6 @@ class UserController extends Controller
         }
         return view('admin.user', [
             'data' => User::all(),
-            'sekolah' => School::all(),
         ]);
     }
 
@@ -254,18 +256,22 @@ class UserController extends Controller
                 'address_teacher' => 'required',
             ]);
 
-            $stut = Student::where('user_id', $id);
-            $artworkStudent = ArtworkStudent::where('student_id', $stut->first()->id)->get();
+            try {
+                $stut = Student::where('user_id', $id);
+                $artworkStudent = ArtworkStudent::where('student_id', $stut->first()->id)->get();
 
-            foreach ($artworkStudent as $art) {
-                $artworkId = $art->artwork_id;
-                $remainingReferences = ArtworkStudent::where('artwork_id', $artworkId)->count() - 1;
-                if ($remainingReferences === 0) {
-                    Artwork::find($artworkId)->delete();
+                foreach ($artworkStudent as $art) {
+                    $artworkId = $art->artwork_id;
+                    $remainingReferences = ArtworkStudent::where('artwork_id', $artworkId)->count() - 1;
+                    if ($remainingReferences === 0) {
+                        Artwork::find($artworkId)->delete();
+                    }
                 }
-            }
 
-            $stut->delete();
+                $stut->delete();
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
 
             User::find($id)->teacher()->updateOrCreate(
                 ['user_id' => $id],

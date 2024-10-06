@@ -92,6 +92,25 @@
             position: absolute;
             /* Posisi absolut untuk ikon */
         }
+
+        div#social-links {
+            margin: 0 auto;
+            max-width: 500px;
+        }
+
+        div#social-links ul li {
+            display: inline-block;
+        }
+
+        div#social-links ul li a {
+            padding: 5px;
+            border: 1px solid #0097ff;
+            margin: 1px;
+            font-size: 20px;
+            color: white;
+            background-color: #0097ff;
+            border-radius: 2px;
+        }
     </style>
     <br>
     <br>
@@ -151,7 +170,7 @@
                                 </div>
                                 <div class="mt-4">
                                     @if ($data->students->count() > 1)
-                                        <h6 style="color: #0097FF" class="d-flex gap-4">Team
+                                        <h6 style="color: #0097FF" class="d-flex gap-4">Kelompok
                                             <div>
                                                 <span style="color: rgba(32,31,41,.6)">
                                                     <li>
@@ -161,7 +180,7 @@
                                             </div>
                                         </h6>
                                     @else
-                                        <h6 style="color: #0097FF">Solo</h6>
+                                        <h6 style="color: #0097FF">Individu</h6>
                                     @endif
                                 </div>
                                 <div class="d-flex gap-1 flex-wrap mt-3">
@@ -169,6 +188,13 @@
                                         <span style="background: #0097FF !important"
                                             class="p-2 badge text-bg-primary">{{ $item->name }}</span>
                                     @endforeach
+                                </div>
+
+                                <div class="d-flex justify-content-end  gap-1 flex-wrap mt-3">
+                                    <div>
+                                        {!! $shareComponent !!}
+                                    </div>
+
                                 </div>
                             </div>
                         </div>

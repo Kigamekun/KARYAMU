@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
-
+use Illuminate\Support\Facades\Validator;
 class RegisteredUserController extends Controller
 {
     /**
@@ -19,6 +19,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
+        // dd('ada');
         return view('auth.register');
     }
 
@@ -35,16 +36,17 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
 
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+        Validator::validate($request->all(), [
+             'name' => ['required', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed'],
-            'nis' => 'required',
+            'nis' => ['required','unique:' . Student::class],
             'school_id' => 'required',
             'phone' => 'required',
             'address' => 'required',
         ]);
+
 
         $user = User::create([
             'name' => $request->name,

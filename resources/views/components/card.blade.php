@@ -197,9 +197,9 @@
         <p class="card-text trun mt-3" style="height: 50px">{{ $item->description }}</p>
         <div class="d-flex mt-3" style="justify-content: space-between">
             @if ($item->students->count() > 1)
-                <span style="background: #0097FF !important" class="p-2 badge text-bg-primary">Team</span>
+                <span style="background: #0097FF !important" class="p-2 badge text-bg-primary">Kelompok</span>
             @else
-                <span class="p-2 badge text-bg-warning text-white">Solo</span>
+                <span class="p-2 badge text-bg-warning text-white">Individu</span>
             @endif
             <div>
                 @php

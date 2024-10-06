@@ -6,10 +6,9 @@
         <div class="row">
             <div class="col-md-6 p-5 d-flex align-items-center">
                 <div>
-                    <h1 style="font-size: 64px">Sebarkan inspirasi lewat karyamu bersama <span
-                            style="font-weight: bold;color:#0097FF">KaryaMu.</span></h1>
-                    <p>Sebarkan inspirasi lewat karyamu bersama KaryaMu, Sebarkan inspirasi lewat karyamu bersama
-                        KaryaMu.</p>
+                    <h1 style="font-size: 64px">Sebarkan inspirasi lewat Karyamu bersama <span
+                            style="font-weight: bold;color:#0097FF">Gencerling.</span></h1>
+                    <p>Sebarkan inspirasi lewat Karyamu bersama Gencerling</p>
                     <a href="{{ route('login') }}" class="btn btn-primary btn-lg" style="background: #0097FF">
                         Mulai Sekarang
                     </a>

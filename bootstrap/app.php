@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(XssSanitization::class);
+        $middleware->alias(['check.school.data' => \App\Http\Middleware\CheckSchoolData::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

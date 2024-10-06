@@ -98,8 +98,12 @@
                 <div class="modal-header">
                     <div>
                         <h5 class="modal-title" id="staticBackdropLabel">Buat Karya</h5>
-                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
+                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span
+                                class="text-danger">*</span> wajib diisi.</small>
                     </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <form action="{{ route('karya.store') }}" id="buatKarya" method="post" enctype="multipart/form-data">
                     @csrf
@@ -119,7 +123,8 @@
 
                         @if (Auth::user()->role == 'admin')
                             <div class="mb-3">
-                                <label for="creator" class="fw-semibold">Pilih Pembuat Karya<span class="ml-1 text-danger">*</span></label>
+                                <label for="creator" class="fw-semibold">Pilih Pembuat Karya<span
+                                        class="ml-1 text-danger">*</span></label>
                                 <select class="js-example-basic-single" id="creator" name="creator" required>
 
                                 </select>
@@ -130,7 +135,7 @@
                         <div class="mb-3">
                             <label for="type" class="fw-semibold">Tipe<span class="ml-1 text-danger">*</span></label>
                             <select class="form-control" onchange="selectType()" id="type" name="type" required>
-                                <option value="image">Foto</option>
+                                <option value="image">Gambar</option>
                                 <option value="video">Video</option>
                             </select>
                             <x-input-error :messages="$errors->get('type')" class="mt-2" />
@@ -140,18 +145,24 @@
                                     class="ml-1 text-danger">*</span></label>
                             <input type="file" class=" dropify" id="image" name="image" placeholder="Isi file"
                                 data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M">
+                            <span class="text-sm text-danger mt-2" style="font-size: 12px;">File harus berformat png,
+                                jpeg, jpg dan berukuran
+                                maksimal 1MB.</span>
                             <x-input-error :messages="$errors->get('image')" class="mt-2" />
                         </div>
                         <div class="mb-3 d-none" id="video-upload">
-                            <label for="video" class="fw-semibold">Video<span class="ml-1 text-danger">*</span></label>
+                            <label for="video" class="fw-semibold">Video<span
+                                    class="ml-1 text-danger">*</span></label>
                             <input type="text" class="form-control" id="video" name="video"
                                 placeholder="Masukan URL Video">
+                            <span class="text-sm text-danger mt-2" style="font-size: 12px;">Gunakan link dari tombol share
+                                di video youtube dengan link diawali dengan https://youtu.be.</span>
                             <x-input-error :messages="$errors->get('video')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="students" class="fw-semibold">Pilih Siswa<span class="ml-1 text-danger">*</span></label>
+                            <label for="students" class="fw-semibold">Pilih Siswa<span
+                                    class="ml-1 text-danger">*</span></label>
                             <select class="select2" id="students" name="students[]" multiple="multiple" required>
-
                             </select>
                             <x-input-error :messages="$errors->get('students')" class="mt-2" />
                         </div>
@@ -231,11 +242,14 @@
                     });
 
                     var html = `
-                 <div class="modal-header">
+                <div class="modal-header">
                     <div>
                         <h5 class="modal-title" id="staticBackdropLabel">Edit Karya</h5>
                         <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
                     </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
             <form action="${$(e.relatedTarget).data('url')}" method="post" enctype="multipart/form-data">
                 @csrf
@@ -255,7 +269,7 @@
                         <div class="mb-3">
                             <label for="type" class="fw-semibold">Tipe<span class="ml-1 text-danger">*</span></label>
                             <select class="form-control" onchange="selectTypeEdit()" id="type-edit" name="type" required>
-                                <option value="image" ${$(e.relatedTarget).data('type') == 'image' ? 'selected' : ''}>Foto</option>
+                                <option value="image" ${$(e.relatedTarget).data('type') == 'image' ? 'selected' : ''}>Gambar</option>
                                 <option value="video" ${$(e.relatedTarget).data('type') == 'video' ? 'selected' : ''}>Video</option>
                             </select>
                             <x-input-error :messages="$errors->get('type')" class="mt-2" />
@@ -264,6 +278,9 @@
                             <label for="image" class="fw-semibold">Image<span class="ml-1 text-danger">*</span></label>
                             <input type="file" class=" dropify" id="image" name="image" placeholder="Isi file"
                                 data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M" data-default-file="${$(e.relatedTarget).data('file_path')}">
+                                   <span class="text-sm text-danger mt-2" style="font-size: 12px;">File harus berformat png,
+                                jpeg, jpg dan berukuran
+                                maksimal 1MB.</span>
                             <x-input-error :messages="$errors->get('image')" class="mt-2" />
                         </div>
                         <div class="mb-3 ${$(e.relatedTarget).data('type') == 'image' ? 'd-none' : ''}" id="video-upload-edit">
@@ -340,15 +357,15 @@
                 ${response.type == 'image' ? ` <div class="mb-3"><label for="video_link" class="fw-semibold">Video Link</label><p><img src="storage/artwork/${response.file_path}" alt="${response.title}" style="width: 100%;border-radius:15px"></p></div>` : ''}
 
                 ${response.type == 'video' ? `
-                            <div class="mb-3">
-                                <label for="video_link" class="fw-semibold">Video Link</label>
-                                <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
-                                        <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
-                                            style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
-                                            class="card-img-top" alt="YouTube Thumbnail">
-                                    </a></p>
-                            </div>
-                            ` : ''}
+                                                                                        <div class="mb-3">
+                                                                                            <label for="video_link" class="fw-semibold">Video Link</label>
+                                                                                            <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
+                                                                                                    <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
+                                                                                                        style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
+                                                                                                        class="card-img-top" alt="YouTube Thumbnail">
+                                                                                                </a></p>
+                                                                                        </div>
+                                                                                        ` : ''}
 
                 <div class="mb-3">
                     <label for="status" class="fw-semibold">Status</label>
@@ -409,27 +426,70 @@
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script>
-        $('#students').select2({
-            ajax: {
-                url: '/get-students', // URL endpoint Anda untuk mengambil data sekolah
-                dataType: 'json',
-                delay: 250,
-                processResults: function(data) {
-                    return {
-                        results: data.map(item => ({
-                            id: item.id,
-                            text: item.name
-                        }))
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
-            placeholder: 'Pilih siswa',
-            allowClear: true
-        });
-    </script>
+
+
+    @if (Auth::user()->role == 'student')
+        <script>
+            $(document).ready(function() {
+                // Inisialisasi Select2
+                var s2 = $('#students').select2({
+                    ajax: {
+                        url: '/get-students', // URL endpoint Anda untuk mengambil data siswa
+                        dataType: 'json',
+                        delay: 250,
+                        processResults: function(data) {
+                            return {
+                                results: data.map(item => ({
+                                    id: item.id,
+                                    text: item.name
+                                }))
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
+                    placeholder: 'Pilih siswa',
+                    allowClear: true
+                });
+
+                var id = {{ Auth::user()->student->id }};
+                var text = '{{ Auth::user()->student->name }}';
+
+                var option = new Option(text, id, true, true);
+
+                s2.append(option).trigger('change');
+
+                s2.val(vals).trigger("change");
+
+            });
+        </script>
+    @else
+        <script>
+            $(document).ready(function() {
+                // Inisialisasi Select2
+                var s2 = $('#students').select2({
+                    ajax: {
+                        url: '/get-students', // URL endpoint Anda untuk mengambil data siswa
+                        dataType: 'json',
+                        delay: 250,
+                        processResults: function(data) {
+                            return {
+                                results: data.map(item => ({
+                                    id: item.id,
+                                    text: item.name
+                                }))
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
+                    placeholder: 'Pilih siswa',
+                    allowClear: true
+                });
+
+            });
+        </script>
+    @endif
 
     <script>
         $('#creator').select2({

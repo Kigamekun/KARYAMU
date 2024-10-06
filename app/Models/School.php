@@ -15,6 +15,12 @@ class School extends Model
         'email',
         'subdistrict_code',
         'province_code',
+
+        'district_code',
+        'regency_code',
+        'subdistrict_code',
+        'npsn',
+        'status'
     ];
 
     public function subdistrict()

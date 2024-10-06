@@ -23,6 +23,47 @@
             height: 100%;
             box-sizing: border-box;
         }
+
+        .legend-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 50px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            /* Jarak antara kotak dan label */
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .high {
+            background-color: #006400;
+            /* Hijau tua */
+        }
+
+        .medium {
+            background-color: #32CD32;
+            /* Hijau sedang */
+        }
+
+        .low {
+            background-color: #90EE90;
+            /* Hijau muda */
+        }
+
+        .label {
+            font-size: 14px;
+            color: black;
+        }
     </style>
 
     <div style="width: 90%;margin:auto">
@@ -33,6 +74,20 @@
             <div class="card-body">
                 <center>
                     @include('components.map')
+                    <div class="legend-container">
+                        <div class="legend-item">
+                            <div class="legend-box high"></div>
+                            <div class="label">Tinggi</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box medium"></div>
+                            <div class="label">Sedang</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box low"></div>
+                            <div class="label">Rendah</div>
+                        </div>
+                    </div>
                 </center>
             </div>
         </div>
@@ -81,7 +136,6 @@
             <div>
                 <h3 class="mb-4">Laporan Imbas Pelatihan Guru</h3>
             </div>
-
 
             @if (!is_null($pelatihan))
                 <div class="container-fluid">
@@ -170,7 +224,8 @@
                                 <div class="empty-state">
                                     <img src="{{ asset('assets/img/empty.svg') }}" alt="">
                                     <h3 class="mt-5">Tidak Ada Imbas Pelatihan.</h3>
-                                    <p>Silakan bagikan ilmu yang telah anda dapatkan melalui pelatihan kemudian tambahkan data pelatihan.</p>
+                                    <p>Silakan bagikan ilmu yang telah anda dapatkan melalui pelatihan kemudian tambahkan
+                                        data pelatihan.</p>
                                 </div>
                             </div>
                         </div>

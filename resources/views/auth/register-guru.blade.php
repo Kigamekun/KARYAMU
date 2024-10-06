@@ -56,13 +56,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>KARYAMU - Aplikasi Management Karya</title>
+    <title>Gencerling - Generasi Cerdas Lingkungan</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 
 <body>
-    <style>
+   <style>
         .main-content::before {
             content: '';
             position: absolute;
@@ -77,10 +77,33 @@
             opacity: 0.7;
             z-index: -1;
         }
+        
+         /* For mobile devices */
+    @media only screen and (max-width: 768px) {
+        #card-content {
+            width: 100% !important;
+            border-radius: 0;
+        }
+        .card-body {
+           padding : 200px 40px 50px !important;
+        }
+    }
+
+    /* For larger screens (desktops) */
+    @media only screen and (min-width: 769px) {
+        #card-content {
+            width: 40%;
+            border-radius: 30px;
+        }
+        
+        .card-body {
+           padding : 50px 100px 50px !important;
+        }
+    }
     </style>
-    <div class="main-content" style="width: 100%;height:100vh;display:flex;justify-content:center;align-items:center; ">
-        <div class="card shadow" style="border:none;width:40%;border-radius:30px">
-            <div class="card-body " style="padding: 50px 100px 50px">
+    <div class="main-content" id="main-content" style="width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center;">
+    <div class="card shadow" id="card-content" style="border: none;">
+            <div class="card-body ">
                 <div class="d-flex justify-content-center align-items-start" style="flex-direction: column">
                     <h1>Register</h1>
                     <span>Masukan data untuk melakukan registrasi akun.</span>
@@ -93,18 +116,18 @@
                     <div class="col mb-3">
                         <label for="name" class="form-label">Name<span
                             class="ms-1 text-danger">*</span></label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+                        <input type="text" class="form-control" id="name" value="{{ old('name') }}"  name="name" required>
                     </div>
                     <div class="row">
                         <div class="col mb-3">
                             <label for="username" class="form-label">Username<span
                                 class="ms-1 text-danger">*</span></label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ old('username') }}"  required>
                         </div>
                         <div class="col mb-3">
                             <label for="email" class="form-label">Email<span
                                 class="ms-1 text-danger">*</span></label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}"  required>
                         </div>
                     </div>
                     <div class="row">
@@ -124,27 +147,30 @@
                         <div class="mb-3 col">
                             <label for="nip" class="form-label">NIP<span
                                 class="ms-1 text-danger">*</span></label>
-                            <input type="text" class="form-control" id="nip" name="nip" required>
+                            <input type="text" class="form-control" id="nip" name="nip" value="{{ old('nip') }}"  required>
                         </div>
                         <div class="mb-3 col">
                             <label for="school_id" class="form-label
                                 ">Sekolah <span
                                 class="ms-1 text-danger">*</span></label>
                             <select class="form-select" id="school_id" name="school_id" required>
-                                <option value="" selected>Pilih Sekolah</option>
-                                @foreach (DB::table('schools')->get() as $item)
-                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                @endforeach
-                            </select>
+    <option value="" {{ old('school_id') == '' ? 'selected' : '' }}>Pilih Sekolah</option>
+    @foreach (DB::table('schools')->get() as $item)
+        <option value="{{ $item->id }}" {{ old('school_id') == $item->id ? 'selected' : '' }}>
+            {{ $item->name }}
+        </option>
+    @endforeach
+</select>
+
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="address" class="form-label">Address</label>
-                        <textarea name="address" class="form-control" id="address" cols="30" rows="2"></textarea>
+                        <textarea name="address" class="form-control" id="address" cols="30" rows="2">{{ old('address') }}</textarea>
                     </div>
                     <div class="mb-3">
                         <label for="phone" class="form-label">Phone</label>
-                        <input type="text" class="form-control" id="phone" name="phone">
+                        <input type="text" class="form-control" id="phone" value="{{ old('phone') }}"  name="phone">
                     </div>
                     <div class="mb-3 mt-3 d-flex justify-content-between">
                         <div class="form-check
@@ -171,6 +197,7 @@
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
         </script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         @if (!is_null(Session::get('message')))
             <script>

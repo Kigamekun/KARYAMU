@@ -38,27 +38,31 @@ class TrainingController extends Controller
     {
         if ($request->ajax()) {
             if (Auth::user()->role == 'admin') {
-                $data = Training::join('teachers as trainer', 'trainer.id', '=', 'trainings.trainer_teacher_id')
+               $data = Training::join('teachers as trainer', 'trainer.id', '=', 'trainings.trainer_teacher_id')
                     ->leftJoin('schools', 'schools.id', '=', 'trainer.school_id')
                     ->leftJoin('teacher_trainings', 'teacher_trainings.training_id', '=', 'trainings.id')
                     ->leftJoin('teachers as participant', 'participant.id', '=', 'teacher_trainings.teacher_id')
+                    ->leftJoin('teachers', 'teachers.id', '=', 'trainings.trainer_teacher_id') // Join ke tabel users
                     ->select(
                         'trainings.id',
                         'trainings.description',
                         'trainings.activity_photo',
+                        'trainings.trainer_teacher_id as trainer_teacher_id',
                         'trainer.name as trainer_name',
                         'schools.name as trainer_school',
-                        DB::raw('COUNT(teacher_trainings.teacher_id) as total_participants')
+                        'teachers.name as trainer_teacher_name', // Mendapatkan nama dari tabel users
+                        DB::raw('COUNT(teacher_trainings.teacher_id) - 1 as total_participants')
                     )
                     ->groupBy(
                         'trainings.id',
                         'trainings.description',
+                        'trainings.trainer_teacher_id',
                         'trainings.activity_photo',
                         'trainer.name',
-                        'schools.name'
+                        'schools.name',
+                        'teachers.name' // Tambahkan 'users.name' ke dalam groupBy
                     )
                     ->get();
-
 
                 return DataTables::of($data)
                     ->addIndexColumn()
@@ -93,6 +97,14 @@ class TrainingController extends Controller
 
                         return $btn;
                     })
+                    ->addColumn('jumlah_terimbas', function ($row) {
+                           
+                        $maxLevel = 1; // Initialize the max level
+
+                        $impactedTeachers = $this->getImpactedTeachers($row->trainer_teacher_id, 1, $maxLevel,$row->id);
+                        
+                        return count($impactedTeachers);
+                    })
                     ->addColumn('role', function ($row) {
                         return $row->role == 'instructor' ? '<div class="badge badge-success">Instruktur</div>' : '<div class="badge badge-primary">Peserta</div>';
                     })
@@ -105,13 +117,16 @@ class TrainingController extends Controller
                     ->leftJoin('schools', 'schools.id', '=', 'trainer.school_id')
                     ->leftJoin('teacher_trainings', 'teacher_trainings.training_id', '=', 'trainings.id')
                     ->leftJoin('teachers as participant', 'participant.id', '=', 'teacher_trainings.teacher_id')
+                    ->leftJoin('teachers', 'teachers.id', '=', 'trainings.trainer_teacher_id')
                     ->select(
                         'trainings.id',
                         'trainings.description',
                         'trainings.activity_photo',
+                        'trainings.trainer_teacher_id as trainer_teacher_id',
                         'trainer.name as trainer_name',
                         'schools.name as trainer_school',
-                        DB::raw('(SELECT COUNT(tt.teacher_id) FROM teacher_trainings tt WHERE tt.training_id = trainings.id) as total_participants'),
+                         'teachers.name as trainer_teacher_name',
+                        DB::raw('(SELECT COUNT(tt.teacher_id) FROM teacher_trainings tt WHERE tt.training_id = trainings.id) - 1 as total_participants'),
                         DB::raw('IF(teacher_trainings.role = "instructor", "instructor", "participant") as role')
                     )
                     ->where('teacher_trainings.teacher_id', '=', $teacherId)
@@ -119,9 +134,11 @@ class TrainingController extends Controller
                         'trainings.id',
                         'trainings.description',
                         'trainings.activity_photo',
+                        'trainings.trainer_teacher_id',
                         'trainer.name',
                         'schools.name',
-                        'teacher_trainings.role'
+                        'teacher_trainings.role',
+                        'teachers.name'
                     )
                     ->get();
 
@@ -134,6 +151,11 @@ class TrainingController extends Controller
                         if ($row->role == 'instructor') {
                             $btn = '
                             <div class="d-flex" style="gap:5px;">
+                            <a href="' . route('pelatihan.detail-imbas', ['id' => $id]) . '" class="btn btn-sm btn-success"
+                                >
+                                    Lihat Imbas
+                                </a>
+
                                 <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
                                 data-id="' . $id . '" >
                                     Detail
@@ -167,6 +189,14 @@ class TrainingController extends Controller
                     ->addColumn('role', function ($row) {
                         return $row->role == 'instructor' ? '<div class="badge badge-success">Instruktur</div>' : '<div class="badge badge-primary">Peserta</div>';
                     })
+                    ->addColumn('jumlah_terimbas', function ($row) {
+                           
+                        $maxLevel = 1; // Initialize the max level
+
+                        $impactedTeachers = $this->getImpactedTeachers($row->trainer_teacher_id, 1, $maxLevel,$row->id);
+                        
+                        return count($impactedTeachers);
+                    })
                     ->rawColumns(['action', 'role'])
                     ->make(true);
             }
@@ -183,8 +213,8 @@ class TrainingController extends Controller
             'members' => $members
         ]);
     }
-
-    public function store(Request $request)
+    
+      public function store(Request $request)
     {
         Validator::validate($request->all(), [
             'description' => 'required',
@@ -211,7 +241,7 @@ class TrainingController extends Controller
         }
 
 
-        if (!is_null($teach = TeacherTraining::where('teacher_id', $teacher_id)->where('role', 'participant')->first())) {
+        if (!is_null($teach = TeacherTraining::where('teacher_id', $teacher_id)->whereIn('role', ['participant','instructor'])->first()) || Auth::user()->role == 'admin') {
 
             if ($request->hasFile('activity_photo')) {
                 $request->validate([
@@ -229,11 +259,14 @@ class TrainingController extends Controller
                 'activity_photo' => $thumbname
             ]);
 
-            TeacherTraining::create([
+             TeacherTraining::create([
                 'training_id' => $training->id,
                 'teacher_id' => $teacher_id,
                 'role' => 'instructor',
-                'original_training_id' => $teach->original_training_id
+                'original_training_id' => !is_null($teach) 
+    ? (!is_null($teach->original_training_id) ? $teach->original_training_id : $teach->training_id)
+    : null,
+    'parent_id' => $teach->training_id
             ]);
 
             foreach ($request->members as $member) {
@@ -242,7 +275,10 @@ class TrainingController extends Controller
                     'teacher_id' => $member,
                     'role' => 'participant',
                     'influenced_by' => $teacher_id,
-                    'original_training_id' => $teach->original_training_id
+                    'original_training_id' => !is_null($teach) 
+    ? (!is_null($teach->original_training_id) ? $teach->original_training_id : $teach->training_id)
+    : null,
+    'parent_id' => $teach->training_id
                 ]);
             }
 
@@ -252,18 +288,20 @@ class TrainingController extends Controller
         }
     }
 
+
     public function detail($id)
     {
         $id = Crypt::decrypt($id);
 
         $data = Training::where('id', $id)->first()->toArray();
 
-        $members = TeacherTraining::where('training_id', $id)->get()->map(function ($item) {
+        $members = TeacherTraining::where('training_id', $id)->where('role','participant')->get()->map(function ($item) {
             return [
                 'name' => $item->teacher->name,
                 'school' => $item->teacher->school->name
             ];
         });
+    
         return response()->json([
             'data' => $data,
             'members' => $members
@@ -370,59 +408,66 @@ class TrainingController extends Controller
         return response()->json($impactedTeachers);
     }
 
-    public function getImpactedTeachers($teacherId, $level = 1, &$maxLevel = 1)
-    {
-        // Array to store unique impacts
-        $result = [];
+   public function getImpactedTeachers($teacherId, $level = 1, &$maxLevel = 1, $training_id)
+{
+    // Array to store unique impacts
+    $result = [];
 
-        // Array to track seen combinations
-        $seen = [];
+    // Array to track seen combinations
+    $seen = [];
 
-        // Helper function to recursively find impacts
-        $findImpacts = function ($id, $currentLevel) use (&$findImpacts, &$result, &$seen, &$maxLevel) {
-            // Fetch direct impacts for the current teacher
-            $directImpact = TeacherTraining::where('influenced_by', $id)
-                ->with('teacher', 'training', 'influencedBy')
-                ->get();
+    // Helper function to recursively find impacts
+    $findImpacts = function ($id, $currentLevel, $trainingId) use (&$findImpacts, &$result, &$seen, &$maxLevel) {
+        // Fetch direct impacts for the current teacher and training
+        $directImpact = TeacherTraining::where('influenced_by', $id)
+            ->where(function($query) use ($trainingId) {
+                $query->where('original_training_id', $trainingId)
+                      ->orWhere('training_id', $trainingId)
+                      ->orWhere('parent_id', $trainingId);
+            })
+            ->with('teacher', 'training', 'influencedBy')
+            ->get();
 
-            foreach ($directImpact as $impact) {
-                $uniqueKey = $impact->teacher->id . '_' . $impact->training->id;
+        foreach ($directImpact as $impact) {
+            $uniqueKey = $impact->teacher->id . '_' . $impact->training->id;
 
-                // Check if the combination has already been seen
-                if (!isset($seen[$uniqueKey])) {
-                    // Update maximum level
-                    if ($currentLevel > $maxLevel) {
-                        $maxLevel = $currentLevel;
-                    }
-
-                    // Store current impact data
-                    $result[] = [
-                        'teacher_id' => $impact->teacher->id,
-                        'teacher_name' => $impact->teacher->name,
-                        'level' => $currentLevel,
-                        'training_id' => $impact->training->id,
-                        'training_name' => $impact->training->title,
-                        'training_description' => $impact->training->description,
-                        'influenced_by' => [
-                            'teacher_id' => $impact->influencedBy->id ?? null,
-                            'teacher_name' => $impact->influencedBy->name ?? null,
-                        ],
-                    ];
-
-                    // Mark this combination as seen
-                    $seen[$uniqueKey] = true;
-
-                    // Recursive call to fetch sub-impacts
-                    $findImpacts($impact->teacher->id, $currentLevel + 1);
+            // Check if the combination has already been seen
+            if (!isset($seen[$uniqueKey])) {
+                // Update maximum level
+                if ($currentLevel > $maxLevel) {
+                    $maxLevel = $currentLevel;
                 }
+
+                // Store current impact data
+                $result[] = [
+                    'teacher_id' => $impact->teacher->id,
+                    'teacher_name' => $impact->teacher->name,
+                    'level' => $currentLevel,
+                    'training_id' => $impact->training->id,
+                    'training_name' => $impact->training->title,
+                    'training_description' => $impact->training->description,
+                    'influenced_by' => [
+                        'teacher_id' => $impact->influencedBy->id ?? null,
+                        'teacher_name' => $impact->influencedBy->name ?? null,
+                    ],
+                ];
+
+                // Mark this combination as seen
+                $seen[$uniqueKey] = true;
+
+                // Recursive call to fetch sub-impacts based on the current training
+                $findImpacts($impact->teacher->id, $currentLevel + 1, $impact->training->id);
             }
-        };
+        }
+    };
 
-        // Start the recursive search
-        $findImpacts($teacherId, $level);
+    // Start the recursive search from the given teacherId and trainingId
+    $findImpacts($teacherId, $level, $training_id);
 
-        return $result;
-    }
+    return $result;
+}
+
+
 
     public function detailImbas($id)
     {
@@ -438,7 +483,7 @@ class TrainingController extends Controller
         });
         $maxLevel = 1; // Initialize the max level
 
-        $impactedTeachers = $this->getImpactedTeachers($data['trainer_teacher_id'], 1, $maxLevel);
+        $impactedTeachers = $this->getImpactedTeachers($data['trainer_teacher_id'], 1, $maxLevel,$id);
 
         return view('admin.detail-imbas', [
             'data' => $data,

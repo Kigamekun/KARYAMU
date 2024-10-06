@@ -46,13 +46,19 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>Instruktor</th>
                                 <th>Keterangan</th>
-                                <th>Member</th>
+                                <th>Peserta</th>
+                                <th>Jumlah Imbas</th>
                                 <th>Role</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                     </table>
+
+                    <button class="btn btn-info">Total Peserta : <span id="total_peserta"></span></button>
+                    <button class="btn btn-info">Total Imbas : <span id="total_imbas"></span></button>
+
                 </div>
             </div>
         </div>
@@ -90,20 +96,26 @@
                 <div class="modal-header">
                     <div>
                         <h5 class="modal-title" id="staticBackdropLabel">Buat Pelatihan</h5>
-                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
+                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span
+                                class="text-danger">*</span> wajib diisi.</small>
                     </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <form action="{{ route('pelatihan.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="description" class="fw-semibold">Deskripsi<span class="ml-1 text-danger">*</span></label>
+                            <label for="description" class="fw-semibold">Deskripsi<span
+                                    class="ml-1 text-danger">*</span></label>
                             <textarea class="form-control" id="description" name="description" placeholder="Masukan Deskripsi" required></textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
                         @if (Auth::user()->role == 'admin')
                             <div class="mb-3">
-                                <label for="creator" class="fw-semibold">Pilih Pembuat Pelatihan<span class="ml-1 text-danger">*</span></label>
+                                <label for="creator" class="fw-semibold">Pilih Pembuat Pelatihan<span
+                                        class="ml-1 text-danger">*</span></label>
                                 <select class="js-example-basic-single" id="creator" name="creator" required>
 
                                 </select>
@@ -111,14 +123,19 @@
                             </div>
                         @endif
                         <div class="mb-3" id="image-upload">
-                            <label for="activity_photo" class="fw-semibold">Activity Photo<span class="ml-1 text-danger">*</span></label>
+                            <label for="activity_photo" class="fw-semibold">Activity Photo<span
+                                    class="ml-1 text-danger">*</span></label>
                             <input type="file" class=" dropify" id="activity_photo" name="activity_photo"
                                 placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]'
                                 data-max-file-size="500K">
+                            <span class="text-sm text-danger mt-2" style="font-size: 12px;">File harus berformat png,
+                                jpeg, jpg dan berukuran
+                                maksimal 500Kb.</span>
                             <x-input-error :messages="$errors->get('activity_photo')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="members" class="fw-semibold">Pilih Peserta<span class="ml-1 text-danger">*</span></label>
+                            <label for="members" class="fw-semibold">Pilih Peserta<span
+                                    class="ml-1 text-danger">*</span></label>
                             <select class="form-control select2" id="members" name="members[]" multiple="multiple">
 
                             </select>
@@ -162,6 +179,10 @@
                         name: 'DT_RowIndex',
                         searchable: false,
                     },
+                    {
+                        data: 'trainer_teacher_name',
+                        name: 'trainer_teacher_name'
+                    },
 
                     {
                         data: 'description',
@@ -170,6 +191,10 @@
                     {
                         data: 'total_participants',
                         name: 'total_participants',
+                    },
+                    {
+                        data: 'jumlah_terimbas',
+                        name: 'jumlah_terimbas',
                     },
                     {
                         data: 'role',
@@ -204,6 +229,9 @@
                         <h5 class="modal-title" id="staticBackdropLabel">Edit Pelatihan</h5>
                         <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
                     </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                         <form action="${$(e.relatedTarget).data('url')}" method="post" enctype="multipart/form-data">
                             @csrf
@@ -218,6 +246,9 @@
                                         <label for="activity_photo" class="fw-semibold">Activity Photo<span class="ml-1 text-danger">*</span></label>
                                         <input type="file" class=" dropify" id="activity_photo" name="activity_photo"
                                             placeholder="Isi file" data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="500K" data-default-file="${$(e.relatedTarget).data('activity_photo')}">
+                                        <span class="text-sm text-danger mt-2" style="font-size: 12px;">File harus berformat png,
+                                            jpeg, jpg dan berukuran
+                                            maksimal 500Kb.</span>
                                         <x-input-error :messages="$errors->get('activity_photo')" class="mt-2" />
                                     </div>
                                     <div class="mb-3">
@@ -343,6 +374,21 @@
             minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
             placeholder: 'Pilih peserta pelatihan',
             allowClear: true
+        });
+    </script>
+
+    <script>
+        $('#datatable-table').on('search.dt', function() {
+
+            $.ajax({
+                url: "/pelatihan/getTotals/" + $('#dt-search-0').val(),
+                method: "GET",
+
+                success: function(response) {
+                    $('#total_peserta').text('Total Peserta: ' + response.total_participants);
+                    $('#total_imbas').text('Total Jumlah Terimbas: ' + response.total_terimbas);
+                }
+            });
         });
     </script>
 

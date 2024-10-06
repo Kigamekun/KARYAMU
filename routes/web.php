@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\{ProfileController, NotificationController, SubscriptionController, ArtworkController, MasterController, UserController, SchoolController, TeacherController, StudentController, TrainingController};
 use Illuminate\Support\Facades\Route;
-use App\Models\{Artwork, Training, Teacher, School, Province, TeacherTraining,Student};
+use App\Models\{Artwork, Training, Teacher, School, Province, TeacherTraining, Student};
 
 Route::get('/', function () {
     if (isset($_GET['provinsi'])) {
@@ -14,9 +14,28 @@ Route::get('/', function () {
             ->where('master_province.id', $provinceId)
             ->pluck('schools.id')
             ->toArray();
-        $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->paginate(12)->appends(request()->query());
+
+        if (isset($_GET['sort'])) {
+            $sort = $_GET['sort'];
+            if ($sort == 'desc') {
+                $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->orderBy('likes', 'DESC')->paginate(12)->appends(request()->query());
+            } else {
+                $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->orderBy('likes', 'ASC')->paginate(12)->appends(request()->query());
+            }
+        } else {
+            $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->paginate(12)->appends(request()->query());
+        }
     } else {
-        $data = Artwork::where('is_approved', 1)->paginate(12)->appends(request()->query());
+        if (isset($_GET['sort'])) {
+            $sort = $_GET['sort'];
+            if ($sort == 'desc') {
+                $data = Artwork::where('is_approved', 1)->orderBy('likes', 'DESC')->paginate(12)->appends(request()->query());
+            } else {
+                $data = Artwork::where('is_approved', 1)->orderBy('likes', 'ASC')->paginate(12)->appends(request()->query());
+            }
+        } else {
+            $data = Artwork::where('is_approved', 1)->paginate(12)->appends(request()->query());
+        }
     }
 
     return view('welcome', [
@@ -43,6 +62,13 @@ Route::get('/get-students', function (Request $request) {
             ->where('name', 'like', "%{$search}%")
             ->limit(50) // Hanya ambil 50 hasil per permintaan
             ->get();
+    } else if (Auth::user()->role == 'student') {
+        $school_id = Auth::user()->student->school_id;
+        $students = Student::where('school_id', $school_id)
+            ->select('id', 'name')
+            ->where('name', 'like', "%{$search}%")
+            ->limit(50) // Hanya ambil 50 hasil per permintaan
+            ->get();
     } else {
         $students = Student::select('id', 'name')
             ->where('name', 'like', "%{$search}%")
@@ -62,14 +88,13 @@ Route::get('/get-teachers', function (Request $request) {
         ->get();
 });
 
-
 Route::get('/trainings/impact/{teacherId}', [TrainingController::class, 'showImpact']);
 
 Route::get('/generate-register-link', [UserController::class, 'createLinkRegisterGuru'])->name('generate.register.link');
 
+Route::match(['GET','POST'],'/register-sekolah', [SchoolController::class, 'registerSekolah'])->name('register.sekolah');
 Route::get('/register-guru', [UserController::class, 'showRegisterGuru'])->name('register.guru');
 Route::post('/create-guru', [UserController::class, 'createGuru'])->name('register.create-guru');
-
 
 Route::get('/about', function () {
     return view('about');
@@ -79,13 +104,27 @@ Route::get('/contact', function () {
     return view('mail.artwork-publish');
 })->name('contact');
 
-
 Route::prefix('karya-home')->group(function () {
     Route::get('/', [ArtworkController::class, 'karyaHome'])->name('karya-home.index');
     Route::get('/detail/{id}', [ArtworkController::class, 'detailHome'])->name('karya-home.detail');
     Route::get('/filter', [ArtworkController::class, 'filterHome'])->name('karya-home.filter');
 });
 
+Route::get('/edit/{id}', [SchoolController::class, 'edit'])->name('sekolah.edit');
+Route::prefix('master')->group(function () {
+    Route::get('/provinsi', [MasterController::class, 'provinsi'])->name('master.provinsi');
+    Route::get('/kota/{id}', [MasterController::class, 'kota'])->name('master.kota');
+    Route::get('/kecamatan/{id}', [MasterController::class, 'kecamatan'])->name('master.kecamatan');
+    Route::get('/kelurahan/{id}', [MasterController::class, 'kelurahan'])->name('master.kelurahan');
+});
+
+Route::prefix('sekolah')->group(function () {
+    Route::get('/', [SchoolController::class, 'index'])->name('sekolah.index');
+    Route::get('/{id}', [SchoolController::class, 'detail'])->name('sekolah.detail');
+    Route::post('/store', [SchoolController::class, 'store'])->name('sekolah.store');
+    Route::put('/update/{id}', [SchoolController::class, 'update'])->name('sekolah.update');
+    Route::delete('/delete/{id}', [SchoolController::class, 'destroy'])->name('sekolah.delete');
+});
 
 Route::get('/dashboard', function () {
 
@@ -109,12 +148,19 @@ Route::get('/dashboard', function () {
         $totalTeachers = Teacher::count();
         $pelatihan = Training::where('trainer_teacher_id', $teacher_id)->first();
 
-        $maxLevel = 1; // Initialize the max level
+        if (!is_null($pelatihan)) {
+            $maxLevel = 1; // Initialize the max level
 
-        $impactedTeachers = app('App\Http\Controllers\TrainingController')->getImpactedTeachers($teacher_id, 1, $maxLevel);
+            $impactedTeachers = app('App\Http\Controllers\TrainingController')->getImpactedTeachers($teacher_id, 1, $maxLevel, null);
+
+        } else {
+            $pelatihan = null;
+            $impactedTeachers = [];
+            $maxLevel = 0;
+        }
 
     } else {
-        $pelatihan = [];
+        $pelatihan = null;
         $impactedTeachers = [];
         $maxLevel = 0;
     }
@@ -125,22 +171,14 @@ Route::get('/dashboard', function () {
         'impactedTeachers' => $impactedTeachers,
         'maxLevel' => $maxLevel
     ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
-
+})->middleware(['auth', 'verified', 'check.school.data'])->name('dashboard');
 
 Route::post('/like-item/{id}', [ArtworkController::class, 'like'])->name('like-item');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'check.school.data'])->group(function () {
 
     Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
     Route::post('/unsubscribe', [SubscriptionController::class, 'unsubscribe']);
-
-    Route::prefix('master')->group(function () {
-        Route::get('/provinsi', [MasterController::class, 'provinsi'])->name('master.provinsi');
-        Route::get('/kota/{id}', [MasterController::class, 'kota'])->name('master.kota');
-        Route::get('/kecamatan/{id}', [MasterController::class, 'kecamatan'])->name('master.kecamatan');
-        Route::get('/kelurahan/{id}', [MasterController::class, 'kelurahan'])->name('master.kelurahan');
-    });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -153,6 +191,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{id}', [ArtworkController::class, 'detail'])->name('karya.detail');
         Route::post('/filter', [ArtworkController::class, 'filter'])->name('karya.filter')->withoutMiddleware('auth');
 
+        Route::put('/unpublish/{id}', [ArtworkController::class, 'unpublish'])->name('karya.unpublish');
         Route::put('/approve/{id}', [ArtworkController::class, 'approve'])->name('karya.approve');
         Route::put('/update/{id}', [ArtworkController::class, 'update'])->name('karya.update');
         Route::delete('/delete/{id}', [ArtworkController::class, 'destroy'])->name('karya.delete');
@@ -165,18 +204,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('user.delete');
     });
 
-    Route::prefix('sekolah')->group(function () {
-        Route::get('/', [SchoolController::class, 'index'])->name('sekolah.index');
-        Route::get('/{id}', [SchoolController::class, 'detail'])->name('sekolah.detail');
-        Route::post('/store', [SchoolController::class, 'store'])->name('sekolah.store');
-        Route::put('/update/{id}', [SchoolController::class, 'update'])->name('sekolah.update');
-        Route::delete('/delete/{id}', [SchoolController::class, 'destroy'])->name('sekolah.delete');
-    });
-
     Route::prefix('pelatihan')->group(function () {
         Route::get('/', [TrainingController::class, 'index'])->name('pelatihan.index');
         Route::get('/{id}', [TrainingController::class, 'detail'])->name('pelatihan.detail');
         Route::get('/detail-imbas/{id}', [TrainingController::class, 'detailImbas'])->name('pelatihan.detail-imbas');
+        Route::get('/getTotals/{search}', [TrainingController::class, 'getTotals'])->name('pelatihan.getTotals');
 
         Route::post('/store', [TrainingController::class, 'store'])->name('pelatihan.store');
         Route::get('/{id}/edit', [TrainingController::class, 'edit'])->name('pelatihan.edit');
@@ -190,6 +222,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/markAsRead', [NotificationController::class, 'markAsRead'])->name('notification.mark-as-read');
     });
 
+});
+
+Route::get('/foo', function () {
+    $target = '/home/xehxhfvs/laravel/storage/app/public'; // Lokasi storage
+    $link = '/home/xehxhfvs/public_html/storage'; // Lokasi tujuan symlink
+
+    if (file_exists($link)) {
+        unlink($link);
+    }
+
+    symlink($target, $link);
+
+    return response()->json(['message' => 'Symbolic link created successfully']);
 });
 
 require __DIR__ . '/auth.php';

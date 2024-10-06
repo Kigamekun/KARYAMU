@@ -20,7 +20,7 @@ use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription as WebPushSubscription;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-
+use Jorenvh\Share\ShareFacade as Share;
 
 class ArtworkController extends Controller
 {
@@ -68,7 +68,7 @@ class ArtworkController extends Controller
         $id = Crypt::decrypt($id);
 
         $artwork = Artwork::find($id);
-        $artwork->students = ArtworkStudent::where('artwork_id', $id)->join('students', 'students.id', '=', 'artwork_students.student_id')->select('students.name','students.id')->get()->toArray();
+        $artwork->students = ArtworkStudent::where('artwork_id', $id)->join('students', 'students.id', '=', 'artwork_students.student_id')->select('students.name', 'students.id')->get()->toArray();
         return response()->json($artwork, 200);
     }
 
@@ -80,6 +80,7 @@ class ArtworkController extends Controller
             ->join('students', 'students.id', '=', 'artwork_students.student_id')
             ->pluck('students.name')
             ->implode(', ');
+
 
         return response()->json($artwork, 200);
     }
@@ -151,6 +152,10 @@ class ArtworkController extends Controller
                                     Approve
                                 </button>
                             </form>';
+                            $btn .= ' <button type="button" title="Detail" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
+                            data-id="' . $id . '" >
+                                Detail
+                            </button>';
                         }
 
                         $btn .= '
@@ -162,6 +167,15 @@ class ArtworkController extends Controller
                             </button>
                         ';
                     } else {
+
+                        $btn .= '<form id="unpublishForm" action="' . route('karya.unpublish', ['id' => $id]) . '" method="POST">
+                        ' . csrf_field() . '
+                        ' . method_field('PUT') . '
+                            <button type="button" title="unpublish" class="btn btn-sm btn-danger btn-unpublish" onclick="confirmUnpublish(event)">
+                                Unpublish
+                            </button>
+                        </form>';
+
                         $btn .= ' <button type="button" title="Detail" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
                             data-id="' . $id . '" >
                                 Detail
@@ -334,7 +348,7 @@ class ArtworkController extends Controller
                 Mail::to($teacher->email)->send(new NewKarya($artwork));
                 DB::table('notifications')->insert([
                     'user_id' => $teacher->id,
-                    'message' => 'Artwork baru telah di submit',
+                    'message' => 'Siswa dengan nama ' . Student::find($student_id)->name . ' telah mengirimkan karya baru berjudul ' . $request->title . ' yang perlu disetujui.',
                     'is_read' => 0,
                 ]);
             }
@@ -452,9 +466,23 @@ class ArtworkController extends Controller
 
         $terkait = Artwork::where('is_approved', 1)->limit(3)->get();
 
+
+        $shareComponent = Share::page(
+            route('karya.detail', ['id' => Crypt::encrypt($artwork->id)]),
+            'Lihat karya ' . $artwork->title . ' di website kami',
+        )
+            ->facebook()
+            ->twitter()
+            ->linkedin()
+            ->telegram()
+            ->whatsapp()
+            ->reddit();
+
+
         return view('karya-detail', [
             'data' => $artwork,
-            'terkait' => $terkait
+            'terkait' => $terkait,
+            'shareComponent' => $shareComponent
         ]);
     }
 
@@ -503,5 +531,15 @@ class ArtworkController extends Controller
         $artwork->save();
 
         return response()->json(['likes' => $artwork->likes]);
+    }
+
+    public function unpublish($id)
+    {
+        $id = Crypt::decrypt($id);
+        Artwork::where('id', $id)->update([
+            'is_approved' => 0,
+            'approved_by_teacher_id' => null
+        ]);
+        return redirect()->back()->with(['message' => 'Artwork berhasil di unpublish', 'status' => 'success']);
     }
 }

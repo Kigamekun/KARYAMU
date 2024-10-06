@@ -536,7 +536,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Nama </th>
+                                <th>NPSN</th>
+                                <th>Nama</th>
                                 <th>Alamat</th>
                                 <th>Phone</th>
                                 <th>Email</th>
@@ -572,12 +573,22 @@
                 <div class="modal-header">
                     <div>
                         <h5 class="modal-title" id="staticBackdropLabel">Buat Sekolah</h5>
-                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
+                        <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span
+                                class="text-danger">*</span> wajib diisi.</small>
                     </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <form action="{{ route('sekolah.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="npsn" class="fw-semibold">NPSN<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="npsn" name="npsn"
+                                placeholder="Masukan NPSN" required>
+                            <x-input-error :messages="$errors->get('npsn')" class="mt-2" />
+                        </div>
                         <div class="mb-3">
                             <label for="name" class="fw-semibold">Nama Sekolah<span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name"
@@ -585,27 +596,36 @@
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
+                        <div class=" mb-3">
+                            <label for="status" class="form-label">Status Sekolah<span
+                                    class="ms-1 text-danger">*</span></label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="N" {{ old('status') == 'N' ? 'selected' : '' }}>Negeri</option>
+                                <option value="S" {{ old('status') == 'S' ? 'selected' : '' }}>Swasta</option>
+                            </select>
+                        </div>
 
                         <div class="mb-3">
                             <label for="address" class="fw-semibold">Alamat</label>
                             <input type="text" class="form-control" id="address" name="address"
-                                placeholder="Masukan Alamat" required>
+                                placeholder="Masukan Alamat">
                             <x-input-error :messages="$errors->get('address')" class="mt-2" />
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="fw-semibold">Phone</label>
                             <input type="text" class="form-control" id="phone" name="phone"
-                                placeholder="Masukan Phone" required>
+                                placeholder="Masukan Phone">
                             <x-input-error :messages="$errors->get('phone')" class="mt-2" />
                         </div>
                         <div class="mb-3">
                             <label for="email" class="fw-semibold">Email</label>
                             <input type="email" class="form-control" id="email" name="email"
-                                placeholder="Masukan Email" required>
+                                placeholder="Masukan Email">
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="dp_provinsi" class="fw-semibold">Provinsi<span class="ml-1 text-danger">*</span></label>
+                            <label for="dp_provinsi" class="fw-semibold">Provinsi<span
+                                    class="ml-1 text-danger">*</span></label>
                             <select class="form-select form-control" id="dp_provinsi" name="dp_provinsi" required>
                             </select>
                             <x-input-error :messages="$errors->get('dp_provinsi')" class="mt-2" />
@@ -617,13 +637,15 @@
                             <x-input-error :messages="$errors->get('dp_kota')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="dp_kecamatan" class="fw-semibold">Kecamatan<span class="ml-1 text-danger">*</span></label>
+                            <label for="dp_kecamatan" class="fw-semibold">Kecamatan<span
+                                    class="ml-1 text-danger">*</span></label>
                             <select class="form-select form-control" id="dp_kecamatan" name="dp_kecamatan" required>
                             </select>
                             <x-input-error :messages="$errors->get('dp_kecamatan')" class="mt-2" />
                         </div>
                         <div class="mb-3">
-                            <label for="dp_kelurahan" class="fw-semibold">Kelurahan<span class="ml-1 text-danger">*</span></label>
+                            <label for="dp_kelurahan" class="fw-semibold">Kelurahan<span
+                                    class="ml-1 text-danger">*</span></label>
                             <select class="form-select form-control" id="dp_kelurahan" name="dp_kelurahan" required>
                             </select>
                             <x-input-error :messages="$errors->get('dp_kelurahan')" class="mt-2" />
@@ -660,8 +682,12 @@
                 ajax: "{{ route('sekolah.index') }}",
                 columns: [{
                         data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        searchable: false,
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'npsn',
+                        name: 'npsn'
                     },
                     {
                         data: 'name',
@@ -803,40 +829,57 @@
                 url: '/sekolah/' + $(e.relatedTarget).data('id'),
                 type: 'GET',
                 success: function(response) {
-
+                    console.log(response.status == 'N' ? 'selected' : '');
                     var html = `
                         <div class="modal-header">
                     <div>
                         <h5 class="modal-title" id="staticBackdropLabel">Edit Sekolah</h5>
                         <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span class="text-danger">*</span> wajib diisi.</small>
                     </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                         <form action="${url}" method="post" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="modal-body">
                                 <div class="mb-3">
+                                    <label for="npsn" class="fw-semibold">NPSN<span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="npsn" name="npsn"
+                                        placeholder="Masukan NPSN" value="${response.npsn}" required>
+                                    <x-input-error :messages="$errors->get('npsn')" class="mt-2" />
+                                </div>
+                                <div class="mb-3">
                                     <label for="name" class="fw-semibold">Nama Sekolah<span class="ml-1 text-danger">*</span></label>
                                     <input type="text" class="form-control" id="name" name="name"
                                         placeholder="Masukan Nama Sekolah" value="${response.name}" required>
                                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                                 </div>
+                                   <div class=" mb-3">
+                            <label for="status" class="form-label">Status Sekolah<span
+                                    class="ms-1 text-danger">*</span></label>
+                            <select class="form-control w-100" id="status" name="status" required>
+                                <option value="N" ${ response.status == 'N' ? 'selected' : '' }>Negeri</option>
+                                <option value="S" ${ response.status == 'S' ? 'selected' : '' }>Swasta</option>
+                            </select>
+                        </div>
                                 <div class="mb-3">
                                     <label for="address" class="fw-semibold">Alamat</label>
                                     <input type="text" class="form-control" id="address" name="address"
-                                        placeholder="Masukan Alamat" value="${response.address}" required>
+                                        placeholder="Masukan Alamat" value="${response.address}" >
                                     <x-input-error :messages="$errors->get('address')" class="mt-2" />
                                 </div>
                                 <div class="mb-3">
                                     <label for="phone" class="fw-semibold">Phone</label>
                                     <input type="text" class="form-control" id="phone" name="phone"
-                                        placeholder="Masukan Phone" value="${response.phone}" required>
+                                        placeholder="Masukan Phone" value="${response.phone}" >
                                     <x-input-error :messages="$errors->get('phone')" class="mt-2" />
                                 </div>
                                 <div class="mb-3">
                                     <label for="email" class="fw-semibold">Email</label>
                                     <input type="email" class="form-control" id="email" name="email"
-                                        placeholder="Masukan Email" value="${response.email}" required>
+                                        placeholder="Masukan Email" value="${response.email}" >
                                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                                 </div>
                                 <div class="mb-3">

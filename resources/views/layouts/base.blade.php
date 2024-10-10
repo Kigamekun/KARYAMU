@@ -45,7 +45,7 @@
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background-color: #0097FF;
+            background-color: #19459D;
 
         }
 
@@ -164,10 +164,8 @@
                         <div class=" d-flex justify-center w-100">
                             <div class="my-4"
                                 style="justify-content:center;align-items:center;width:100%;flex-direction: column;display:flex;">
-                                <a href="/" style="font-size: 25px;color:#0097FF">
-                                    <i class="fa-solid fa-graduation-cap"></i>
-                                    Gencerling</a>
-                                <span style="font-size: 10px">Generasi Cerdas Lingkungan</span>
+                                <a href="/" style="font-size: 25px;color:#19459D">
+                                    <img src="{{ asset('assets/img/logo.png') }}" alt="logo" style="width: 150px">
                             </div>
                         </div>
                         <div class=" d-flex justify-center w-100">
@@ -175,7 +173,7 @@
                                 style="justify-content:center;align-items:center;width:100%;flex-direction: column;display:flex;">
                                 <button class="btn shadow-sm d-flex"
                                     style="border:1px solid rgba(0,0,0,.3); width: 80%;gap:20px;align-items:center">
-                                    <i class="fa-solid fa-book-open fa-xl " style="color: #0097FF"></i>
+                                    <i class="fa-solid fa-book-open fa-xl " style="color: #19459D"></i>
                                     <div style="text-align:left">
                                         Sekolah Dasar
                                         <h6 style="font-size: 15px">
@@ -188,7 +186,7 @@
                         </div>
                     </div>
                     <div class="sidebar-brand sidebar-brand-sm">
-                        <a href="/" style="color: #0097FF"> <i class="fa-solid fa-graduation-cap"></i>
+                        <a href="/" style="color: #19459D"> <i class="fa-solid fa-graduation-cap"></i>
                         </a>
                     </div>
                     <div class="d-flex align-center justify-between"

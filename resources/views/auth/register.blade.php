@@ -150,30 +150,16 @@
                         <input type="text" class="form-control" id="phone" value="{{ old('phone') }}"
                             name="phone">
                     </div>
-                    <div class="mb-3 mt-3 d-flex justify-content-between">
-                        <div class="form-check
-                        ">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                Ingat Saya?
-                            </label>
-                        </div>
-                        @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" style="text-decoration:none">
-                                <p style="color:#0097FF;">Lupa Kata Sandi?</p>
-                            </a>
-                        @endif
-                    </div>
                     <div class="d-grid gap-2">
-                        <button type="submit" style="border-radius:15px;background:#0097FF;border:none"
+                        <button type="submit" style="border-radius:15px;background:#19459D;border:none"
                             class="p-3 btn btn-primary">Registrasi</button>
                     </div>
 
                     <center>
-                        <p class="mt-4">Sudah memiliki Akun ? <a style="color:#0097ff;text-decoration:none;"
+                        <p class="mt-4">Sudah memiliki Akun ? <a style="color:#19459D;text-decoration:none;"
                                 href="/login">Masuk</a></p>
                         <p class="mt-1">Data Sekolah belum terdaftar ? <a
-                                style="color:#0097ff;text-decoration:none;" href="/register-school">Registrasi
+                                style="color:#19459D;text-decoration:none;" href="/register-sekolah">Registrasi
                                 Sekolah</a></p>
                     </center>
                 </form>

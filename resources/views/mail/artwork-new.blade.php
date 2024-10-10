@@ -36,8 +36,7 @@
                     <tr>
                         <td align="center" style="padding: 20px;">
                             @if ($data->type == 'image')
-                                <img src="{{ env('APP_URL') . '/storage/artwork/' . $data->file_path }}"
-                                    alt="Thumbnail"
+                                <img src="{{ env('APP_URL') . '/storage/artwork/' . $data->file_path }}" alt="Thumbnail"
                                     style="width: 240px; height: auto; border-radius: 10px; display: block;">
                             @else
                                 <img src="https://img.youtube.com/vi/{{ $data->video_id }}/hqdefault.jpg"
@@ -59,7 +58,7 @@
                     <tr>
                         <td align="center" style="padding: 20px;">
                             <a href="{{ env('APP_URL') . '/karya' }}"
-                                style="display: inline-block; padding: 10px 20px; background-color: #0097FF; color: white; font-family: Arial, sans-serif; font-weight: 500; text-decoration: none; border-radius: 5px;">Lihat
+                                style="display: inline-block; padding: 10px 20px; background-color: #19459D; color: white; font-family: Arial, sans-serif; font-weight: 500; text-decoration: none; border-radius: 5px;">Lihat
                                 Karya</a>
                         </td>
                     </tr>

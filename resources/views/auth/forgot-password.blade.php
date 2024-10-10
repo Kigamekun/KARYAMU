@@ -58,7 +58,9 @@
             <div class="card-body " style="padding: 50px 100px 50px">
                 <div class="d-flex justify-content-center align-items-center" style="flex-direction: column">
                     <h1>Lupa Kata Sandi</h1>
-                    <p class="mt-3" style="text-align: justify">Lupa kata sandi Anda? Tidak masalah. Cukup beri tahu kami alamat email Anda dan kami akan mengirimkan email berisi tautan pengaturan ulang kata sandi yang memungkinkan Anda memilih yang baru.</p>
+                    <p class="mt-3" style="text-align: justify">Lupa kata sandi Anda? Tidak masalah. Cukup beri tahu
+                        kami alamat email Anda dan kami akan mengirimkan email berisi tautan pengaturan ulang kata sandi
+                        yang memungkinkan Anda memilih yang baru.</p>
                 </div>
                 <br>
                 <form method="POST" action="{{ route('password.email') }}">
@@ -67,7 +69,8 @@
                     <!-- Email Address -->
                     <div>
                         <x-input-label for="email" :value="__('Email')" />
-                        <x-text-input id="email" class="form-control" type="email" name="email" :value="old('email')" required autofocus />
+                        <x-text-input id="email" class="form-control" type="email" name="email"
+                            :value="old('email')" required autofocus />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 

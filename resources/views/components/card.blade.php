@@ -7,7 +7,7 @@
         /* Ubah tinggi menjadi lebih kecil */
         width: 1.5em;
         /* Ubah lebar menjadi lebih kecil */
-        background-color: #0097FF;
+        background-color: #19459D;
         background-image:
             linear-gradient(hsla(0, 0%, 100%, 0),
                 hsla(0, 0%, 100%, 0.5) 5px,
@@ -35,10 +35,10 @@
         background-image:
             linear-gradient(-45deg,
                 transparent 50%,
-                #0097FF 50%),
+                #19459D 50%),
             linear-gradient(45deg,
                 transparent 50%,
-                #0097FF 50%);
+                #19459D 50%);
         z-index: -1;
     }
 
@@ -52,12 +52,12 @@
 
 
     <style>.accordion-button {
-        background: #0097FF !important;
+        background: #19459D !important;
         color: white !important;
     }
 
     .accordion-button:not(.collapsed) {
-        background: #0097FF !important;
+        background: #19459D !important;
         color: white !important;
     }
 
@@ -141,8 +141,8 @@
     }
 
     .btn-primary {
-        background-color: #0097FF !important;
-        border-color: #0097FF !important;
+        background-color: #19459D !important;
+        border-color: #19459D !important;
     }
 
     .trun {
@@ -154,7 +154,7 @@
     }
 
     .active {
-        color: #0097FF !important;
+        color: #19459D !important;
     }
 </style>
 
@@ -190,14 +190,14 @@
         <div style="height: 80px">
             <h5 class="card-title">{{ $item->title }}</h5>
             <div style="display: flex;gap:10px;align-items:center;" class="text-muted">
-                <div style="width: 10px;height:10px;background:#0097FF;border-radius:50%"></div>
+                <div style="width: 10px;height:10px;background:#19459D;border-radius:50%"></div>
                 {{ DB::table('schools')->where('id', $item->school_id)->first()->name }}
             </div>
         </div>
         <p class="card-text trun mt-3" style="height: 50px">{{ $item->description }}</p>
         <div class="d-flex mt-3" style="justify-content: space-between">
             @if ($item->students->count() > 1)
-                <span style="background: #0097FF !important" class="p-2 badge text-bg-primary">Kelompok</span>
+                <span style="background: #19459D !important" class="p-2 badge text-bg-primary">Kelompok</span>
             @else
                 <span class="p-2 badge text-bg-warning text-white">Individu</span>
             @endif

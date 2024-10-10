@@ -651,14 +651,14 @@
 
                     <!-- Submit Button -->
                     <div class="d-grid gap-2 mt-3">
-                        <button type="submit" style="border-radius:15px;background:#0097FF;border:none"
+                        <button type="submit" style="border-radius:15px;background:#19459D;border:none"
                             class="p-3 btn btn-primary">Registrasi Sekolah</button>
                     </div>
 
                 </form>
 
                 <center>
-                    <p class="mt-4">Sudah memiliki Akun ? <a style="color:#0097ff;text-decoration:none;"
+                    <p class="mt-4">Sudah memiliki Akun ? <a style="color:#19459D;text-decoration:none;"
                             href="/login">Masuk</a></p>
                 </center>
 
@@ -773,22 +773,20 @@
                     });
                 });
             });
-
-
         </script>
 
-@if (!is_null(Session::get('message')))
-<script>
-    Swal.fire({
-        position: 'center',
-        icon: @json(Session::get('status')),
-        title: @json(Session::get('status')),
-        html: @json(Session::get('message')),
-        showConfirmButton: false,
-        timer: 2000
-    })
-</script>
-@endif
+        @if (!is_null(Session::get('message')))
+            <script>
+                Swal.fire({
+                    position: 'center',
+                    icon: @json(Session::get('status')),
+                    title: @json(Session::get('status')),
+                    html: @json(Session::get('message')),
+                    showConfirmButton: false,
+                    timer: 2000
+                })
+            </script>
+        @endif
 
     </div>
 </body>

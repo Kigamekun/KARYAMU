@@ -8,7 +8,7 @@
     <title>Email Template</title>
 </head>
 
-<body >
+<body>
 
     <h2>Registrasi Sekolah Baru - Perhatian Diperlukan</h2>
     <p>Hai Admin,</p>

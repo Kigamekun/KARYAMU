@@ -512,11 +512,11 @@
     function showMap(region) {
         const element = document.getElementById(region);
         if (!element.dataset.initialColorSet) { // Check if the color has been set initially
-            element.style.fill = '#0097FF'; // Ganti dengan warna yang Anda inginkan
+            element.style.fill = '#19459D'; // Ganti dengan warna yang Anda inginkan
 
             const children = element.querySelectorAll('*');
             children.forEach(child => {
-                child.style.fill = '#0097FF'; // Terapkan warna yang sama ke semua children
+                child.style.fill = '#19459D'; // Terapkan warna yang sama ke semua children
             });
         }
         document.getElementById('map-tooltip').style.display = 'block';
@@ -558,10 +558,10 @@
         if (province) {
             const element = document.getElementById(province);
             if (element) {
-                element.style.fill = '#0097FF';
+                element.style.fill = '#19459D';
                 const children = element.querySelectorAll('*');
                 children.forEach(child => {
-                    child.style.fill = '#0097FF'; // Terapkan warna yang sama ke semua children
+                    child.style.fill = '#19459D'; // Terapkan warna yang sama ke semua children
                 });
                 element.dataset.initialColorSet = 'true'; // Set a flag indicating the initial color has been set
             }

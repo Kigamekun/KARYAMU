@@ -554,7 +554,7 @@
                             class="text-danger">*</span> wajib diisi.</small>
                 </div>
                 <br>
-                <form method="POST" action="{{ route('sekolah.update',['id'=>$id]) }}">
+                <form method="POST" action="{{ route('sekolah.update', ['id' => $id]) }}">
                     @method('PUT')
                     @csrf
 
@@ -652,7 +652,7 @@
 
                     <!-- Submit Button -->
                     <div class="d-grid gap-2 mt-3">
-                        <button type="submit" style="border-radius:15px;background:#0097FF;border:none"
+                        <button type="submit" style="border-radius:15px;background:#19459D;border:none"
                             class="p-3 btn btn-primary">Registrasi Sekolah</button>
                     </div>
 
@@ -664,7 +664,7 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit"
-                                style="border-radius:15px;background:white;color:#0097FF;border:none"
+                                style="border-radius:15px;background:white;color:#19459D;border:none"
                                 class="p-3 btn btn-primary">Logout</button>
                         </form>
                     </center>

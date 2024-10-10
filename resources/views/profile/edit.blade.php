@@ -35,7 +35,7 @@
     <style>
         .profile-user-img {
             width: 200px;
-            border: 5px solid #0097FF;
+            border: 5px solid #19459D;
             box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
             border-radius: 50%;
             object-fit: cover;
@@ -83,7 +83,7 @@
         .avatar-upload .avatar-edit input+label:after {
             content: "";
             font-family: "FontAwesome";
-            color: #0097FF;
+            color: #19459D;
             position: absolute;
             left: 0;
             right: 0;

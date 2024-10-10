@@ -107,17 +107,17 @@
                         </div>
                         @if (Route::has('password.request'))
                             <a href="{{ route('password.request') }}" style="text-decoration:none">
-                                <p style="color:#0097FF;">Lupa Kata Sandi?</p>
+                                <p style="color:#19459D;">Lupa Kata Sandi?</p>
                             </a>
                         @endif
                     </div>
                     <div class="d-grid gap-2">
-                        <button type="submit" style="border-radius:15px;background:#0097FF;border:none"
+                        <button type="submit" style="border-radius:15px;background:#19459D;border:none"
                             class="p-3 btn btn-primary">Masuk</button>
                     </div>
 
                     <center>
-                        <p class="mt-4">Belum memiliki Akun ? <a style="color:#0097ff;text-decoration:none;"
+                        <p class="mt-4">Belum memiliki Akun ? <a style="color:#19459D;text-decoration:none;"
                                 href="/register">Registrasi</a></p>
                     </center>
                 </form>

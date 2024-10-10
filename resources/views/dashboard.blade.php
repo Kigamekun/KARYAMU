@@ -284,7 +284,7 @@
                                     <div style="height: 80px">
                                         <h5 class="card-title">{{ $item->title }}</h5>
                                         <div style="display: flex;gap:10px;align-items:center;" class="text-muted">
-                                            <div style="width: 10px;height:10px;background:#0097FF;border-radius:50%"></div>
+                                            <div style="width: 10px;height:10px;background:#19459D;border-radius:50%"></div>
                                             {{ DB::table('schools')->where('id', $item->school_id)->first()->name }}
                                         </div>
                                     </div>

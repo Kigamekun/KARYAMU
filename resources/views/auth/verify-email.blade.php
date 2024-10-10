@@ -65,7 +65,7 @@
                 <div class="d-flex justify-content-center align-items-center" style="flex-direction: column">
                     <h1>Verifikasi Email</h1>
                     @if (session('status') == 'verification-link-sent')
-                        <div class="mb-4 mt-4 font-medium text-sm text-success" >
+                        <div class="mb-4 mt-4 font-medium text-sm text-success">
                             {{ __('A new verification link has been sent to the email address you provided during registration.') }}
                         </div>
                     @endif

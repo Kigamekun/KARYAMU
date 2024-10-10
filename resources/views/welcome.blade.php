@@ -15,7 +15,6 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            /* Jarak antara kotak dan label */
         }
 
         .legend-box {
@@ -46,10 +45,10 @@
     </style>
     <div style="width: 80%;margin:auto">
         <div class="card shadow border-none" style="border: none !important;border-radius:30px;">
-            <center class="my-3" style="font-size: 30px">
-                Eksplorasi karya dari seluruh <span style="color: #0097FF">Indonesia</span>!
+            <center class="my-3 logo" style="font-weight:600; font-size: 20px">
+                Eksplorasi karya dari seluruh <span style="color: #19459D">Indonesia</span>!
             </center>
-            <div class="card-body py-3">
+            <div class="card-body py-3" style="position: relative;">
                 <center>
                     @include('components.map')
                     <div class="legend-container">
@@ -66,8 +65,8 @@
                             <div class="label">Rendah</div>
                         </div>
                     </div>
-
                 </center>
+                <img src="{{ asset('assets/img/dodo.png') }}" alt="Image" class="corner-image">
             </div>
         </div>
         <div class="mt-5">

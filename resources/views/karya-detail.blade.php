@@ -5,12 +5,12 @@
 @section('content')
     <style>
         .accordion-button {
-            background: #0097FF !important;
+            background: #19459D !important;
             color: white !important;
         }
 
         .accordion-button:not(.collapsed) {
-            background: #0097FF !important;
+            background: #19459D !important;
             color: white !important;
         }
 
@@ -104,11 +104,11 @@
 
         div#social-links ul li a {
             padding: 5px;
-            border: 1px solid #0097ff;
+            border: 1px solid #19459D;
             margin: 1px;
             font-size: 20px;
             color: white;
-            background-color: #0097ff;
+            background-color: #19459D;
             border-radius: 2px;
         }
     </style>
@@ -170,7 +170,7 @@
                                 </div>
                                 <div class="mt-4">
                                     @if ($data->students->count() > 1)
-                                        <h6 style="color: #0097FF" class="d-flex gap-4">Kelompok
+                                        <h6 style="color: #19459D" class="d-flex gap-4">Kelompok
                                             <div>
                                                 <span style="color: rgba(32,31,41,.6)">
                                                     <li>
@@ -180,12 +180,12 @@
                                             </div>
                                         </h6>
                                     @else
-                                        <h6 style="color: #0097FF">Individu</h6>
+                                        <h6 style="color: #19459D">Individu</h6>
                                     @endif
                                 </div>
                                 <div class="d-flex gap-1 flex-wrap mt-3">
                                     @foreach ($data->students as $item)
-                                        <span style="background: #0097FF !important"
+                                        <span style="background: #19459D !important"
                                             class="p-2 badge text-bg-primary">{{ $item->name }}</span>
                                     @endforeach
                                 </div>

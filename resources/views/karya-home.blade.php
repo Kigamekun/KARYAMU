@@ -21,7 +21,6 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            /* Jarak antara kotak dan label */
         }
 
         .legend-box {
@@ -32,17 +31,14 @@
 
         .high {
             background-color: #006400;
-            /* Hijau tua */
         }
 
         .medium {
             background-color: #32CD32;
-            /* Hijau sedang */
         }
 
         .low {
             background-color: #90EE90;
-            /* Hijau muda */
         }
 
         .label {
@@ -52,10 +48,10 @@
     </style>
     <div style="width: 80%;margin:auto">
         <div class="card shadow border-none" style="border: none !important;border-radius:30px;">
-            <center class="my-3" style="font-size: 30px">
-                Eksplor karya dari seluruh <span style="color: #0097FF">Indonesia</span>!
+            <center class="my-3 logo" style="font-weight:600; font-size: 20px">
+                Eksplorasi karya dari seluruh <span style="color: #19459D">Indonesia</span>!
             </center>
-            <div class="card-body py-3">
+            <div class="card-body py-3" style="position: relative;">
                 <center>
                     @include('components.map')
                     <div class="legend-container">
@@ -73,6 +69,7 @@
                         </div>
                     </div>
                 </center>
+                <img src="{{ asset('assets/img/dodo.png') }}" alt="Image" class="corner-image">
             </div>
         </div>
     </div>
@@ -102,9 +99,6 @@
                                         <div class="accordion-body">
                                             <h6>Sekolah</h6>
                                             <select id="selectElement" class="w-100 mb-2 " name="schools[]" multiple>
-                                                {{-- @foreach (DB::table('schools')->get() as $item)
-                                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                                @endforeach --}}
                                             </select>
                                             <br>
                                             <br>
@@ -149,7 +143,7 @@
                     </div>
                 @else
                     <div class="d-flex justify-content-between align-items-center">
-                        <h1 class="mb-4">Karya Terbaru</h1>
+                        <h2 class="">Karya Terbaru</h2>
                         <div>
                             @if (!isset($_GET['sort']) or $_GET['sort'] == 'desc')
                                 <button onclick="sortAddParams('asc')" class="btn btn-primary">
@@ -168,7 +162,7 @@
                 @endisset
                 <div class="row ">
                     @if ($data->isEmpty())
-                        <div class="col-12 text-center mt-4">
+                        <div class="col-12 text-center mt-5">
                             <div class="empty-state">
                                 <img src="{{ asset('assets/img/empty.svg') }}" alt="">
                                 <h3 class="mt-5">Tidak ada data yang tersedia</h3>

@@ -539,13 +539,16 @@
                                 </a>
                             </div>
                             <div>
-                                <h6>Deskripsi Pelatihan  {{ $data['date'] }}</h6>
+                                <h6>Deskripsi Pelatihan {{ $data['date'] }}</h6>
                                 <p>
                                     {{ $data['description'] }}
                                 </p>
 
                                 @php
-                                    $teach = DB::table('teachers')->select('name')->where('id', $data['trainer_teacher_id'])->first();
+                                    $teach = DB::table('teachers')
+                                        ->select('name')
+                                        ->where('id', $data['trainer_teacher_id'])
+                                        ->first();
                                 @endphp
                                 <p>
                                 <div class="badge badge-primary">{{ $teach->name }}</div>

@@ -173,7 +173,7 @@ class SchoolController extends Controller
                 'status' => $request->status,
             ];
 
-            $adminEmail = 'reksa.prayoga1012@gmail.com'; // Ganti dengan email admin
+            $adminEmail = 'helpdeskgencerling@gmail.com'; // Ganti dengan email admin
             Mail::send('mail.sekolah-registrasi', $data, function ($message) use ($adminEmail) {
                 $message->to($adminEmail)
                     ->from('gencerling@gmail.com', 'Information')  // Menambahkan nama pengirim

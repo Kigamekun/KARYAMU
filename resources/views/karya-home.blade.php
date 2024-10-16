@@ -47,6 +47,10 @@
         }
     </style>
     <div style="width: 80%;margin:auto">
+                <div class="py-4">
+            <img src="{{asset('assets/img/header-atass.png')}}" style="border-radius: 15px;width:100%;width: 100%; height: 280px; object-fit: cover; object-position: center;" alt="">
+        </div>
+
         <div class="card shadow border-none" style="border: none !important;border-radius:30px;">
             <center class="my-3 logo" style="font-weight:600; font-size: 20px">
                 Eksplorasi karya dari seluruh <span style="color: #19459D">Indonesia</span>!
@@ -142,8 +146,8 @@
                         </div>
                     </div>
                 @else
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="">Karya Terbaru</h2>
+                    <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+                        <h2 class="" style="margin: 0px !important">Karya Terbaru</h2>
                         <div>
                             @if (!isset($_GET['sort']) or $_GET['sort'] == 'desc')
                                 <button onclick="sortAddParams('asc')" class="btn btn-primary">

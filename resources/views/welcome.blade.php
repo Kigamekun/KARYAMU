@@ -44,6 +44,13 @@
         }
     </style>
     <div style="width: 80%;margin:auto">
+
+        <div class="py-4">
+            <img src="{{ asset('assets/img/header-atass.png') }}"
+                style="border-radius: 15px;width:100%;width: 100%;height: 280px;object-fit: cover;object-position: center;"
+                alt="">
+        </div>
+
         <div class="card shadow border-none" style="border: none !important;border-radius:30px;">
             <center class="my-3 logo" style="font-weight:600; font-size: 20px">
                 Eksplorasi karya dari seluruh <span style="color: #19459D">Indonesia</span>!

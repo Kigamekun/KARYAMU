@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Category;
 
 class Artwork extends Model
 {
@@ -20,6 +21,7 @@ class Artwork extends Model
         'is_approved',
         'school_id',
         'user_id',
+        'category_id'
     ];
 
     public function students()
@@ -41,6 +43,11 @@ class Artwork extends Model
     public function school()
     {
         return $this->belongsTo(School::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
     use HasFactory;

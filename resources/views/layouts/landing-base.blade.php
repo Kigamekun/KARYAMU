@@ -128,12 +128,10 @@
                     <h5>Kontak dan Alamat</h5>
                     <ul class="nav flex-column">
                         <li class="nav-item mb-2"><a href="#"
-                                class="nav-link p-0 text-body-secondary">Karya@mail.com</a>
+                                class="nav-link p-0 text-body-secondary">gencerling@gmail.com</a>
                         </li>
-                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">+62 871
-                                2313 01213</a></li>
-                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Kota Bogor,
-                                Bogor, Jawa Barat</a>
+
+                        <li class="nav-item mb-2"><a href="#" class="nav-link p-0 text-body-secondary">Depok, Jawa Barat</a>
                         </li>
 
                     </ul>

@@ -187,20 +187,28 @@
         </div>
     </a>
     <div class="card-body">
-        <div style="height: 80px">
+        <div style="height: 60px">
             <h5 class="card-title">{{ $item->title }}</h5>
+
             <div style="display: flex;gap:10px;align-items:center;" class="text-muted">
-                <div style="width: 10px;height:10px;background:#19459D;border-radius:50%"></div>
-                {{ DB::table('schools')->where('id', $item->school_id)->first()->name }}
+                <div style="width: 10px;height:10px;background:#19459D;border-radius:50%;"></div>
+                <span
+                    style="font-size: 12px;margin-top:2px;font-weight:bold">{{ DB::table('schools')->where('id', $item->school_id)->first()->name }}</span>
             </div>
         </div>
-        <p class="card-text trun mt-3" style="height: 50px">{{ $item->description }}</p>
+        <p class="card-text trun mt-1" style="height: 50px">{{ $item->description }}</p>
         <div class="d-flex mt-3" style="justify-content: space-between">
-            @if ($item->students->count() > 1)
-                <span style="background: #19459D !important" class="p-2 badge text-bg-primary">Kelompok</span>
-            @else
-                <span class="p-2 badge text-bg-warning text-white">Individu</span>
-            @endif
+            <div>
+                @if ($item->students->count() > 1)
+                    <span style="background: #19459D !important" class="p-2 badge text-bg-primary mb-1">Kelompok</span>
+                @else
+                    <span class="p-2 badge text-bg-warning text-white mb-1">Individu</span>
+                @endif
+                @if ($item->category)
+                    <span style="background: #19459D !important"
+                        class="p-2 badge mb-1 text-white">{{ $item->category->name }}</span>
+                @endif
+            </div>
             <div>
                 @php
                     $liked =

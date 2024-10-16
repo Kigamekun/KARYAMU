@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\NewKarya;
 use App\Models\Artwork;
 use App\Models\ArtworkStudent;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -69,6 +70,7 @@ class ArtworkController extends Controller
 
         $artwork = Artwork::find($id);
         $artwork->students = ArtworkStudent::where('artwork_id', $id)->join('students', 'students.id', '=', 'artwork_students.student_id')->select('students.name', 'students.id')->get()->toArray();
+        $artwork->categories = Category::all();
         return response()->json($artwork, 200);
     }
 
@@ -140,7 +142,6 @@ class ArtworkController extends Controller
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-
                     $id = Crypt::encrypt($row->id);
                     $btn = '<div class="d-flex" style="gap:5px;">';
                     if ($row->is_approved == 0 and (Auth::user()->role == 'admin' or Auth::user()->role == 'teacher')) {
@@ -157,9 +158,7 @@ class ArtworkController extends Controller
                                 Detail
                             </button>';
                         }
-
                         $btn .= '
-
                             <button type="button" title="EDIT" class="btn btn-sm btn-warning btn-edit" data-toggle="modal" data-target="#updateData"
                             data-url="' . route('karya.update', ['id' => $id]) . '"
                             data-id="' . $id . '" data-title="' . $row->title . '" data-description="' . $row->description . '" data-type="' . $row->type . '" data-video_link="' . $row->video_link . '" data-file_path="' . asset('storage/artwork/' . $row->file_path) . '">
@@ -167,7 +166,6 @@ class ArtworkController extends Controller
                             </button>
                         ';
                     } else {
-
                         $btn .= '<form id="unpublishForm" action="' . route('karya.unpublish', ['id' => $id]) . '" method="POST">
                         ' . csrf_field() . '
                         ' . method_field('PUT') . '
@@ -175,7 +173,6 @@ class ArtworkController extends Controller
                                 Unpublish
                             </button>
                         </form>';
-
                         $btn .= ' <button type="button" title="Detail" class="btn btn-sm btn-warning btn-info" data-toggle="modal" data-target="#detailData"
                             data-id="' . $id . '" >
                                 Detail
@@ -255,6 +252,7 @@ class ArtworkController extends Controller
             'title' => 'required',
             'description' => 'required',
             'type' => 'required',
+            'category_id' => 'required',
             'students.*' => 'required',
             'students' => 'required',
         ]);
@@ -292,6 +290,7 @@ class ArtworkController extends Controller
                 'is_approved' => 0,
                 'created_by_student_id' => $student_id,
                 'created_by_teacher_id' => $teacher_id,
+                'category_id' => $request->category_id,
                 'school_id' => $school_id,
             ]);
             foreach ($request->students as $student) {
@@ -325,6 +324,7 @@ class ArtworkController extends Controller
                 'is_approved' => 0,
                 'created_by_student_id' => $student_id,
                 'created_by_teacher_id' => $teacher_id,
+                'category_id' => $request->category_id,
                 'school_id' => $school_id,
             ]);
             foreach ($request->students as $student) {
@@ -376,6 +376,7 @@ class ArtworkController extends Controller
         Validator::validate($request->all(), [
             'title' => 'required',
             'description' => 'required',
+            'category_id' => 'required',
             'type' => 'required',
             'students.*' => 'required',
             'students' => 'required',
@@ -394,6 +395,8 @@ class ArtworkController extends Controller
                     'title' => $request->title,
                     'description' => $request->description,
                     'type' => $request->type,
+                    'category_id' => $request->category_id,
+
                     'file_path' => $thumbname,
                 ]);
             } else {
@@ -413,6 +416,7 @@ class ArtworkController extends Controller
                 'description' => $request->description,
                 'type' => $request->type,
                 'video_link' => $request->video,
+                'category_id' => $request->category_id,
                 'video_id' => $videoId,
             ]);
         }

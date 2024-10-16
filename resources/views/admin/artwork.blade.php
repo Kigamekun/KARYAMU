@@ -20,10 +20,8 @@
         ];
     @endphp
 
-
     <div class="container-fluid">
         <x-jumbotroon :title="'Data Karya'" :breadcrumbs="$breadcrumbs" />
-
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -46,7 +44,6 @@
                     </div>
                 </div>
                 <br>
-
                 <div class="table-responsive">
                     <table id="datatable-table" class="mt-3 mb-3 rounded-sm table table-bordered table-md">
                         <thead>
@@ -58,13 +55,11 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-
                     </table>
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- Modal -->
     <div class="modal fade" id="updateData" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -77,7 +72,6 @@
             </div>
         </div>
     </div>
-
 
     <div class="modal fade" id="detailData" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="detailDataLabel" aria-hidden="true">
@@ -120,18 +114,26 @@
                             <textarea class="form-control" id="description" name="description" placeholder="Masukan Deskripsi" required></textarea>
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
-
+                        <div class="mb-3">
+                            <label for="category_id" class="fw-semibold">Category<span
+                                    class="ml-1 text-danger">*</span></label>
+                            <select class="form-control" id="category_id" name="category_id" required>
+                                <option value="">Pilih Kategori Karya</option>
+                                @foreach (DB::table('categories')->get() as $item)
+                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('type')" class="mt-2" />
+                        </div>
                         @if (Auth::user()->role == 'admin')
                             <div class="mb-3">
                                 <label for="creator" class="fw-semibold">Pilih Pembuat Karya<span
                                         class="ml-1 text-danger">*</span></label>
-                                <select class="js-example-basic-single" id="creator" name="creator" required>
-
+                                <select class="js-example-basic-single select2" id="creator" name="creator" required>
                                 </select>
                                 <x-input-error :messages="$errors->get('creator')" class="mt-2" />
                             </div>
                         @endif
-
                         <div class="mb-3">
                             <label for="type" class="fw-semibold">Tipe<span class="ml-1 text-danger">*</span></label>
                             <select class="form-control" onchange="selectType()" id="type" name="type" required>
@@ -241,6 +243,12 @@
                             `<option value="${student.id}" selected>${student.name}</option>`;
                     });
 
+                    let categoryOption = '';
+                    response.categories.forEach(category => {
+                        categoryOption +=
+                            `<option value="${category.id}" ${category.id == response.category_id ? 'selected' : ''}>${category.name}</option>`;
+                    });
+
                     var html = `
                 <div class="modal-header">
                     <div>
@@ -267,6 +275,15 @@
                             <x-input-error :messages="$errors->get('description')" class="mt-2" />
                         </div>
                         <div class="mb-3">
+                            <label for="category_id" class="fw-semibold">Category<span
+                                    class="ml-1 text-danger">*</span></label>
+                            <select class="form-control"  id="category_id" name="category_id" required>
+                                <option value="">Pilih Kategori Karya</option>
+                                ${categoryOption}
+                            </select>
+                            <x-input-error :messages="$errors->get('type')" class="mt-2" />
+                        </div>
+                        <div class="mb-3">
                             <label for="type" class="fw-semibold">Tipe<span class="ml-1 text-danger">*</span></label>
                             <select class="form-control" onchange="selectTypeEdit()" id="type-edit" name="type" required>
                                 <option value="image" ${$(e.relatedTarget).data('type') == 'image' ? 'selected' : ''}>Gambar</option>
@@ -278,7 +295,7 @@
                             <label for="image" class="fw-semibold">Image<span class="ml-1 text-danger">*</span></label>
                             <input type="file" class=" dropify" id="image" name="image" placeholder="Isi file"
                                 data-allowed-file-extensions='["png", "jpeg","jpg"]' data-max-file-size="2M" data-default-file="${$(e.relatedTarget).data('file_path')}">
-                                   <span class="text-sm text-danger mt-2" style="font-size: 12px;">File harus berformat png,
+                                    <span class="text-sm text-danger mt-2" style="font-size: 12px;">File harus berformat png,
                                 jpeg, jpg dan berukuran
                                 maksimal 1MB.</span>
                             <x-input-error :messages="$errors->get('image')" class="mt-2" />
@@ -355,18 +372,16 @@
                         </p>
                 </div>
                 ${response.type == 'image' ? ` <div class="mb-3"><label for="video_link" class="fw-semibold">Video Link</label><p><img src="storage/artwork/${response.file_path}" alt="${response.title}" style="width: 100%;border-radius:15px"></p></div>` : ''}
-
                 ${response.type == 'video' ? `
-                                                                                            <div class="mb-3">
-                                                                                                <label for="video_link" class="fw-semibold">Video Link</label>
-                                                                                                <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
-                                                                                                        <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
-                                                                                                            style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
-                                                                                                            class="card-img-top" alt="YouTube Thumbnail">
-                                                                                                    </a></p>
-                                                                                            </div>
-                                                                                            ` : ''}
-
+                            <div class="mb-3">
+                                <label for="video_link" class="fw-semibold">Video Link</label>
+                                <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
+                                        <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
+                                            style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
+                                            class="card-img-top" alt="YouTube Thumbnail">
+                                    </a></p>
+                            </div>
+                            ` : ''}
                 <div class="mb-3">
                     <label for="status" class="fw-semibold">Status</label>
                     <p>${response.is_approved == 1 ? 'Published' : 'Draft'}</p>
@@ -375,8 +390,6 @@
                     <label for="students" class="fw-semibold">Peserta</label>
                     <p>${response.students}</p>
                 </div>
-
-
             </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -425,8 +438,6 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-
 
     @if (Auth::user()->role == 'student')
         <script>
@@ -510,6 +521,51 @@
             minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
             placeholder: 'Pilih siswanya',
             allowClear: true
+        });
+    </script>
+
+    <script>
+        $('#createData').on('shown.bs.modal', function(e) {
+            $('.main-content .select2').select2({
+                ajax: {
+                    url: '/get-students', // URL endpoint Anda untuk mengambil data sekolah
+                    dataType: 'json',
+                    delay: 250,
+                    processResults: function(data) {
+                        return {
+                            results: data.map(item => ({
+                                id: item.id,
+                                text: item.name
+                            }))
+                        };
+                    },
+                    cache: true
+                },
+                dropdownParent: $("#createData .modal-content"),
+                minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
+                placeholder: 'Pilih siswa',
+                allowClear: true
+            });
+            $('.main-content .select1').select2({
+                ajax: {
+                    url: '/get-students', // URL endpoint Anda untuk mengambil data siswa
+                    dataType: 'json',
+                    delay: 250,
+                    processResults: function(data) {
+                        return {
+                            results: data.map(item => ({
+                                id: item.id,
+                                text: item.name
+                            }))
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 3, // Pengguna harus mengetik minimal 3 karakter sebelum data dimuat
+                placeholder: 'Pilih siswa',
+                dropdownParent: $("#createData .modal-content"),
+                allowClear: true
+            });
         });
     </script>
 @endsection

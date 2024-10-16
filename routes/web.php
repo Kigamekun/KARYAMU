@@ -18,23 +18,23 @@ Route::get('/', function () {
         if (isset($_GET['sort'])) {
             $sort = $_GET['sort'];
             if ($sort == 'desc') {
-                $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->orderBy('likes', 'DESC')->paginate(12)->appends(request()->query());
+                $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->orderBy('likes', 'DESC')->orderBy('id', 'DESC')->paginate(12)->appends(request()->query());
             } else {
-                $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->orderBy('likes', 'ASC')->paginate(12)->appends(request()->query());
+                $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->orderBy('likes', 'ASC')->orderBy('id', 'DESC')->paginate(12)->appends(request()->query());
             }
         } else {
-            $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->paginate(12)->appends(request()->query());
+            $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->orderBy('likes', 'DESC')->orderBy('id', 'DESC')->paginate(12)->appends(request()->query());
         }
     } else {
         if (isset($_GET['sort'])) {
             $sort = $_GET['sort'];
             if ($sort == 'desc') {
-                $data = Artwork::where('is_approved', 1)->orderBy('likes', 'DESC')->paginate(12)->appends(request()->query());
+                $data = Artwork::where('is_approved', 1)->orderBy('likes', 'DESC')->orderBy('id', 'DESC')->paginate(12)->appends(request()->query());
             } else {
-                $data = Artwork::where('is_approved', 1)->orderBy('likes', 'ASC')->paginate(12)->appends(request()->query());
+                $data = Artwork::where('is_approved', 1)->orderBy('likes', 'ASC')->orderBy('id', 'DESC')->paginate(12)->appends(request()->query());
             }
         } else {
-            $data = Artwork::where('is_approved', 1)->paginate(12)->appends(request()->query());
+            $data = Artwork::where('is_approved', 1)->orderBy('likes', 'DESC')->orderBy('id', 'DESC')->paginate(12)->appends(request()->query());
         }
     }
 
@@ -92,7 +92,7 @@ Route::get('/trainings/impact/{teacherId}', [TrainingController::class, 'showImp
 
 Route::get('/generate-register-link', [UserController::class, 'createLinkRegisterGuru'])->name('generate.register.link');
 
-Route::match(['GET','POST'],'/register-sekolah', [SchoolController::class, 'registerSekolah'])->name('register.sekolah');
+Route::match(['GET', 'POST'], '/register-sekolah', [SchoolController::class, 'registerSekolah'])->name('register.sekolah');
 Route::get('/register-guru', [UserController::class, 'showRegisterGuru'])->name('register.guru');
 Route::post('/create-guru', [UserController::class, 'createGuru'])->name('register.create-guru');
 
@@ -225,16 +225,9 @@ Route::middleware(['auth', 'verified', 'check.school.data'])->group(function () 
 });
 
 Route::get('/foo', function () {
-    $target = '/home/xehxhfvs/laravel/storage/app/public'; // Lokasi storage
-    $link = '/home/xehxhfvs/public_html/storage'; // Lokasi tujuan symlink
 
-    if (file_exists($link)) {
-        unlink($link);
-    }
+    \Artisan::call('optimize:clear');
 
-    symlink($target, $link);
-
-    return response()->json(['message' => 'Symbolic link created successfully']);
 });
 
 require __DIR__ . '/auth.php';

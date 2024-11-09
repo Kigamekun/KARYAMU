@@ -1,11 +1,11 @@
 {{-- <x-guest-layout>
     <div class="mb-4 text-sm text-gray-600">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
+        {{ __('Terima kasih telah mendaftar! Sebelum memulai, bisakah Anda memverifikasi alamat email Anda dengan mengeklik tautan yang baru saja kami kirimkan melalui email kepada Anda? Jika Anda tidak menerima email tersebut, kami dengan senang hati akan mengirimkan email lainnya.') }}
     </div>
 
     @if (session('status') == 'verification-link-sent')
         <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+            {{ __('Tautan verifikasi baru telah dikirim ke alamat email yang Anda berikan saat pendaftaran.') }}
         </div>
     @endif
 
@@ -66,7 +66,7 @@
                     <h1>Verifikasi Email</h1>
                     @if (session('status') == 'verification-link-sent')
                         <div class="mb-4 mt-4 font-medium text-sm text-success">
-                            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+                            {{ __('Tautan verifikasi baru telah dikirim ke alamat email yang Anda berikan saat pendaftaran.') }}
                         </div>
                     @endif
                     <p class="mt-3 text-justify" style="text-align: justify">Terima kasih telah mendaftar! Sebelum

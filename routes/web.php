@@ -146,7 +146,12 @@ Route::get('/dashboard', function () {
         $teacher_id = Auth::user()->teacher->id;
 
         $totalTeachers = Teacher::count();
-        $pelatihan = Training::where('trainer_teacher_id', $teacher_id)->first();
+        $pelatihan = Training::where('trainer_teacher_id', $teacher_id)
+        ->whereHas('teacherTrainings', function ($query) {
+            $query->where('role', 'instructor');
+        })
+        ->first();
+
 
         if (!is_null($pelatihan)) {
             $maxLevel = 1; // Initialize the max level

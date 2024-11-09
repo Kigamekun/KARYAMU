@@ -43,7 +43,59 @@
             }
         }
 
-        @import url('https://fonts.googleapis.com/css2?family=Cerebri+Sans:wght@700&family=Gordita:wght@700&family=Open+Sans:wght@400&display=swap');
+        /*@import url('https://fonts.googleapis.com/css2?family=Cerebri+Sans:wght@700&family=Gordita:wght@700&family=Open+Sans:wght@400&display=swap');*/
+        
+         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&display=swap');
+         
+        @font-face {
+    font-family: 'Gordita';
+    src: url('/assets/fonts/Gordita-Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Gordita';
+    src: url('/assets/fonts/Gordita-BlackItalic.otf') format('opentype');
+    font-weight: 900;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Gordita';
+    src: url('/assets/fonts/Gordita-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Gordita';
+    src: url('/assets/fonts/Gordita-BoldItalic.otf') format('opentype');
+    font-weight: 700;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Gordita';
+    src: url('/assets/fonts/Gordita-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Gordita';
+    src: url('/assets/fonts/Gordita-RegularItalic.otf') format('opentype');
+    font-weight: 400;
+    font-style: italic;
+}
+
+
+@font-face {
+    font-family: 'Cerebri Sans';
+    src: url('/assets/fonts/Cerebri-Sans-Bold.ttf') format('opentype');
+}
+
+
 
         /* Base Styles */
         body {
@@ -65,7 +117,7 @@
         h4,
         h5,
         h6 {
-            font-family: 'Gordita', sans-serif;
+            font-family: 'Gordita';
             font-weight: bold;
             margin-bottom: 1rem;
         }

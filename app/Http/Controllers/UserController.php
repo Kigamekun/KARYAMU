@@ -18,6 +18,8 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\ArtworkStudent;
 use App\Models\Artwork;
+use App\Models\Training;
+use App\Models\TeacherTraining;
 
 
 class UserController extends Controller
@@ -324,7 +326,16 @@ class UserController extends Controller
             'expires_at' => $expiresAt
         ]));
 
-        $url = route('register.guru', ['data' => $encryptedData]);
+
+        if (Auth::user()->role == 'admin') {
+            $url = route('register.guru', ['data' => $encryptedData]);
+
+        } else {
+            $id_encrpt = Crypt::encrypt(Auth::user()->teacher->id);
+
+            $url = route('register.guru', ['data' => $encryptedData, 'fr' => $id_encrpt]);
+
+        }
 
         return response()->json(['url' => $url]);
     }
@@ -352,35 +363,122 @@ class UserController extends Controller
 
     public function createGuru(Request $request)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'confirmed'],
-            'nip' => 'required',
-            'school_id' => 'required',
-        ]);
+        if (isset($request->fr)) {
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'username' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+                'password' => ['required', 'confirmed'],
+                'nip' => ['required', 'unique:' . Teacher::class],
+                'school_id' => 'required',
+            ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'teacher',
-        ]);
+            $user = User::create([
+                'name' => $request->name,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'teacher',
+            ]);
 
-        Teacher::create([
-            'name' => $request->name,
-            'nip' => $request->nip,
-            'school_id' => $request->school_id,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'user_id' => $user->id,
-        ]);
+            $teacher = Teacher::create([
+                'name' => $request->name,
+                'nip' => $request->nip,
+                'school_id' => $request->school_id,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'user_id' => $user->id,
+            ]);
 
-        event(new Registered($user));
 
-        Auth::login($user);
+            $trainer_id = Crypt::decrypt($request->fr);
+
+            if (!DB::table('teacher_trainings')->where('teacher_id', $trainer_id)->where('role', 'instructor')->exists()) {
+                $original_training = DB::table('teacher_trainings')->where('teacher_id', $trainer_id)->first();
+
+
+
+
+
+
+
+
+                $training = Training::create([
+                    'description' => "Training Guru Mandiri",
+                    'trainer_teacher_id' => $trainer_id,
+                ]);
+
+                TeacherTraining::create([
+                    'training_id' => $training->id,
+                    'teacher_id' => $trainer_id,
+                    'role' => 'instructor',
+                    'original_training_id' => $original_training->training_id,
+                    'parent_id' => $original_training->training_id,
+                ]);
+
+                TeacherTraining::create([
+                    'training_id' => $training->id,
+                    'teacher_id' => $teacher->id,
+                    'role' => 'participant',
+                    'influenced_by' => $trainer_id,
+                    'original_training_id' => $original_training->training_id,
+                    'parent_id' => $original_training->training_id,
+                ]);
+            } else {
+                $original_training = DB::table('teacher_trainings')->where('teacher_id', $trainer_id)->first();
+                $teacher_training = DB::table('teacher_trainings')->where('teacher_id', $trainer_id)->where('role', 'instructor')->first();
+                TeacherTraining::create([
+                    'training_id' => $teacher_training->training_id,
+                    'teacher_id' => $teacher->id,
+                    'role' => 'participant',
+                    'original_training_id' => $original_training->training_id,
+                    'parent_id' => $teacher_training->training_id,
+                ]);
+            }
+            event(new Registered($user));
+            Auth::login($user);
+        } else {
+            $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'username' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+                'password' => ['required', 'confirmed'],
+                'nip' => ['required', 'unique:' . Teacher::class],
+                'school_id' => 'required',
+            ]);
+
+            $user = User::create([
+                'name' => $request->name,
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'teacher',
+            ]);
+
+            $teacher = Teacher::create([
+                'name' => $request->name,
+                'nip' => $request->nip,
+                'school_id' => $request->school_id,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'user_id' => $user->id,
+            ]);
+
+            $training = Training::create([
+                'description' => "Training Mandiri",
+                'trainer_teacher_id' => $teacher->id,
+            ]);
+
+            TeacherTraining::create([
+                'training_id' => $training->id,
+                'teacher_id' => $teacher->id,
+                'role' => 'participant',
+                'influenced_by' => $teacher->id,
+            ]);
+            event(new Registered($user));
+
+            Auth::login($user);
+        }
 
         return redirect(route('dashboard', absolute: false));
     }

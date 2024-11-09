@@ -45,9 +45,9 @@
 <body>
     <div class="container">
         <h2>Verifikasi Akun Anda</h2>
-        <p>Halo ! Terima kasih telah mendaftar di aplikasi kami.</p>
+        <p>Halo, {{ $user->name }}! Terima kasih telah mendaftar di aplikasi kami.</p>
         <p>Silakan klik tombol di bawah ini untuk memverifikasi akun Anda:</p>
-        <a href="" class="button">Verifikasi Akun</a>
+        <a href="{{ $verificationUrl }}" class="button">Verifikasi Akun</a>
         <p class="footer">Jika Anda tidak mendaftar di aplikasi kami, abaikan email ini.</p>
     </div>
 </body>

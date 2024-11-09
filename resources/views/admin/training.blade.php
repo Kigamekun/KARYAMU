@@ -38,6 +38,10 @@
                                 Tambah Data
                             </button>
                         @endif
+
+                        @if (Auth::user()->role == 'teacher')
+                            <button class="btn btn-primary" id="generate-link-btn">Generate Register Link</button>
+                        @endif
                     </div>
                 </div>
                 <br>
@@ -413,4 +417,32 @@
             allowClear: true
         });
     </script>
+
+
+
+    @if (Auth::user()->role == 'teacher')
+        <script>
+            document.getElementById('generate-link-btn').addEventListener('click', function() {
+                // Send AJAX request to generate the register link
+                fetch('/generate-register-link')
+                    .then(response => response.json())
+                    .then(data => {
+                        const link = data.url;
+
+                        // Copy the link to the clipboard
+                        navigator.clipboard.writeText(link).then(() => {
+                            alert('Link has been copied to clipboard!');
+                        }).catch(err => {
+                            console.error('Failed to copy the text: ', err);
+                        });
+
+                        // Optional: Display the link on the page
+                        document.getElementById('link-output').textContent = link;
+                    })
+                    .catch(error => {
+                        console.error('Error generating the link:', error);
+                    });
+            });
+        </script>
+    @endif
 @endsection

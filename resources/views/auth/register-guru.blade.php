@@ -48,16 +48,17 @@
             }
 
             .card-body {
-                padding: 50px 100px 50px !important;
+                padding: 25px 50px 25px !important;
             }
         }
     </style>
+
     <div class="main-content" id="main-content"
         style="width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center;">
         <div class="card shadow" id="card-content" style="border: none;">
             <div class="card-body ">
                 <div class="d-flex justify-content-center align-items-start" style="flex-direction: column">
-                    <h1>Register</h1>
+                    <h1>Registrasi</h1>
                     <span>Masukan data untuk melakukan registrasi akun.</span>
                     <small id="emailHelp" class="form-text text-muted">Field dengan tanda <span
                             class="text-danger">*</span> wajib diisi.</small>
@@ -66,10 +67,14 @@
                 <br>
                 <form method="POST" action="{{ route('register.create-guru') }}">
                     @csrf
+                    @if (isset($_GET['fr']))
+                        <input type="hidden" name="fr" value="{{ $_GET['fr'] }}">
+                    @endif
+
                     <div class="col mb-3">
-                        <label for="name" class="form-label">Name<span class="ms-1 text-danger">*</span></label>
-                        <input type="text" class="form-control" id="name" value="{{ old('name') }}"
-                            name="name" required>
+                        <label for="name" class="form-label">Nama<span class="ms-1 text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name"
+                            value="{{ old('name') }}" required>
                     </div>
                     <div class="row">
                         <div class="col mb-3">
@@ -116,14 +121,14 @@
                     </div>
                     <div class="row">
                         <div class="mb-3 col">
-                            <label for="nip" class="form-label">NIP<span class="ms-1 text-danger">*</span></label>
+                            <label for="nip" class="form-label">NIK<span class="ms-1 text-danger">*</span></label>
                             <input type="text" class="form-control" id="nip" name="nip"
                                 value="{{ old('nip') }}" required>
                         </div>
                         <div class="mb-3 col">
-                            <label for="school_id" class="form-label
-                                ">Sekolah <span
-                                    class="ms-1 text-danger">*</span></label>
+                            <label for="school_id" class="form-label">
+                                Sekolah <span class="ms-1 text-danger">*</span>
+                            </label>
                             <select class="form-select" id="school_id" name="school_id" required>
                                 <option value="" {{ old('school_id') == '' ? 'selected' : '' }}>Pilih Sekolah
                                 </option>
@@ -134,39 +139,37 @@
                                     </option>
                                 @endforeach --}}
                             </select>
-
                         </div>
+
                     </div>
                     <div class="mb-3">
-                        <label for="address" class="form-label">Address</label>
+                        <label for="address" class="form-label">Alamat<span
+                                class="ms-1 text-danger">*</span></label>
                         <textarea name="address" class="form-control" id="address" cols="30" rows="2">{{ old('address') }}</textarea>
+
                     </div>
                     <div class="mb-3">
-                        <label for="phone" class="form-label">Phone</label>
+                        <label for="phone" class="form-label">No Telephone<span
+                                class="ms-1 text-danger">*</span></label>
                         <input type="text" class="form-control" id="phone" value="{{ old('phone') }}"
                             name="phone">
                     </div>
-                    <div class="mb-3 mt-3 d-flex justify-content-between">
-                        <div class="form-check
-                        ">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                Remember me
-                            </label>
-                        </div>
-                        @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" style="text-decoration:none">
-                                <p style="color:#0097FF;">Forgot Password?</p>
-                            </a>
-                        @endif
-                    </div>
                     <div class="d-grid gap-2">
-                        <button type="submit" style="border-radius:15px;background:#0097FF;border:none"
-                            class="p-3 btn btn-primary">Register</button>
+                        <button type="submit" style="border-radius:15px;background:#19459D;border:none"
+                            class="p-3 btn btn-primary">Registrasi</button>
                     </div>
+
+                    <center>
+                        <p class="mt-4">Sudah memiliki Akun ? <a style="color:#19459D;text-decoration:none;"
+                                href="/login">Masuk</a></p>
+                        <p class="mt-1">Data Sekolah belum terdaftar ? <a
+                                style="color:#19459D;text-decoration:none;" href="/register-sekolah">Registrasi
+                                Sekolah</a></p>
+                    </center>
                 </form>
             </div>
         </div>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
         </script>

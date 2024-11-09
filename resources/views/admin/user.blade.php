@@ -137,10 +137,10 @@
                         </div>
                         <div id="teacher" class="d-none">
                             <div class="mb-3">
-                                <label for="nip" class="fw-semibold">NIP<span
+                                <label for="nip" class="fw-semibold">NIK<span
                                         class="ml-1 text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nip" name="nip"
-                                    placeholder="Masukan NIP">
+                                    placeholder="Masukan NIK">
                                 <x-input-error :messages="$errors->get('nip')" class="mt-2" />
                             </div>
                             <div class="mb-3">
@@ -384,10 +384,10 @@
                                 </div>
                                 <div id="teacher-edit" class="d-none">
                                     <div class="mb-3">
-                                        <label for="nip" class="fw-semibold">NIP<span
+                                        <label for="nip" class="fw-semibold">NIK<span
                                             class="ml-1 text-danger">*</span></label>
                                         <input type="text" class="form-control" id="nip" name="nip"
-                                            placeholder="Masukan NIP" value="${$(e.relatedTarget).data('nip')}" >
+                                            placeholder="Masukan NIK" value="${$(e.relatedTarget).data('nip')}" >
                                         <x-input-error :messages="$errors->get('nip')" class="mt-2" />
                                     </div>
                                     <div class="mb-3">
@@ -562,10 +562,10 @@
                                 </div>
                                 <div id="teacher-edit" class="d-none">
                                     <div class="mb-3">
-                                        <label for="nip" class="fw-semibold">NIP<span
+                                        <label for="nip" class="fw-semibold">NIK<span
                                             class="ml-1 text-danger">*</span></label>
                                         <input type="text" class="form-control" id="nip" name="nip"
-                                            placeholder="Masukan NIP" value="${$(e.relatedTarget).data('nip')}" >
+                                            placeholder="Masukan NIK" value="${$(e.relatedTarget).data('nip')}" >
                                         <x-input-error :messages="$errors->get('nip')" class="mt-2" />
                                     </div>
                                     <div class="mb-3">

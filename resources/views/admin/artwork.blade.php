@@ -373,15 +373,15 @@
                 </div>
                 ${response.type == 'image' ? ` <div class="mb-3"><label for="video_link" class="fw-semibold">Video Link</label><p><img src="storage/artwork/${response.file_path}" alt="${response.title}" style="width: 100%;border-radius:15px"></p></div>` : ''}
                 ${response.type == 'video' ? `
-                            <div class="mb-3">
-                                <label for="video_link" class="fw-semibold">Video Link</label>
-                                <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
-                                        <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
-                                            style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
-                                            class="card-img-top" alt="YouTube Thumbnail">
-                                    </a></p>
-                            </div>
-                            ` : ''}
+                                <div class="mb-3">
+                                    <label for="video_link" class="fw-semibold">Video Link</label>
+                                    <p> <a href="https://www.youtube.com/watch?v=${response.video_id}" target="_blank">
+                                            <img src="https://img.youtube.com/vi/${response.video_id}/hqdefault.jpg"
+                                                style="border-top-left-radius:15px;border-top-right-radius:15px;height:300px;object-fit:cover;"
+                                                class="card-img-top" alt="YouTube Thumbnail">
+                                        </a></p>
+                                </div>
+                                ` : ''}
                 <div class="mb-3">
                     <label for="status" class="fw-semibold">Status</label>
                     <p>${response.is_approved == 1 ? 'Published' : 'Draft'}</p>

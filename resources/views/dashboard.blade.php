@@ -161,7 +161,7 @@
                                             </div>
                                         </div>
                                         <h1 style="font-size: 50px">
-                                            {{ count($impactedTeachers) }} <span style="font-size: 10px">Guru
+                                            {{ count($impactedTeachers) - 1}} <span style="font-size: 10px">Guru
                                                 Terimbas</span>
                                         </h1>
                                     </div>

@@ -16,5 +16,5 @@ class NotificationController extends Controller
             ->update(['is_read' => 1]);
 
         return redirect()->back()->with(['message' => 'Notifikasi telah dibaca semua', 'status' => 'success']);
-        }
+    }
 }

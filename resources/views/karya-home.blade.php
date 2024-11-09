@@ -86,42 +86,67 @@
                         ">Penyaring</h5>
                         <br>
                         <form action="{{ route('karya-home.filter') }}" method="GET">
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" name="search" placeholder="Search"
-                                    aria-label="Search" aria-describedby="button-addon2">
-                            </div>
                             <div class="accordion w-100" id="accordionExample">
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingOne">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                            Penyaring Berdasarkan
-                                        </button>
-                                    </h2>
-                                    <div id="collapseOne" class="accordion-collapse collapse show"
-                                        aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                                        <div class="accordion-body">
-                                            <h6>Sekolah</h6>
-                                            <select id="selectElement" class="w-100 mb-2 " name="schools[]" multiple>
-                                            </select>
-                                            <br>
-                                            <br>
-                                            <h6>Tipe</h6>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="type[]"
-                                                    value="image" id="flexCheckDefault" checked>
-                                                <label class="form-check-label" for="flexCheckDefault">Gambar</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="type[]"
-                                                    value="video" id="flexCheckChecked" checked>
-                                                <label class="form-check-label" for="flexCheckChecked">Video</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary mt-3 w-100">Saring</button>
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Penyaring Berdasarkan
+            </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show"
+            aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <h6>Sekolah</h6>
+                
+                @php
+                    if(isset($_GET['schools'])){
+                    $schools = $schools = DB::table('schools')
+            ->whereIn('id', $_GET['schools'])
+            ->get();
+           
+                    } else {
+                    $schools = [];
+                    }
+                @endphp
+              
+                <select id="selectElement" class="w-100 mb-2" name="schools[]" multiple>
+                </select>
+
+                <br><br>
+
+                <h6>Category</h6>
+                @foreach(DB::table('categories')->get() as $ct)
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categories[]"
+                        value="{{ $ct->id }}" id="flexCheckDefault_{{ $ct->id }}"
+                        {{ in_array($ct->id, old('categories', request()->categories ?? [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="flexCheckDefault_{{ $ct->id }}">
+                        {{$ct->name}}
+                    </label>
+                </div>
+                @endforeach
+                <br>
+
+                <h6>Tipe</h6>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type[]"
+                        value="image" id="flexCheckDefaultImage"
+                        {{ in_array('image', old('type', request()->type ?? [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="flexCheckDefaultImage">Gambar</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="type[]"
+                        value="video" id="flexCheckDefaultVideo"
+                        {{ in_array('video', old('type', request()->type ?? [])) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="flexCheckDefaultVideo">Video</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<button type="submit" class="btn btn-primary mt-3 w-100">Saring</button>
+
                         </form>
                     </div>
                 </div>
@@ -133,11 +158,11 @@
                         <div>
                             @if (!isset($_GET['sort']) or $_GET['sort'] == 'desc')
                                 <button onclick="sortAddParams('asc')" class="btn btn-primary">
-                                    <i class="fa-solid fa-arrow-down-wide-short"></i> Urutkan Secara Menaik
+                                    <i class="fa-solid fa-arrow-down-wide-short"></i> Urutkan Like Secara Menaik
                                 </button>
                             @else
                                 <button onclick="sortAddParams('desc')" class="btn btn-primary">
-                                    <i class="fa-solid fa-arrow-down-short-wide"></i> Urutkan Secara Menurun
+                                    <i class="fa-solid fa-arrow-down-short-wide"></i> Urutkan Like Secara Menurun
                                 </button>
                             @endif
                             <button onclick="resetParams()" class="btn btn-primary">
@@ -213,6 +238,16 @@
             placeholder: 'Pilih sekolah',
             allowClear: true
         });
+        
+        var selectedSchools = @json($schools);
+        
+         if (selectedSchools.length > 0) {
+        selectedSchools.forEach(function(school) {
+            var option = new Option(school.name, school.id, true, true);
+            $('#selectElement').append(option).trigger('change');
+        });
+    }
+        
 
         function sortAddParams(sort) {
             let url = new URL(window.location.href);

@@ -89,6 +89,7 @@ class ArtworkController extends Controller
 
     public function filterHome(Request $request)
     {
+
         if (isset($_GET['provinsi'])) {
             $provinceId = Province::where('name', $_GET['provinsi'])->first()->id;
             $school = School::join('master_subdistrict', 'schools.subdistrict_code', '=', 'master_subdistrict.code')
@@ -100,7 +101,7 @@ class ArtworkController extends Controller
                 ->toArray();
             $data = Artwork::where('is_approved', 1)->whereIn('school_id', $school)->paginate(12);
 
-        } else if (isset($_GET['search'])) {
+        } else if (isset($_GET['search']) || isset($_GET['schools']) || isset($_GET['type']) || isset($_GET['categories'])) {
 
             $query = Artwork::query();
             if (isset($_GET['search'])) {
@@ -114,6 +115,14 @@ class ArtworkController extends Controller
             if (isset($_GET['type'])) {
                 $query->whereIn('type', $_GET['type']);
             }
+
+
+
+            if (isset($_GET['categories'])) {
+
+                $query->whereIn('category_id', $_GET['categories']);
+            }
+
 
             $data = $query->paginate(12);
 
@@ -492,9 +501,14 @@ class ArtworkController extends Controller
 
     public function filter(Request $request)
     {
+
         $search = $request->input('search');
         $selectedSchools = $request->input('schools');
         $types = $request->input('type');
+
+        $categories = $request->input('categories');
+
+
 
         $query = Artwork::query();
         if ($search) {
@@ -507,6 +521,10 @@ class ArtworkController extends Controller
 
         if ($types) {
             $query->whereIn('type', $types);
+        }
+
+        if ($categories) {
+            $query->whereIn('category_id', $categories);
         }
 
         $karyas = $query->paginate(12)->appends(request()->query());
